@@ -1,0 +1,13 @@
+# 一時ファイル（ダウンロードしたzip、サーバログ等）
+tmp/
+
+# セッションログ・補助スクリプト（会話ログを含むため公開しない）
+etc/
+
+# ローカル設定
+.claude/
+
+# llama.cpp の配布バイナリ
+# NVIDIA の CUDA 再頒布DLL を含み、100MB を超えるファイルもあるため管理対象外。
+# 取得手順は docs/plan/local-llm-plan.html の第8章 Step 1 を参照。
+bin/

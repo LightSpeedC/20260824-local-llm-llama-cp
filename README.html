@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ローカルLLM 実行環境</title>
+<style>
+:root{
+	--navy1:#12224d;
+	--navy2:#2f5fbf;
+	--ink:#1c2330;
+	--ink-soft:#4a5568;
+	--line:#d9dfe8;
+	--code-bg:#f4f6fa;
+	--accent:var(--navy1);
+	--accent2:var(--navy2);
+	--soft:#f2f5fb;
+}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,65%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,65%);--soft:hsl(0,28%,95%);}
+
+*{box-sizing:border-box;}
+body{
+	margin:0;
+	background:#fff;
+	color:var(--ink);
+	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+	font-size:15.5px;
+	line-height:1.85;
+}
+.titlebar{
+	background:linear-gradient(135deg,var(--navy1),var(--navy2));
+	color:#fff;
+	padding:34px 30px 30px;
+}
+.titlebar .inner{max-width:1400px;margin:0 auto;}
+.titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
+.titlebar .meta{font-size:0.88em;color:#cfe0ff;}
+.titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+
+.wrap{max-width:1400px;margin:0 auto;padding:0 30px;}
+
+.minibar{
+	background:linear-gradient(100deg,var(--navy1),var(--navy2));
+	color:#fff;
+	font-size:1.15em;
+	font-weight:700;
+	padding:10px 20px;
+	border-radius:8px;
+	margin:34px 0 0;
+	box-shadow:0 3px 10px rgba(0,0,0,0.15);
+}
+
+section{
+	background:linear-gradient(180deg,var(--soft),#fff);
+	border:1px solid var(--line);
+	border-radius:10px;
+	padding:4px 26px 26px;
+	margin:16px 0 34px;
+}
+section h1{
+	background:linear-gradient(100deg,var(--accent),var(--accent2));
+	color:#fff;
+	font-size:1.45em;
+	padding:14px 20px;
+	margin:26px 0 20px;
+	border-radius:8px;
+	box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+h2{
+	font-size:1.15em;
+	border-left:6px solid var(--accent);
+	background:linear-gradient(90deg,var(--soft),#fff);
+	padding:6px 12px;
+	margin:30px 0 12px;
+	color:var(--accent);
+}
+p{margin:8px 0;}
+ul{margin:8px 0;padding-left:1.5em;}
+li{margin:4px 0;}
+
+code{
+	background:var(--code-bg);
+	border:1px solid var(--line);
+	color:#17335f;
+	border-radius:4px;
+	padding:1px 5px;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+}
+pre{
+	background:var(--code-bg);
+	color:var(--ink);
+	border:1px solid var(--line);
+	border-left:5px solid var(--accent2);
+	border-radius:0 8px 8px 0;
+	padding:13px 16px;
+	overflow-x:auto;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+	line-height:1.6;
+}
+pre code{background:none;border:none;padding:0;color:inherit;}
+
+.tablewrap{overflow-x:auto;margin:12px 0;}
+table{
+	border-collapse:collapse;
+	width:100%;
+	border-radius:8px;
+	overflow:hidden;
+	box-shadow:0 2px 7px rgba(0,0,0,0.09);
+	font-size:0.95em;
+}
+th{
+	background:linear-gradient(100deg,var(--accent),var(--accent2));
+	color:#fff;
+	text-align:left;
+	padding:9px 12px;
+}
+th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+tr:nth-child(even) td{background:#fafbfe;}
+.nowrap{white-space:nowrap;}
+
+.badge{
+	display:inline-block;
+	color:#fff;
+	font-size:0.8em;
+	font-weight:600;
+	border-radius:5px;
+	padding:2px 9px;
+	margin-right:7px;
+	white-space:nowrap;
+}
+.b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
+.b-non{background:linear-gradient(100deg,#5a6472,#97a1ae);}
+.b-warn{background:linear-gradient(100deg,#b8620a,#f0a548);}
+
+.callout{
+	border-left:6px solid var(--accent);
+	background:linear-gradient(180deg,var(--soft),#fff);
+	border-radius:0 8px 8px 0;
+	padding:12px 16px;
+	margin:16px 0;
+}
+.callout strong{color:var(--accent);}
+
+a{color:var(--navy2);}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+	<div class="inner">
+		<h1>ローカルLLM 実行環境</h1>
+		<div class="meta">
+			RTX 3050 Ti Laptop（VRAM 4GB）／RAM 16GB のノートPCで llama.cpp を動かす<br>
+			📅 作成: 2026-08-24 / 更新: 2026-08-25
+		</div>
+	</div>
+</div>
+
+<div class="wrap">
+
+<div class="minibar">プロジェクトの状況</div>
+
+<section class="ch01">
+<h1>このプロジェクトについて</h1>
+
+<p>
+手元のノートPCでローカルLLMを常用できる状態にする。
+実行基盤は <strong>llama.cpp</strong>、モデルは <code>C:\AI_Models</code> にある手持ちのGGUFを流用する方針。
+</p>
+
+<h2>現在の段階</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">段階</th><th>状態</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">計画</td><td><span class="badge b-ok">作成済み</span>下記の計画書にまとめてある</td></tr>
+<tr><td class="nowrap">モデルの棚卸し</td><td><span class="badge b-ok">完了</span>重複していた 12.6 GB を整理（98.5 → 86.0 GB）</td></tr>
+<tr><td class="nowrap">llama.cpp の配置</td><td><span class="badge b-ok">完了</span>b10612（CUDA 12.4）を <code>bin\llama.cpp\</code> に展開</td></tr>
+<tr><td class="nowrap">起動スクリプト</td><td><span class="badge b-ok">完了</span><code>scripts\</code> に4種類（常用・品質重視・9B・MoE）</td></tr>
+<tr><td class="nowrap">速度の実測</td><td><span class="badge b-ok">完了</span>下記のとおり。計画書の第10章に詳細</td></tr>
+<tr><td class="nowrap">品質の評価</td><td><span class="badge b-ok">完了</span>質問セットで Qwen3-4B と E4B を比較。用途による使い分けを確定</td></tr>
+<tr><td class="nowrap">Claude Code 接続</td><td><span class="badge b-non">未着手</span>API 動作は確認済み。接続先を <code>127.0.0.1:8080</code> に向け替えるだけ</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>環境</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">項目</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">GPU</td><td>NVIDIA GeForce RTX 3050 Ti Laptop（VRAM 4 GB）／ドライバ 592.82</td></tr>
+<tr><td class="nowrap">CPU / RAM</td><td>Intel Core i7-11370H（4コア8スレッド）／15.8 GB</td></tr>
+<tr><td class="nowrap">モデル置き場</td><td><code>C:\AI_Models</code>（LM Studio と共用・約 86.0 GB / 26ファイル）</td></tr>
+<tr><td class="nowrap">既存ツール</td><td>LM Studio 導入済み。Ollama はアンインストール済み</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>実測した生成速度</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">用途</th><th>モデルと設定</th><th class="nowrap">速度</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><span class="badge b-ok">対話・下書き</span></td><td class="nowrap"><strong>Qwen3-4B-Instruct-2507</strong> <code>-ngl 99 -c 8192</code></td><td class="nowrap">56.5 tok/s</td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">事実・コード</span></td><td class="nowrap"><strong>gemma-4-E4B-it</strong> <code>-ngl 99</code>（reasoning）</td><td class="nowrap">45.2 tok/s</td></tr>
+<tr><td class="nowrap"><span class="badge b-warn">用途限定</span></td><td class="nowrap">Qwen3.5-9B <code>-ngl 24</code> ＋KV量子化</td><td class="nowrap">8.1 tok/s</td></tr>
+<tr><td class="nowrap"><span class="badge b-warn">用途限定</span></td><td class="nowrap">gpt-oss-20b <code>--n-cpu-moe 18</code></td><td class="nowrap">5.9 tok/s</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout">
+<strong>速度で一本化しないこと。</strong>
+Qwen3-4B は 1〜2秒で返るが、「量子化とは」の説明で<strong>量子力学と混同した誤答</strong>を出した。
+日本語が自然なぶん気づきにくい。gemma-4-E4B は思考を経るため10秒前後かかるが、同じ問いに正確に答える。
+<strong>対話は 4B、事実確認とコードは E4B</strong> と用途で切り替える。
+</div>
+
+<div class="callout">
+<strong>予想外だったのは gemma-4-E4B。</strong>
+ファイルは 4.95 GiB で 9B クラス扱いだったが、Per-Layer Embeddings の 2730 MiB が CPU 側に分離されるため、
+GPU には 2868 MiB しか載らず <strong>4B クラスに近い速度で動く</strong>。
+サイズだけで仕分けると取りこぼすモデルがある。詳細は計画書の第10章。
+</div>
+
+<div class="callout">
+<strong>VRAM を超えても、エラーではなく「5〜40倍遅くなる」形で現れる。</strong>
+NVIDIAドライバが共有GPUメモリに逃がすため止まらない。
+<code>-ngl</code> の付けすぎと、コンテキスト 16384 の指定がこれを起こす。8192 を上限として運用する。
+</div>
+</section>
+
+<section class="ch02">
+<h1>ドキュメント</h1>
+
+<h2>計画</h2>
+<ul>
+	<li><a href="docs/plan/local-llm-plan.html"><strong>ローカルLLM 実行計画</strong></a>
+		— ソフトウェア選定（llama.cpp / Ollama / LM Studio）、配布バイナリと自前コンパイルの比較、
+		手持ちモデルの棚卸し、量子化とVRAM配分、最新量子化とMoEの検討、導入手順、検証計画</li>
+</ul>
+
+<h2>フォルダ構成</h2>
+<pre><code>20260824-local-llm-llama-cp/
+├─ README.html              … このファイル
+├─ bin/llama.cpp/           … b10612 (CUDA 12.4) 一式
+├─ scripts/
+│   ├─ run-server.cmd       … 常用 (Qwen3-4B)
+│   ├─ run-server-e4b.cmd   … 品質重視 (gemma-4-E4B)
+│   ├─ run-server-9b.cmd    … Qwen3.5-9B
+│   ├─ run-server-moe.cmd   … gpt-oss-20b (MoE)
+│   └─ bench.cmd            … 速度計測
+├─ docs/plan/               … 計画書
+├─ etc/                     … 補助スクリプト（git管理外）
+└─ tmp/                     … ダウンロードしたzip等（git管理外）
+
+C:\AI_Models\                … GGUF の実体（LM Studio と共用・移動しない）</code></pre>
+</section>
+
+</div>
+
+</body>
+</html>
