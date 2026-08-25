@@ -177,6 +177,19 @@ llama-server.exe ^
 > [!NOTE]
 > **実行前に、まずオプションの存在確認から始める。** `llama-server.exe --help` で `--model-draft` 系が実際に何という名前で用意されているかを確かめる。 ここが空振りなら、ドラフトモデルの取得は不要になる。
 
+### 参考資料
+
+#### 調査のきっかけ
+
+- [Qwen3.8-27Bにおすすめの推論エンジン](https://note.com/npaka/n/nef6d45dfe376) （npaka / 2026-08-23）— 第1章で引用した mlx-dspark・DFlash 2 の数値の出典
+
+#### 実装の確認先
+
+- [ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp) — `--model-draft` 系オプションの仕様。版によって名称が変わるため、 使用中のビルド（b10612）の `--help` を正とする
+
+> [!NOTE]
+> **第4章の見積りは推定値を含む。** ドラフトモデルのサイズ（約 410 MiB）と KV キャッシュ（約 300 MiB）は パラメータ数からの概算で、実測していない。本命モデルの 2376 MiB のみ計画書 第10章の実測値。
+
 ---
 
 ← [README に戻る](../../README.md)
