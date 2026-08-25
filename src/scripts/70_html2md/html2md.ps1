@@ -16,7 +16,9 @@ $ErrorActionPreference = 'Stop'
 # 変換対象（プロジェクトルートからの相対パス）
 $targets = @(
 	'README.html',
-	'docs\plan\local-llm-plan.html'
+	'docs\plan\local-llm-plan.html',
+	'docs\research\speculative-decoding.html',
+	'docs\research\hp-zgx-nano.html'
 )
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path

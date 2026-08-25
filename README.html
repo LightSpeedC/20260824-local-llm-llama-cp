@@ -243,7 +243,16 @@ NVIDIAドライバが共有GPUメモリに逃がすため止まらない。
 <ul>
 	<li><a href="docs/plan/local-llm-plan.html"><strong>ローカルLLM 実行計画</strong></a>
 		— ソフトウェア選定（llama.cpp / Ollama / LM Studio）、配布バイナリと自前コンパイルの比較、
-		手持ちモデルの棚卸し、量子化とVRAM配分、最新量子化とMoEの検討、導入手順、検証計画</li>
+		手持ちモデルの棚卸し、量子化とVRAM配分、最新量子化とMoEの検討、導入手順、検証計画、<strong>実測結果</strong></li>
+</ul>
+
+<h2>調査</h2>
+<ul>
+	<li><a href="docs/research/speculative-decoding.html"><strong>Speculative Decoding 調査</strong></a>
+		— 小さなドラフトモデルで先読みして生成を速める手法。VRAM 4GB で成立するかの事前検討。
+		<span class="badge b-non">検証は未実施</span></li>
+	<li><a href="docs/research/hp-zgx-nano.html"><strong>HP ZGX Nano G1n 調査</strong></a>
+		— 128GB 統合メモリの AI ワークステーション。容量と帯域の違い、他の選択肢との比較、判断材料の整理</li>
 </ul>
 
 <h2>フォルダ構成</h2>
@@ -256,7 +265,10 @@ NVIDIAドライバが共有GPUメモリに逃がすため止まらない。
 │   ├─ run-server-9b.cmd    … Qwen3.5-9B
 │   ├─ run-server-moe.cmd   … gpt-oss-20b (MoE)
 │   └─ bench.cmd            … 速度計測
-├─ docs/plan/               … 計画書
+├─ docs/
+│   ├─ plan/                … 計画書
+│   └─ research/            … 個別テーマの調査
+├─ src/scripts/70_html2md/  … HTML→Markdown 変換
 ├─ etc/                     … 補助スクリプト（git管理外）
 └─ tmp/                     … ダウンロードしたzip等（git管理外）
 

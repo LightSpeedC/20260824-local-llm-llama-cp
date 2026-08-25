@@ -52,7 +52,12 @@
 
 ### 計画
 
-- [**ローカルLLM 実行計画**](docs/plan/local-llm-plan.md) — ソフトウェア選定（llama.cpp / Ollama / LM Studio）、配布バイナリと自前コンパイルの比較、 手持ちモデルの棚卸し、量子化とVRAM配分、最新量子化とMoEの検討、導入手順、検証計画
+- [**ローカルLLM 実行計画**](docs/plan/local-llm-plan.md) — ソフトウェア選定（llama.cpp / Ollama / LM Studio）、配布バイナリと自前コンパイルの比較、 手持ちモデルの棚卸し、量子化とVRAM配分、最新量子化とMoEの検討、導入手順、検証計画、**実測結果**
+
+### 調査
+
+- [**Speculative Decoding 調査**](docs/research/speculative-decoding.md) — 小さなドラフトモデルで先読みして生成を速める手法。VRAM 4GB で成立するかの事前検討。 **⬜ 検証は未実施**
+- [**HP ZGX Nano G1n 調査**](docs/research/hp-zgx-nano.md) — 128GB 統合メモリの AI ワークステーション。容量と帯域の違い、他の選択肢との比較、判断材料の整理
 
 ### フォルダ構成
 
@@ -66,7 +71,10 @@
 │   ├─ run-server-9b.cmd    … Qwen3.5-9B
 │   ├─ run-server-moe.cmd   … gpt-oss-20b (MoE)
 │   └─ bench.cmd            … 速度計測
-├─ docs/plan/               … 計画書
+├─ docs/
+│   ├─ plan/                … 計画書
+│   └─ research/            … 個別テーマの調査
+├─ src/scripts/70_html2md/  … HTML→Markdown 変換
 ├─ etc/                     … 補助スクリプト（git管理外）
 └─ tmp/                     … ダウンロードしたzip等（git管理外）
 

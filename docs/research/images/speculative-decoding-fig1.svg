@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300" aria-label="通常の生成とSpeculative Decodingの比較">
+	<rect width="100%" height="100%" fill="#ffffff"/>
+	<defs>
+		<linearGradient id="g-spec-fig1-a" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(280,78%,25%)"/><stop offset="1" stop-color="hsl(280,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-spec-fig1-b" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(140,78%,25%)"/><stop offset="1" stop-color="hsl(140,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-spec-fig1-c" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(30,78%,25%)"/><stop offset="1" stop-color="hsl(30,58%,65%)"/>
+		</linearGradient>
+	</defs>
+
+	<text x="20" y="24" fill="#1c2330" font-size="15" font-weight="700">通常の生成 — 1トークンごとに本命モデル(4B)を1回読む</text>
+	<g>
+		<rect x="20" y="36" width="150" height="46" rx="6" fill="url(#g-spec-fig1-a)"/>
+		<text x="95" y="65" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">4B 読込</text>
+		<rect x="180" y="36" width="150" height="46" rx="6" fill="url(#g-spec-fig1-a)"/>
+		<text x="255" y="65" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">4B 読込</text>
+		<rect x="340" y="36" width="150" height="46" rx="6" fill="url(#g-spec-fig1-a)"/>
+		<text x="415" y="65" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">4B 読込</text>
+		<rect x="500" y="36" width="150" height="46" rx="6" fill="url(#g-spec-fig1-a)"/>
+		<text x="575" y="65" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">4B 読込</text>
+		<text x="670" y="65" fill="#4a5568" font-size="14">→ 4トークン分の時間</text>
+	</g>
+
+	<text x="20" y="120" fill="#1c2330" font-size="15" font-weight="700">Speculative Decoding — 小さなモデル(0.6B)が先読みし、本命が1回でまとめて検証する</text>
+	<g>
+		<rect x="20" y="132" width="38" height="46" rx="5" fill="url(#g-spec-fig1-b)"/>
+		<rect x="63" y="132" width="38" height="46" rx="5" fill="url(#g-spec-fig1-b)"/>
+		<rect x="106" y="132" width="38" height="46" rx="5" fill="url(#g-spec-fig1-b)"/>
+		<rect x="149" y="132" width="38" height="46" rx="5" fill="url(#g-spec-fig1-b)"/>
+		<text x="104" y="161" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">0.6B ×4</text>
+		<text x="104" y="198" fill="#4a5568" font-size="13" text-anchor="middle">先読み（軽い）</text>
+
+		<rect x="200" y="132" width="150" height="46" rx="6" fill="url(#g-spec-fig1-a)"/>
+		<text x="275" y="161" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">4B 読込 ×1</text>
+		<text x="275" y="198" fill="#4a5568" font-size="13" text-anchor="middle">4トークンまとめて検証</text>
+
+		<rect x="370" y="132" width="120" height="46" rx="6" fill="url(#g-spec-fig1-c)"/>
+		<text x="430" y="155" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">合った分だけ</text>
+		<text x="430" y="172" fill="#fff" font-size="13" text-anchor="middle">採用</text>
+		<text x="510" y="161" fill="#4a5568" font-size="14">→ 当たれば4トークンが1回分の時間で出る</text>
+	</g>
+
+	<text x="20" y="248" fill="#1c2330" font-size="14" font-weight="700">要点: 重みの読み出し回数を減らすのであって、計算を速くするのではない</text>
+	<text x="20" y="274" fill="#4a5568" font-size="13">→ 帯域に余裕がある環境ほど効く。使い切っている環境では効きにくい</text>
+</svg>

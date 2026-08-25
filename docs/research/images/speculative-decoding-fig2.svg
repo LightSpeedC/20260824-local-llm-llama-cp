@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="200" viewBox="0 0 900 200" aria-label="ドラフトモデル同居時のVRAM配分試算">
+	<rect width="100%" height="100%" fill="#ffffff"/>
+	<defs>
+		<linearGradient id="g-spec-fig2-a" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(70,78%,25%)"/><stop offset="1" stop-color="hsl(70,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-spec-fig2-b" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(180,78%,25%)"/><stop offset="1" stop-color="hsl(180,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-spec-fig2-c" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(230,78%,25%)"/><stop offset="1" stop-color="hsl(230,58%,65%)"/>
+		</linearGradient>
+	</defs>
+
+	<text x="20" y="24" fill="#4a5568" font-size="13">← 横幅全体が空き VRAM 3287 MiB →</text>
+	<rect x="20" y="36" width="860" height="60" rx="8" fill="#eef1f6" stroke="#d9dfe8"/>
+	<rect x="20" y="36" width="622" height="60" rx="8" fill="url(#g-spec-fig2-a)"/>
+	<text x="331" y="62" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">本命 Qwen3-4B  2376 MiB</text>
+	<text x="331" y="83" fill="#fff" font-size="13" text-anchor="middle">実測で確認済みの値</text>
+	<rect x="642" y="36" width="107" height="60" fill="url(#g-spec-fig2-b)"/>
+	<text x="695" y="62" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">ドラフト</text>
+	<text x="695" y="82" fill="#fff" font-size="13" text-anchor="middle">約 410 MiB</text>
+	<rect x="749" y="36" width="78" height="60" fill="url(#g-spec-fig2-c)"/>
+	<text x="788" y="62" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">KV×2</text>
+	<text x="788" y="82" fill="#fff" font-size="12" text-anchor="middle">約 300</text>
+	<text x="854" y="70" fill="#4a5568" font-size="12" text-anchor="middle">余</text>
+
+	<text x="20" y="130" fill="#1c2330" font-size="14">合計 約 3086 MiB ／ 空き 3287 MiB に対して <tspan font-weight="700">残り約 200 MiB</tspan></text>
+	<text x="20" y="156" fill="#a51f22" font-size="13" font-weight="700">この余裕では、コンテキストを伸ばすと超過する。-c 4096 程度に抑える前提になる</text>
+	<text x="20" y="180" fill="#4a5568" font-size="12">※ ドラフトのサイズと KV は推定値。実測で置き換える</text>
+</svg>

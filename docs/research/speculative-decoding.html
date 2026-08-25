@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speculative Decoding 調査</title>
+<style>
+:root{
+	--navy1:#12224d;
+	--navy2:#2f5fbf;
+	--ink:#1c2330;
+	--ink-soft:#4a5568;
+	--line:#d9dfe8;
+	--code-bg:#f4f6fa;
+	--accent:var(--navy1);
+	--accent2:var(--navy2);
+	--soft:#f2f5fb;
+}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,65%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(210,78%,25%);--accent2:hsl(210,58%,65%);--soft:hsl(210,28%,95%);}
+.ch03{--accent:hsl(140,78%,25%);--accent2:hsl(140,58%,65%);--soft:hsl(140,28%,95%);}
+.ch04{--accent:hsl(70,78%,25%);--accent2:hsl(70,58%,65%);--soft:hsl(70,28%,95%);}
+.ch05{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,65%);--soft:hsl(0,28%,95%);}
+
+*{box-sizing:border-box;}
+body{
+	margin:0;
+	background:#fff;
+	color:var(--ink);
+	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+	font-size:15.5px;
+	line-height:1.85;
+}
+.titlebar{
+	background:linear-gradient(135deg,var(--navy1),var(--navy2));
+	color:#fff;
+	padding:34px 30px 30px;
+}
+.titlebar .inner{max-width:1400px;margin:0 auto;}
+.titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
+.titlebar .meta{font-size:0.88em;color:#cfe0ff;}
+.titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+
+.wrap{max-width:1400px;margin:0 auto;padding:0 30px;}
+
+section{
+	background:linear-gradient(180deg,var(--soft),#fff);
+	border:1px solid var(--line);
+	border-radius:10px;
+	padding:4px 26px 26px;
+	margin:34px 0;
+}
+section h1{
+	background:linear-gradient(100deg,var(--accent),var(--accent2));
+	color:#fff;
+	font-size:1.45em;
+	padding:14px 20px;
+	margin:26px 0 20px;
+	border-radius:8px;
+	box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+h2{
+	font-size:1.15em;
+	border-left:6px solid var(--accent);
+	background:linear-gradient(90deg,var(--soft),#fff);
+	padding:6px 12px;
+	margin:30px 0 12px;
+	color:var(--accent);
+}
+h3{
+	font-size:1.02em;
+	display:inline-block;
+	border-bottom:2px dotted var(--accent2);
+	padding-bottom:3px;
+	margin:20px 0 8px;
+	color:var(--ink);
+}
+p{margin:8px 0;}
+ul,ol{margin:8px 0;padding-left:1.5em;}
+li{margin:4px 0;}
+
+code{
+	background:var(--code-bg);
+	border:1px solid var(--line);
+	color:#17335f;
+	border-radius:4px;
+	padding:1px 5px;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+}
+pre{
+	background:var(--code-bg);
+	color:var(--ink);
+	border:1px solid var(--line);
+	border-left:5px solid var(--accent2);
+	border-radius:0 8px 8px 0;
+	padding:13px 16px;
+	overflow-x:auto;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+	line-height:1.6;
+}
+pre code{background:none;border:none;padding:0;color:inherit;}
+
+.tablewrap{overflow-x:auto;margin:12px 0;}
+table{
+	border-collapse:collapse;
+	width:100%;
+	border-radius:8px;
+	overflow:hidden;
+	box-shadow:0 2px 7px rgba(0,0,0,0.09);
+	font-size:0.95em;
+}
+th{
+	background:linear-gradient(100deg,var(--accent),var(--accent2));
+	color:#fff;
+	text-align:left;
+	padding:9px 12px;
+}
+th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+tr:nth-child(even) td{background:#fafbfe;}
+.nowrap{white-space:nowrap;}
+.num{text-align:right;white-space:nowrap;}
+
+.badge{
+	display:inline-block;
+	color:#fff;
+	font-size:0.8em;
+	font-weight:600;
+	border-radius:5px;
+	padding:2px 9px;
+	margin-right:7px;
+	white-space:nowrap;
+}
+.b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
+.b-ng{background:linear-gradient(100deg,#a51f22,#e05a5c);}
+.b-non{background:linear-gradient(100deg,#5a6472,#97a1ae);}
+.b-warn{background:linear-gradient(100deg,#b8620a,#f0a548);}
+
+.callout{
+	border-left:6px solid var(--accent);
+	background:linear-gradient(180deg,var(--soft),#fff);
+	border-radius:0 8px 8px 0;
+	padding:12px 16px;
+	margin:16px 0;
+}
+.callout strong{color:var(--accent);}
+
+.toc{
+	background:linear-gradient(180deg,#f2f5fb,#fff);
+	border:1px solid var(--line);
+	border-radius:10px;
+	padding:6px 26px 22px;
+	margin:34px 0;
+}
+.toc ol{
+	list-style:none;
+	display:flex;
+	flex-wrap:wrap;
+	gap:8px;
+	padding:0;
+	margin:12px 0 0;
+	counter-reset:toc;
+}
+.toc li{counter-increment:toc;margin:0;}
+.toc a{
+	display:-webkit-box;
+	-webkit-line-clamp:2;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:normal;
+	width:310px;
+	max-width:100%;
+	background:linear-gradient(100deg,var(--accent),var(--accent2));
+	color:#fff;
+	text-decoration:none;
+	border-radius:7px;
+	padding:8px 12px;
+	font-size:0.92em;
+	line-height:1.4;
+}
+.toc a::before{content:counter(toc) ". ";font-weight:700;}
+
+svg{max-width:100%;height:auto;display:block;margin:16px 0;}
+
+.backlink{margin:20px 0 0;font-size:0.95em;}
+.backlink a{color:var(--navy2);}
+footer{
+	max-width:1400px;
+	margin:0 auto;
+	padding:18px 30px 0;
+	border-top:1px solid var(--line);
+	color:var(--ink-soft);
+	font-size:0.9em;
+	margin-top:40px;
+	margin-bottom:40px;
+}
+footer a{color:var(--navy2);}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+	<div class="inner">
+		<h1>Speculative Decoding 調査</h1>
+		<div class="meta">
+			小さなドラフトモデルで先読みして生成を速める手法が、VRAM 4GB の本PCで成立するかを検討する<br>
+			📅 作成: 2026-08-25 / 更新: 2026-08-25
+		</div>
+	</div>
+</div>
+
+<div class="wrap">
+
+<p class="backlink">← <a href="../../README.html">README に戻る</a></p>
+
+<div class="toc">
+	<h2 style="border-left-color:var(--navy1);color:var(--navy1);">目次</h2>
+	<ol>
+		<li class="ch01"><a href="#ch01">調査のきっかけと結論</a></li>
+		<li class="ch02"><a href="#ch02">仕組み — なぜ速くなるのか</a></li>
+		<li class="ch03"><a href="#ch03">llama.cpp での使い方</a></li>
+		<li class="ch04"><a href="#ch04">このPCで成立するか — VRAM の見積り</a></li>
+		<li class="ch05"><a href="#ch05">検証計画</a></li>
+	</ol>
+</div>
+
+<h2 style="border-left-color:var(--navy1);color:var(--navy1);">この文書の位置づけ</h2>
+<p>
+<a href="../plan/local-llm-plan.html">ローカルLLM 実行計画</a>の実測（第10章）で、Qwen3-4B は 56.5 tok/s に到達した。
+これはGPUのメモリ帯域が決める上限に近い。<strong>帯域を増やさずに、さらに速くする手段はあるか</strong>——
+その問いに対する候補が Speculative Decoding である。本書はその成立可能性を検討する。実行はまだしていない。
+</p>
+
+<!-- ============ 1 ============ -->
+<section class="ch01" id="ch01">
+<h1>調査のきっかけと結論</h1>
+
+<h2>きっかけ</h2>
+<p>
+npaka 氏の記事「Qwen3.8-27Bにおすすめの推論エンジン」（2026-08-23）で、
+Speculative Decoding による高速化が目玉として紹介されていた。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>手法</th><th class="nowrap">環境</th><th class="nowrap">効果</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">mlx-dspark</td><td class="nowrap">M4 Pro / 8bit</td><td class="nowrap">8.3 → 20.3 tok/s（<strong>2.45倍</strong>）</td></tr>
+<tr><td class="nowrap">DFlash 2</td><td class="nowrap">H200 / SGLang</td><td class="nowrap">GSM8K <strong>3.43倍</strong>、MATH-500 3.34倍</td></tr>
+</tbody>
+</table>
+</div>
+<p>
+ただし記事が扱っていた実装は<strong>いずれも本PCでは使えない</strong>。
+mlx-dspark は Apple Silicon 専用、DFlash 2 は SGLang（NVIDIA の大容量GPU向け）専用である。
+記事の想定環境も最小で VRAM 24GB と、本PCの6倍以上を前提にしている。
+</p>
+<p>
+一方で、<strong>Speculative Decoding という手法自体は llama.cpp にも実装がある</strong>。
+そこだけを取り出して本PCに適用できないかを調べたのが本書である。
+</p>
+
+<h2>結論（現時点の見立て）</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">論点</th><th>見立て</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">VRAMに収まるか</td><td><span class="badge b-warn">ぎりぎり</span>Qwen3-4B ＋ 0.6B ドラフトで約 2.8 GB。空き 3.21 GB に対して余裕は 0.4 GB 程度</td></tr>
+<tr><td class="nowrap">速くなるか</td><td><span class="badge b-warn">疑わしい</span>本PCは既に帯域を使い切っており、この手法が最も効く条件から外れている</td></tr>
+<tr><td class="nowrap">やる価値</td><td><span class="badge b-ok">ある</span>ドラフトモデルの取得は数百MBで済み、失敗しても損失が小さい</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout">
+<strong>期待値は高くない。</strong>
+記事の 2.45 倍・3.43 倍という数字は、大きなモデルを潤沢なメモリで動かす環境のものである。
+本PCの条件はほぼ正反対で、同じ倍率は望めない。<strong>効果ゼロか、むしろ遅くなる可能性も相応にある</strong>。
+それでも試す理由は、コストが小さく、外れた場合も「なぜ効かないか」が第10章の帯域律速の裏付けになるため。
+</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="ch02" id="ch02">
+<h1>仕組み — なぜ速くなるのか</h1>
+
+<h2>通常の生成が遅い理由</h2>
+<p>
+LLM は1トークンを作るたびに<strong>モデル全体の重みをメモリから読み出す</strong>。
+Qwen3-4B なら 2.32 GiB を毎回読む。計算そのものは軽く、<strong>待ち時間の大半はメモリ転送</strong>である。
+これが「生成速度はメモリ帯域で決まる」と言われる理由で、実測の 56 tok/s もこの上限に近い。
+</p>
+
+<h2>先読みと検証に分ける</h2>
+<svg viewBox="0 0 900 300" role="img" aria-label="通常の生成とSpeculative Decodingの比較">
+	<defs>
+		<linearGradient id="g-spec-fig1-a" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(280,78%,25%)"/><stop offset="1" stop-color="hsl(280,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-spec-fig1-b" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(140,78%,25%)"/><stop offset="1" stop-color="hsl(140,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-spec-fig1-c" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(30,78%,25%)"/><stop offset="1" stop-color="hsl(30,58%,65%)"/>
+		</linearGradient>
+	</defs>
+
+	<text x="20" y="24" fill="#1c2330" font-size="15" font-weight="700">通常の生成 — 1トークンごとに本命モデル(4B)を1回読む</text>
+	<g>
+		<rect x="20" y="36" width="150" height="46" rx="6" fill="url(#g-spec-fig1-a)"/>
+		<text x="95" y="65" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">4B 読込</text>
+		<rect x="180" y="36" width="150" height="46" rx="6" fill="url(#g-spec-fig1-a)"/>
+		<text x="255" y="65" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">4B 読込</text>
+		<rect x="340" y="36" width="150" height="46" rx="6" fill="url(#g-spec-fig1-a)"/>
+		<text x="415" y="65" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">4B 読込</text>
+		<rect x="500" y="36" width="150" height="46" rx="6" fill="url(#g-spec-fig1-a)"/>
+		<text x="575" y="65" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">4B 読込</text>
+		<text x="670" y="65" fill="#4a5568" font-size="14">→ 4トークン分の時間</text>
+	</g>
+
+	<text x="20" y="120" fill="#1c2330" font-size="15" font-weight="700">Speculative Decoding — 小さなモデル(0.6B)が先読みし、本命が1回でまとめて検証する</text>
+	<g>
+		<rect x="20" y="132" width="38" height="46" rx="5" fill="url(#g-spec-fig1-b)"/>
+		<rect x="63" y="132" width="38" height="46" rx="5" fill="url(#g-spec-fig1-b)"/>
+		<rect x="106" y="132" width="38" height="46" rx="5" fill="url(#g-spec-fig1-b)"/>
+		<rect x="149" y="132" width="38" height="46" rx="5" fill="url(#g-spec-fig1-b)"/>
+		<text x="104" y="161" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">0.6B ×4</text>
+		<text x="104" y="198" fill="#4a5568" font-size="13" text-anchor="middle">先読み（軽い）</text>
+
+		<rect x="200" y="132" width="150" height="46" rx="6" fill="url(#g-spec-fig1-a)"/>
+		<text x="275" y="161" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">4B 読込 ×1</text>
+		<text x="275" y="198" fill="#4a5568" font-size="13" text-anchor="middle">4トークンまとめて検証</text>
+
+		<rect x="370" y="132" width="120" height="46" rx="6" fill="url(#g-spec-fig1-c)"/>
+		<text x="430" y="155" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">合った分だけ</text>
+		<text x="430" y="172" fill="#fff" font-size="13" text-anchor="middle">採用</text>
+		<text x="510" y="161" fill="#4a5568" font-size="14">→ 当たれば4トークンが1回分の時間で出る</text>
+	</g>
+
+	<text x="20" y="248" fill="#1c2330" font-size="14" font-weight="700">要点: 重みの読み出し回数を減らすのであって、計算を速くするのではない</text>
+	<text x="20" y="274" fill="#4a5568" font-size="13">→ 帯域に余裕がある環境ほど効く。使い切っている環境では効きにくい</text>
+</svg>
+
+<h2>3つのステップ</h2>
+<ol>
+	<li><strong>先読み</strong> — 小さなドラフトモデルが次の数トークンを一気に推測する。軽いので速い</li>
+	<li><strong>検証</strong> — 本命モデルが、その推測列を<strong>1回の読み出しでまとめて</strong>検証する</li>
+	<li><strong>採用</strong> — 先頭から合っている分だけ採用し、外れた時点で本命の答えに差し替える</li>
+</ol>
+<p>
+出力は<strong>通常の生成と完全に一致する</strong>。品質を落として速くする手法ではなく、
+「本命モデルが出すはずの答え」を先回りして当てにいく仕組みである。外れても正しさは損なわれず、単に速くならないだけ。
+</p>
+
+<div class="callout">
+<strong>効くかどうかは「帯域が余っているか」で決まる。</strong>
+本命モデルを1回読む間に複数トークンを確定できるのが利点なので、
+<strong>1回の読み出しが遅い環境（＝大きなモデル・広い帯域）ほど得をする</strong>。
+逆に本PCのように小さなモデルで帯域を使い切っていると、削れる余地自体が小さい。
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
+<h1>llama.cpp での使い方</h1>
+
+<h2>主なオプション</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">オプション</th><th>意味</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><code>-md</code> / <code>--model-draft</code></td><td>ドラフトモデルの GGUF を指定する</td></tr>
+<tr><td class="nowrap"><code>-ngld</code> / <code>--n-gpu-layers-draft</code></td><td>ドラフトモデルをGPUに載せる層数。ここを削ると本命に回せる</td></tr>
+<tr><td class="nowrap"><code>--draft-max</code></td><td>一度に先読みするトークン数の上限。大きいほど当たった時の利得が大きく、外れた時の無駄も大きい</td></tr>
+<tr><td class="nowrap"><code>--draft-min</code></td><td>先読みの下限</td></tr>
+<tr><td class="nowrap"><code>--draft-p-min</code></td><td>ドラフトの確信度がこの値を下回ったら先読みを打ち切る</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>起動例</h2>
+<pre><code>llama-server.exe ^
+  -m  "C:\AI_Models\qwen\Qwen3-4B-Instruct-2507-GGUF\Qwen3-4B-Instruct-2507-Q4_K_M.gguf" ^
+  -md "C:\AI_Models\qwen\Qwen3-0.6B-GGUF\Qwen3-0.6B-Q4_K_M.gguf" ^
+  -ngl 99 ^
+  -ngld 99 ^
+  --draft-max 4 ^
+  -c 4096 ^
+  --host 127.0.0.1 --port 8080</code></pre>
+
+<h2>成立の前提条件</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">条件</th><th>内容</th><th class="nowrap">本PCでの充足</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">語彙の一致</td><td>ドラフトと本命の<strong>トークナイザが互換</strong>である必要がある。異なる系列のモデルは組み合わせられない</td><td><span class="badge b-ok">満たせる</span>Qwen3 系で揃える</td></tr>
+<tr><td class="nowrap">両方をメモリに載せる</td><td>ドラフトと本命の<strong>両方</strong>が同時に必要。KVキャッシュも2つ分要る</td><td><span class="badge b-warn">ぎりぎり</span>第4章で見積る</td></tr>
+<tr><td class="nowrap">ドラフトが十分速い</td><td>先読みが遅いと、検証を減らした利得を食い潰す</td><td><span class="badge b-ok">満たせる</span>0.6B は 4B の4倍近く軽い</td></tr>
+<tr><td class="nowrap">受理率が高い</td><td>ドラフトの推測が当たらないと、単に無駄な計算が増える</td><td><span class="badge b-warn">未知</span>実測でしか分からない</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout">
+<strong>語彙の一致は妥協できない。</strong>
+Qwen3-4B に gemma の小型モデルを組み合わせる、といったことはできない。
+ドラフトは<strong>同じ系列の小さい版</strong>から選ぶ。手持ちに 0.6B 級が無いため、取得が前提になる。
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="ch04" id="ch04">
+<h1>このPCで成立するか — VRAM の見積り</h1>
+
+<h2>使える VRAM</h2>
+<p>
+計画書 第10章の実測どおり、本PCの VRAM は 4095 MiB のうち <strong>808 MiB が画面表示等で先に使われており、空きは 3287 MiB（3.21 GiB）</strong>。
+ここに2つのモデルを同居させることになる。
+</p>
+
+<h2>配分の試算</h2>
+<svg viewBox="0 0 900 200" role="img" aria-label="ドラフトモデル同居時のVRAM配分試算">
+	<defs>
+		<linearGradient id="g-spec-fig2-a" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(70,78%,25%)"/><stop offset="1" stop-color="hsl(70,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-spec-fig2-b" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(180,78%,25%)"/><stop offset="1" stop-color="hsl(180,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-spec-fig2-c" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(230,78%,25%)"/><stop offset="1" stop-color="hsl(230,58%,65%)"/>
+		</linearGradient>
+	</defs>
+
+	<text x="20" y="24" fill="#4a5568" font-size="13">← 横幅全体が空き VRAM 3287 MiB →</text>
+	<rect x="20" y="36" width="860" height="60" rx="8" fill="#eef1f6" stroke="#d9dfe8"/>
+	<rect x="20" y="36" width="622" height="60" rx="8" fill="url(#g-spec-fig2-a)"/>
+	<text x="331" y="62" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">本命 Qwen3-4B  2376 MiB</text>
+	<text x="331" y="83" fill="#fff" font-size="13" text-anchor="middle">実測で確認済みの値</text>
+	<rect x="642" y="36" width="107" height="60" fill="url(#g-spec-fig2-b)"/>
+	<text x="695" y="62" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">ドラフト</text>
+	<text x="695" y="82" fill="#fff" font-size="13" text-anchor="middle">約 410 MiB</text>
+	<rect x="749" y="36" width="78" height="60" fill="url(#g-spec-fig2-c)"/>
+	<text x="788" y="62" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">KV×2</text>
+	<text x="788" y="82" fill="#fff" font-size="12" text-anchor="middle">約 300</text>
+	<text x="854" y="70" fill="#4a5568" font-size="12" text-anchor="middle">余</text>
+
+	<text x="20" y="130" fill="#1c2330" font-size="14">合計 約 3086 MiB ／ 空き 3287 MiB に対して <tspan font-weight="700">残り約 200 MiB</tspan></text>
+	<text x="20" y="156" fill="#a51f22" font-size="13" font-weight="700">この余裕では、コンテキストを伸ばすと超過する。-c 4096 程度に抑える前提になる</text>
+	<text x="20" y="180" fill="#4a5568" font-size="12">※ ドラフトのサイズと KV は推定値。実測で置き換える</text>
+</svg>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">項目</th><th class="nowrap">見積り</th><th>根拠</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">本命 Qwen3-4B Q4_K_M</td><td class="num">2376 MiB</td><td>計画書 第10章の実測値（2.32 GiB）</td></tr>
+<tr><td class="nowrap">ドラフト 0.6B Q4_K_M</td><td class="num">約 410 MiB</td><td>推定。パラメータ数からの概算</td></tr>
+<tr><td class="nowrap">KVキャッシュ ×2</td><td class="num">約 300 MiB</td><td>推定。<code>-c 4096</code> 相当を2モデル分</td></tr>
+<tr><td class="nowrap"><strong>合計</strong></td><td class="num"><strong>約 3086 MiB</strong></td><td>空き 3287 MiB に対して余裕 <strong>約 200 MiB</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>収まるが、余裕はない</h2>
+<p>
+計算上は収まる。ただし残り 200 MiB は<strong>誤差で消える水準</strong>である。
+計画書 第10章で確認したとおり、VRAM を超えてもエラーにはならず
+<strong>共有メモリに逃げて数十倍遅くなる</strong>ため、超過に気づきにくい点にも注意が要る。
+</p>
+
+<h3>逃げ道</h3>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">手</th><th>効果</th><th class="nowrap">副作用</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><code>-ngld</code> を下げる</td><td>ドラフトの一部をCPUに置き、VRAMを空ける</td><td>先読みが遅くなり、利得が減る</td></tr>
+<tr><td class="nowrap">KV量子化</td><td><code>--cache-type-k q8_0</code> でKVを半分に</td><td>ほぼ無し。計画書でも採用済み</td></tr>
+<tr><td class="nowrap">より小さいドラフト</td><td>0.6B より小さい版があれば</td><td>受理率が下がる恐れ</td></tr>
+<tr><td class="nowrap">画面表示を内蔵GPUへ</td><td>808 MiB のうち数百MBを取り戻せる</td><td>設定変更が要る</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout">
+<strong>本PCの条件は、この手法が最も効く条件と逆を向いている。</strong>
+Speculative Decoding は「本命モデルの読み出しが重い」ほど得をする。
+本PCの本命は 2.32 GiB と軽く、既に 56 tok/s まで出ている。
+削れる余地が小さいうえ、ドラフトの実行時間が新たに乗る。<strong>差し引きでマイナスになる可能性がある</strong>。
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="ch05" id="ch05">
+<h1>検証計画</h1>
+
+<h2>事前に必要なもの</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">項目</th><th>内容</th><th class="nowrap">取得量</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">ドラフトモデル</td><td>Qwen3-0.6B の GGUF（Q4_K_M）。本命と同系列で語彙を揃える</td><td class="num">約 0.4 GB</td></tr>
+<tr><td class="nowrap">対照データ</td><td>計画書 第10章の Qwen3-4B 単体 56.49 tok/s</td><td class="num">取得済み</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>測る組み合わせ</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">No</th><th>構成</th><th class="nowrap">draft-max</th><th>狙い</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td class="nowrap">Qwen3-4B 単体（対照）</td><td class="nowrap">—</td><td>基準。56.49 tok/s と一致するか確認する</td></tr>
+<tr><td class="num">2</td><td class="nowrap">4B ＋ 0.6B ドラフト</td><td class="num">2</td><td>控えめな先読み。外れた時の損失が小さい</td></tr>
+<tr><td class="num">3</td><td class="nowrap">4B ＋ 0.6B ドラフト</td><td class="num">4</td><td>標準的な設定</td></tr>
+<tr><td class="num">4</td><td class="nowrap">4B ＋ 0.6B ドラフト</td><td class="num">8</td><td>強気の先読み。受理率が高ければ最も伸びる</td></tr>
+<tr><td class="num">5</td><td class="nowrap">4 に KV量子化を追加</td><td class="num">8</td><td>VRAM を空けて余裕を作る</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>測定時に併せて確認すること</h3>
+<ul>
+	<li><strong>VRAM 使用量</strong> — <code>nvidia-smi</code> で 3287 MiB を超えていないか。超えていれば速度低下の原因はここ</li>
+	<li><strong>受理率</strong> — llama.cpp のログに出るドラフト採用率。低ければ <code>--draft-max</code> を下げる</li>
+	<li><strong>出力の同一性</strong> — 同じ seed で単体構成と同じ出力になるか。仕組み上は一致するはず</li>
+</ul>
+
+<h2>判断基準</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">結果</th><th>次の一手</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><span class="badge b-ok">70 tok/s 以上</span></td><td>採用する。計画書の常用構成を差し替え、起動スクリプトを更新する</td></tr>
+<tr><td class="nowrap"><span class="badge b-warn">56〜70 tok/s</span></td><td>効果はあるが VRAM の余裕を失う。コンテキスト長とのトレードオフで判断する</td></tr>
+<tr><td class="nowrap"><span class="badge b-ng">56 tok/s 未満</span></td><td>見送る。<strong>帯域律速という第10章の見立てが裏付けられた</strong>ことを記録して終える</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>この調査で分かっていないこと</h2>
+<ul>
+	<li><span class="badge b-non">未確認</span>Qwen3-0.6B の GGUF が実際に配布されているか。無ければ別系列で組み直す必要がある</li>
+	<li><span class="badge b-non">未確認</span>ドラフトモデルの正確なファイルサイズ。第4章の 410 MiB は概算</li>
+	<li><span class="badge b-non">未確認</span>本PCのビルド（b10612）で <code>-md</code> 系オプションがどう提供されているか。オプション名は版により変わる</li>
+	<li><span class="badge b-non">未実施</span><strong>検証そのもの。本書は事前検討のみで、実行はしていない</strong></li>
+</ul>
+
+<div class="callout">
+<strong>実行前に、まずオプションの存在確認から始める。</strong>
+<code>llama-server.exe --help</code> で <code>--model-draft</code> 系が実際に何という名前で用意されているかを確かめる。
+ここが空振りなら、ドラフトモデルの取得は不要になる。
+</div>
+</section>
+
+</div>
+
+<footer>
+	← <a href="../../README.html">README に戻る</a>
+</footer>
+
+</body>
+</html>
