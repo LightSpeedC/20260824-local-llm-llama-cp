@@ -17,6 +17,7 @@ $ErrorActionPreference = 'Stop'
 $targets = @(
 	'README.html',
 	'docs\plan\local-llm-plan.html',
+	'docs\plan\agent-architecture.html',
 	'docs\research\speculative-decoding.html',
 	'docs\research\hp-zgx-nano.html'
 )

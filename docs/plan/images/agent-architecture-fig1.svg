@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="320" viewBox="0 0 900 320" aria-label="複数モデル常駐と並列スロットのVRAM比較">
+	<rect width="100%" height="100%" fill="#ffffff"/>
+	<defs>
+		<linearGradient id="g-agent-fig1-a" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(233.3,78%,25%)"/><stop offset="1" stop-color="hsl(233.3,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-agent-fig1-b" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(0,78%,25%)"/><stop offset="1" stop-color="hsl(0,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-agent-fig1-c" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(140,78%,25%)"/><stop offset="1" stop-color="hsl(140,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-agent-fig1-d" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(60,78%,25%)"/><stop offset="1" stop-color="hsl(60,58%,65%)"/>
+		</linearGradient>
+	</defs>
+
+	<text x="20" y="22" fill="#1c2330" font-size="15" font-weight="700">方法A: モデルを2つ立てる — 収まらない</text>
+	<rect x="20" y="34" width="700" height="56" rx="8" fill="#eef1f6" stroke="#d9dfe8"/>
+	<rect x="20" y="34" width="506" height="56" rx="8" fill="url(#g-agent-fig1-a)"/>
+	<text x="273" y="58" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">Qwen3-4B #1</text>
+	<text x="273" y="78" fill="#fff" font-size="13" text-anchor="middle">2376 MiB</text>
+	<rect x="526" y="34" width="374" height="56" rx="8" fill="url(#g-agent-fig1-b)" opacity="0.85"/>
+	<text x="713" y="58" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">Qwen3-4B #2</text>
+	<text x="713" y="78" fill="#fff" font-size="13" text-anchor="middle">2376 MiB — 枠外へはみ出す</text>
+	<line x1="720" y1="28" x2="720" y2="96" stroke="#a51f22" stroke-width="2" stroke-dasharray="5 3"/>
+	<text x="726" y="112" fill="#a51f22" font-size="12" font-weight="700">← 空き VRAM 3287 MiB の限界</text>
+
+	<text x="20" y="152" fill="#1c2330" font-size="15" font-weight="700">方法B: 1モデルに並列スロットを持たせる — 収まる</text>
+	<rect x="20" y="164" width="700" height="56" rx="8" fill="#eef1f6" stroke="#d9dfe8"/>
+	<rect x="20" y="164" width="506" height="56" rx="8" fill="url(#g-agent-fig1-c)"/>
+	<text x="273" y="188" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">Qwen3-4B（重みは1つだけ）</text>
+	<text x="273" y="208" fill="#fff" font-size="13" text-anchor="middle">2376 MiB</text>
+	<rect x="526" y="164" width="44" height="56" fill="url(#g-agent-fig1-d)"/>
+	<rect x="572" y="164" width="44" height="56" fill="url(#g-agent-fig1-d)"/>
+	<rect x="618" y="164" width="44" height="56" fill="url(#g-agent-fig1-d)"/>
+	<rect x="664" y="164" width="44" height="56" fill="url(#g-agent-fig1-d)"/>
+	<text x="617" y="188" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">KV ×4</text>
+	<text x="617" y="206" fill="#fff" font-size="12" text-anchor="middle">スロット</text>
+	<text x="740" y="196" fill="#4a5568" font-size="13">4タスク同時</text>
+
+	<text x="20" y="256" fill="#1c2330" font-size="14" font-weight="700">重みは共有され、増えるのは会話ごとの KV キャッシュだけ</text>
+	<text x="20" y="280" fill="#4a5568" font-size="13">代償: 総コンテキストがスロット数で割られる（-c 8192 --parallel 4 → 各 2048 トークン）</text>
+	<text x="20" y="304" fill="#a51f22" font-size="13" font-weight="700">注意: 帯域は共有のため、4並列でも合計スループットは4倍にならない（実測が必要）</text>
+</svg>

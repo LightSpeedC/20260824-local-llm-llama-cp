@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="340" viewBox="0 0 900 340" aria-label="階層型エージェントの処理フロー">
+	<rect width="100%" height="100%" fill="#ffffff"/>
+	<defs>
+		<linearGradient id="g-agent-fig2-a" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(280,78%,25%)"/><stop offset="1" stop-color="hsl(280,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-agent-fig2-b" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(200,78%,25%)"/><stop offset="1" stop-color="hsl(200,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-agent-fig2-c" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(140,78%,25%)"/><stop offset="1" stop-color="hsl(140,58%,65%)"/>
+		</linearGradient>
+		<linearGradient id="g-agent-fig2-d" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(40,78%,25%)"/><stop offset="1" stop-color="hsl(40,58%,65%)"/>
+		</linearGradient>
+		<marker id="g-agent-fig2-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+			<path d="M 0 0 L 10 5 L 0 10 z" fill="#4a5568"/>
+		</marker>
+	</defs>
+
+	<rect x="20" y="30" width="170" height="66" rx="8" fill="url(#g-agent-fig2-a)"/>
+	<text x="105" y="56" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">メイン</text>
+	<text x="105" y="76" fill="#fff" font-size="12" text-anchor="middle">大きなモデル</text>
+	<text x="105" y="112" fill="#4a5568" font-size="12" text-anchor="middle">目的を受け取り分解</text>
+
+	<line x1="195" y1="63" x2="240" y2="63" stroke="#4a5568" stroke-width="2" marker-end="url(#g-agent-fig2-arrow)"/>
+
+	<rect x="248" y="30" width="150" height="66" rx="8" fill="url(#g-agent-fig2-b)"/>
+	<text x="323" y="56" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">タスク定義</text>
+	<text x="323" y="76" fill="#fff" font-size="12" text-anchor="middle">JSON</text>
+	<text x="323" y="112" fill="#4a5568" font-size="12" text-anchor="middle">検証方法を各件に添える</text>
+
+	<line x1="403" y1="63" x2="448" y2="63" stroke="#4a5568" stroke-width="2" marker-end="url(#g-agent-fig2-arrow)"/>
+
+	<rect x="456" y="18" width="200" height="30" rx="5" fill="url(#g-agent-fig2-c)"/>
+	<text x="556" y="38" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">サブ #1（スロット1）</text>
+	<rect x="456" y="52" width="200" height="30" rx="5" fill="url(#g-agent-fig2-c)"/>
+	<text x="556" y="72" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">サブ #2（スロット2）</text>
+	<rect x="456" y="86" width="200" height="30" rx="5" fill="url(#g-agent-fig2-c)"/>
+	<text x="556" y="106" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">サブ #3（スロット3）</text>
+	<text x="556" y="136" fill="#4a5568" font-size="12" text-anchor="middle">llama-server 1プロセス / --parallel</text>
+
+	<line x1="661" y1="67" x2="706" y2="67" stroke="#4a5568" stroke-width="2" marker-end="url(#g-agent-fig2-arrow)"/>
+
+	<rect x="714" y="34" width="166" height="66" rx="8" fill="url(#g-agent-fig2-d)"/>
+	<text x="797" y="60" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">検証</text>
+	<text x="797" y="80" fill="#fff" font-size="12" text-anchor="middle">ビルド / テスト</text>
+
+	<path d="M 797 104 L 797 180 L 105 180 L 105 104" stroke="#a51f22" stroke-width="2" fill="none" stroke-dasharray="5 3" marker-end="url(#g-agent-fig2-arrow)"/>
+	<text x="450" y="174" fill="#a51f22" font-size="13" font-weight="700" text-anchor="middle">不合格 → メインに差し戻す（自動）</text>
+
+	<rect x="20" y="212" width="860" height="46" rx="8" fill="#f4f6fa" stroke="#d9dfe8"/>
+	<text x="40" y="232" fill="#1c2330" font-size="13" font-weight="700">オーケストレータ（PowerShell）</text>
+	<text x="40" y="250" fill="#4a5568" font-size="12">タスクの配分・API 呼び出し・検証の実行・結果の集約・差し戻しの判断を担う</text>
+
+	<text x="20" y="288" fill="#1c2330" font-size="13" font-weight="700">要点: サブエージェントは「別プロセス」ではなく「同一サーバの別スロット」</text>
+	<text x="20" y="312" fill="#4a5568" font-size="12">エージェントらしさはオーケストレータ側の制御で作る。モデル側は状態を持たない</text>
+</svg>

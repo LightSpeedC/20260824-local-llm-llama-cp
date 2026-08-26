@@ -244,6 +244,9 @@ NVIDIAドライバが共有GPUメモリに逃がすため止まらない。
 	<li><a href="docs/plan/local-llm-plan.html"><strong>ローカルLLM 実行計画</strong></a>
 		— ソフトウェア選定（llama.cpp / Ollama / LM Studio）、配布バイナリと自前コンパイルの比較、
 		手持ちモデルの棚卸し、量子化とVRAM配分、最新量子化とMoEの検討、導入手順、検証計画、<strong>実測結果</strong></li>
+	<li><a href="docs/plan/agent-architecture.html"><strong>階層型エージェント構成案</strong></a>
+		— 大きなモデルで計画し、小さなモデルで実装する構成。VRAM 4GB では複数モデルを同時常駐できないため、
+		<code>--parallel</code> による並列スロットで代替する設計。<span class="badge b-non">実装は未着手</span></li>
 </ul>
 
 <h2>調査</h2>
