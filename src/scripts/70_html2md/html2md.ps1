@@ -391,8 +391,7 @@ function Convert-HtmlFile {
 			continue
 		}
 		if ($m.Groups['footer'].Success) {
-			[void]$sb.AppendLine('---')
-			[void]$sb.AppendLine()
+			# HTML に無い記号（水平線等）は足さない
 			$f = (Convert-Inline $m.Groups['footer'].Value) -replace [regex]::Escape($BR), ' '
 			[void]$sb.AppendLine($f)
 			[void]$sb.AppendLine()
@@ -416,6 +415,75 @@ function Convert-HtmlFile {
 	[IO.File]::WriteAllText($mdPath, $md, (New-Object Text.UTF8Encoding($false)))
 	Write-Host ("  出力: {0} ({1:N1} KB)" -f $mdPath.Replace("$root\", ''), ((Get-Item $mdPath).Length / 1KB))
 	return $mdPath
+}
+
+# ------------------------------------------------------------
+# 文言の同一性の確認
+#
+# Markdown 側にしか存在しない文言が無いかを機械的に調べる。
+# 記法由来の記号と空白をすべて落として突き合わせるため、
+# 「HTML に無い文章・記号を足していないか」だけを見ることになる。
+# ------------------------------------------------------------
+function Get-PlainForCompare {
+	param([string]$s, [switch]$FromMarkdown)
+
+	if ($FromMarkdown) {
+		$s = $s -replace '(?m)^\s*\|[\s\-:|]+\|\s*$', ''    # テーブルの区切り行
+		$s = $s -replace '!\[[^\]]*\]\([^)]*\)', ''         # 画像（元は SVG なので対応する本文が無い）
+		$s = $s -replace '\[([^\]]*)\]\([^)]*\)', '$1'      # リンクは表示文字だけ残す
+		$s = $s -replace '(?m)^\s*>\s*\[!\w+\]\s*$', ''     # アラートの種別行
+		$s = $s -replace '(?m)^\s*>\s?', ''                 # 引用
+		$s = $s -replace '(?m)^\s*#{1,6}\s*', ''            # 見出し
+		$s = $s -replace '(?m)^\s*```.*$', ''               # コードフェンス
+		$s = $s -replace '(?m)^\s*[-*]\s+', ''              # 箇条書き
+		$s = $s -replace '(?m)^\s*\d+\.\s+', ''             # 番号付きリスト
+		$s = $s -replace '\\\|', '|'                        # セル内のエスケープを戻す
+		$s = $s -replace '\*\*', ''                         # 太字
+		$s = $s -replace '`', ''                            # コード
+		$s = $s -replace '<br>', ' '
+	} else {
+		$s = [regex]::Replace($s, '(?s)<head\b.*?</head>', '')
+		$s = [regex]::Replace($s, '(?s)<style\b.*?</style>', '')
+		$s = [regex]::Replace($s, '(?s)<svg\b.*?</svg>', '')   # 図は画像として切り出される
+		$s = $s -replace '<[^>]+>', ' '
+		$s = ConvertFrom-HtmlEntity $s
+	}
+
+	# 色分けの代替として認められた記号は、両側から落として比較する
+	$s = $s -replace '✅', ''
+	$s = $s -replace '❌', ''
+	$s = $s -replace '⚠️', ''
+	$s = $s -replace '⚠', ''
+	$s = $s -replace '⬜', ''
+	$s = $s -replace '️', ''
+
+	# テーブルの区切りと本文中の縦棒が混ざるため、両側から落として比較する
+	$s = $s -replace '\|', ''
+
+	# 空白の入り方は記法で変わるため、比較前にすべて落とす
+	$s = $s -replace '\s', ''
+	return $s
+}
+
+function Test-MarkdownText {
+	param([string]$htmlPath, [string]$mdPath)
+
+	$htmlPlain = Get-PlainForCompare ([IO.File]::ReadAllText($htmlPath, [Text.Encoding]::UTF8))
+	$mdRaw     = [IO.File]::ReadAllText($mdPath, [Text.Encoding]::UTF8)
+
+	$ng = 0
+	foreach ($line in ($mdRaw -split "`r?`n")) {
+		if (-not $line.Trim()) { continue }
+		$plain = Get-PlainForCompare $line -FromMarkdown
+		if ($plain.Length -lt 2) { continue }
+		if (-not $htmlPlain.Contains($plain)) {
+			$show = if ($line.Length -gt 70) { $line.Substring(0, 70) + '…' } else { $line }
+			Write-Host ("  HTML に無い文言: {0}" -f $show.Trim()) -ForegroundColor Red
+			$ng++
+		}
+	}
+	if ($ng -eq 0) { Write-Host "  Markdown 側だけの文言なし" }
+	return $ng
 }
 
 # ------------------------------------------------------------
@@ -457,20 +525,31 @@ foreach ($rel in $targets) {
 	Write-Host "[$rel]"
 	$script:stem   = [IO.Path]::GetFileNameWithoutExtension($path)
 	$script:imgDir = Join-Path (Split-Path $path -Parent) 'images'
-	$results += (Convert-HtmlFile $path)
+	$md = Convert-HtmlFile $path
+	$results += [pscustomobject]@{ Html = $path; Md = $md }
 }
 
 Write-Host ''
 Write-Host '=== リンク切れの確認 ==='
-$total = 0
-foreach ($md in $results) {
-	Write-Host ("[{0}]" -f $md.Replace("$root\", ''))
-	$total += (Test-MarkdownLink $md)
+$ngLink = 0
+foreach ($r in $results) {
+	Write-Host ("[{0}]" -f $r.Md.Replace("$root\", ''))
+	$ngLink += (Test-MarkdownLink $r.Md)
 }
 
 Write-Host ''
-if ($total -eq 0) {
+Write-Host '=== 文言の同一性の確認 ==='
+$ngText = 0
+foreach ($r in $results) {
+	Write-Host ("[{0}]" -f $r.Md.Replace("$root\", ''))
+	$ngText += (Test-MarkdownText $r.Html $r.Md)
+}
+
+Write-Host ''
+if ($ngLink -eq 0 -and $ngText -eq 0) {
 	Write-Host '変換が完了しました。'
 } else {
-	Write-Host ("変換は完了しましたが、リンク切れが {0} 件あります。" -f $total) -ForegroundColor Yellow
+	if ($ngLink -gt 0) { Write-Host ("リンク切れ {0} 件" -f $ngLink) -ForegroundColor Yellow }
+	if ($ngText -gt 0) { Write-Host ("Markdown 側だけの文言 {0} 件" -f $ngText) -ForegroundColor Yellow }
+	Write-Host '変換は完了しましたが、上記を確認してください。'
 }
