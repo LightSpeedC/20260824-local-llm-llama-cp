@@ -1696,11 +1696,39 @@ LM Studio に繋いでいた構成の接続先を <code>127.0.0.1:8080</code> �
 両者はポートが違うので、並べて立てて応答を比較できる。
 </div>
 
-<h2>品質評価 — 速度で選ぶと精度を失う</h2>
+<h2>品質評価 — 差が出るのは知識を問うときだけ</h2>
 <p>
-第9章の質問セットのうち3問を、Qwen3-4B と gemma-4-E4B の両方に同じ条件で投げた。
-<strong>速度の順位と品質の順位が逆転した。</strong>
+第9章の質問セット5問を、Qwen3-4B と gemma-4-E4B の両方に同じ条件で投げた。
+当初は3問だけで「速度と品質が逆転する」と結論づけたが、
+残る2問（要約・長文読解）を加えると<strong>差が出る場面はもっと限定的だった</strong>。
 </p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">設問</th><th>種類</th><th class="nowrap">Qwen3-4B</th><th class="nowrap">gemma-4-E4B</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Q1 要約</td><td>与えられた文章を縮める</td><td class="nowrap"><span class="badge b-ok">正確</span>3.2 秒</td><td class="nowrap"><span class="badge b-ok">正確</span>17.9 秒</td></tr>
+<tr><td class="nowrap">Q2 説明</td><td><strong>知識から答える</strong></td><td class="nowrap"><span class="badge b-ng">誤答</span>1.4 秒</td><td class="nowrap"><span class="badge b-ok">正確</span>13.9 秒</td></tr>
+<tr><td class="nowrap">Q3 指示追従</td><td>形式を守る</td><td class="nowrap"><span class="badge b-ok">合格</span>0.9 秒</td><td class="nowrap"><span class="badge b-warn">未完</span>思考で溢れた</td></tr>
+<tr><td class="nowrap">Q4 コード生成</td><td>知識＋要件の充足</td><td class="nowrap"><span class="badge b-warn">惜しい</span>0.6 秒</td><td class="nowrap"><span class="badge b-ok">正確</span>2.0 秒</td></tr>
+<tr><td class="nowrap">Q5 長文読解</td><td>与えられた文章から答える</td><td class="nowrap"><span class="badge b-ok">正確</span>6.6 秒</td><td class="nowrap"><span class="badge b-ok">正確</span>18.7 秒</td></tr>
+</tbody>
+</table>
+</div>
+<p>
+<strong>Q1 と Q5——文章が手元にある課題では、両者に差がつかなかった。</strong>
+差が出たのは Q2 と Q4、いずれもモデル内部の知識に依存する設問である。
+</p>
+
+<h3>Q1「413字の文章をちょうど3行に要約」</h3>
+<p>
+計画書の本文から抜き出した 413 字を素材にした。<strong>両者とも3行という指示を守り、内容も素材に忠実だった。</strong>
+</p>
+<ul>
+	<li><strong>Qwen3-4B</strong> — <span class="badge b-ok">合格</span>3.2 秒。素材の順に沿って要点を拾う</li>
+	<li><strong>gemma-4-E4B</strong> — <span class="badge b-ok">合格</span>17.9 秒（うち思考 987 字）。
+		「制約 → 手段 → 理由」と論理の順に組み替えており、<strong>整理はこちらが上</strong></li>
+</ul>
+<p>質としては E4B がわずかに勝るが、<strong>5.6 倍の時間を払う差ではない</strong>。</p>
 
 <h3>Q2「量子化を初心者向けに150字で説明」</h3>
 <div class="tablewrap">
@@ -1724,6 +1752,29 @@ LM Studio に繋いでいた構成の接続先を <code>127.0.0.1:8080</code> �
 	<li><strong>Qwen3-4B</strong> — <span class="badge b-warn">惜しい</span>動作するが <code>-Recurse</code> が無く、「配下」という指定を満たしていない</li>
 	<li><strong>gemma-4-E4B</strong> — <span class="badge b-ok">正確</span><code>-Recurse</code> 付き。サイズをMB換算し、パスも表示する実用的な形</li>
 </ul>
+
+<h3>Q5「1970字の文章を読み、2点を答える」</h3>
+<p>
+第7章の本文から 1970 字を素材にし、<strong>その文章にしか書かれていない情報</strong>を2つ問うた。
+事前知識では答えられない設問である。
+</p>
+<ol>
+	<li><code>--n-cpu-moe</code> の層の数え方の注意点は何か（正解: 最上位の層から数える）</li>
+	<li>CPUオフロードが密モデルで成立せず MoE で成立する理由は何か</li>
+</ol>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">モデル</th><th class="nowrap">所要</th><th>結果</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Qwen3-4B</td><td class="num">6.6 秒</td><td><span class="badge b-ok">両問正解</span>「最上位（いちばん番号の大きい層）から数える」と本文どおりに答え、理由も転送コストの観点まで説明した</td></tr>
+<tr><td class="nowrap">gemma-4-E4B</td><td class="num">18.7 秒</td><td><span class="badge b-ok">両問正解</span>思考 2174 字を経て、より簡潔に回答</td></tr>
+</tbody>
+</table>
+</div>
+<p>
+<strong>1970字の文脈を保持し、そこから正確に答える能力は 4B でも十分にあった。</strong>
+第2章で「小型帯では日本語の破綻が少ない」と見込んだ点は、読解でも裏付けられた形になる。
+</p>
 
 <h3>E4B は reasoning モデルだった</h3>
 <p>
@@ -1751,19 +1802,31 @@ E4B が遅かった理由は速度ではなく<strong>出力量</strong>にあ�
 </div>
 
 <h3>使い分けの結論</h3>
+<p>
+5問を通して見ると、分岐点は「対話か事実か」ではなく
+<strong>「答えが渡した文章の中にあるか、モデルの中にあるか」</strong>だった。
+</p>
 <div class="tablewrap">
 <table>
-<thead><tr><th>場面</th><th>選ぶモデル</th><th>理由</th></tr></thead>
+<thead><tr><th class="nowrap">答えの在り処</th><th>該当する作業</th><th class="nowrap">選ぶモデル</th><th>理由</th></tr></thead>
 <tbody>
-<tr><td class="nowrap">対話・短い応答・下書き</td><td class="nowrap"><strong>Qwen3-4B</strong></td><td>1〜2秒で返る。形式の指示にもよく従う</td></tr>
-<tr><td class="nowrap">事実を問う・コードを書かせる</td><td class="nowrap"><strong>gemma-4-E4B</strong></td><td>10秒前後かかるが、内容の正確さが違う</td></tr>
+<tr><td class="nowrap"><strong>渡した文章の中</strong></td><td>要約、翻訳、長文からの抽出、資料に基づく質疑、書き換え</td><td class="nowrap"><strong>Qwen3-4B</strong></td><td>Q1・Q5 とも E4B と同じ正確さで、<strong>3〜6倍速い</strong>。品質を落とさずに速度を取れる</td></tr>
+<tr><td class="nowrap"><strong>モデルの中</strong></td><td>知識を問う説明、仕様の記憶に頼るコード生成</td><td class="nowrap"><strong>gemma-4-E4B</strong></td><td>Q2 で 4B は誤答し、Q4 では要件を落とした。ここだけは時間を払う価値がある</td></tr>
+<tr><td class="nowrap">形式が主</td><td>決まった書式での出力、箇条書き、整形</td><td class="nowrap"><strong>Qwen3-4B</strong></td><td>Q3 で指示を完全に満たした。E4B は思考が長く打ち切られた</td></tr>
 </tbody>
 </table>
 </div>
+
+<div class="callout">
+<strong>当初の見立ては修正が必要だった。</strong>
+3問だけ実施した時点では「速度で選ぶと精度を失う」と結論づけたが、
+Q1・Q5 を加えると<strong>その心配は知識を問う場面に限られる</strong>と分かった。
+資料を渡して読ませる使い方——実務で多いのはむしろこちら——では、Qwen3-4B で速度も品質も取れる。
+</div>
+
 <p>
-<strong>速度だけで Qwen3-4B に一本化するのは危険</strong>だと分かった。
-Q2 のような「もっともらしく間違える」応答は、速いぶん検算されずに通ってしまう。
-用途で明確に切り替える運用にする。
+実運用では<strong>「モデルに思い出させるのではなく、資料を渡す」</strong>形に寄せるほど 4B で足りることになる。
+E4B が要るのは、渡す資料が用意できない場面に絞られる。
 </p>
 
 <h2>計画時の予測と実測の対比</h2>
@@ -1779,6 +1842,7 @@ Q2 のような「もっともらしく間違える」応答は、速いぶん�
 <tr><td class="nowrap">コンテキスト 16384</td><td class="nowrap">余裕があれば可</td><td class="nowrap"><strong>不可</strong></td><td><span class="badge b-ng">予測が外れ</span></td></tr>
 <tr><td class="nowrap">アーキテクチャ未対応</td><td class="nowrap">起きうる</td><td class="nowrap">起きなかった</td><td><span class="badge b-ok">杞憂</span>b10612 は全て対応済み</td></tr>
 <tr><td class="nowrap">導入の手軽さ（案A）</td><td class="nowrap">5〜10分</td><td class="nowrap">約20秒</td><td><span class="badge b-ok">想定以上</span></td></tr>
+<tr><td class="nowrap">4Bの長文読解</td><td class="nowrap">予測していなかった</td><td class="nowrap">1970字を正確に処理</td><td><span class="badge b-ok">想定以上</span>使い分けの基準が変わった</td></tr>
 </tbody>
 </table>
 </div>
@@ -1788,8 +1852,8 @@ Q2 のような「もっともらしく間違える」応答は、速いぶん�
 <table>
 <thead><tr><th class="nowrap">位置づけ</th><th>モデルと設定</th><th class="nowrap">速度</th><th>用途</th></tr></thead>
 <tbody>
-<tr><td class="nowrap"><span class="badge b-ok">常用</span></td><td class="nowrap"><strong>Qwen3-4B-Instruct-2507</strong><br><code>-ngl 99 -c 8192</code></td><td class="nowrap">56 tok/s<br>（1〜2秒で返る）</td><td>対話・下書き・形式のある出力。<span class="badge b-warn">事実確認には使わない</span>もっともらしく間違えることがある</td></tr>
-<tr><td class="nowrap"><span class="badge b-ok">正確さ重視</span></td><td class="nowrap"><strong>gemma-4-E4B-it</strong><br><code>-ngl 99</code>／<code>max_tokens</code> は 1500 以上</td><td class="nowrap">41 tok/s<br>（10秒前後）</td><td>事実を問う場面とコード生成。思考を経るぶん遅いが、内容の正確さが明確に上</td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">常用</span></td><td class="nowrap"><strong>Qwen3-4B-Instruct-2507</strong><br><code>-ngl 99 -c 8192</code></td><td class="nowrap">56 tok/s<br>（1〜7秒で返る）</td><td><strong>資料を渡す作業のすべて</strong>——要約・長文からの抽出・資料に基づく質疑・整形。1970字の読解でも E4B と同じ正確さだった</td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">知識を問う時</span></td><td class="nowrap"><strong>gemma-4-E4B-it</strong><br><code>-ngl 99</code>／<code>max_tokens</code> は 1500 以上</td><td class="nowrap">41 tok/s<br>（10〜20秒）</td><td><strong>渡す資料が用意できない場面に限る</strong>。知識を問う説明とコード生成では 4B が誤る</td></tr>
 <tr><td class="nowrap"><span class="badge b-warn">用途限定</span></td><td class="nowrap">Qwen3.5-9B<br><code>-ngl 24 -ctk q8_0 -ctv q8_0 -fa</code></td><td class="nowrap">8 tok/s</td><td>待てる作業（バッチ要約・翻訳）のみ</td></tr>
 <tr><td class="nowrap"><span class="badge b-warn">用途限定</span></td><td class="nowrap">gpt-oss-20b<br><code>-ngl 99 --n-cpu-moe 18</code></td><td class="nowrap">5.9 tok/s</td><td>20B級の知識が要る場面のみ。他アプリを閉じて使う</td></tr>
 </tbody>
