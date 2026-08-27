@@ -418,6 +418,38 @@ function Convert-HtmlFile {
 }
 
 # ------------------------------------------------------------
+# 更新日の書き換え忘れの確認
+#
+# ヘッダに書かれた更新日より、ファイルの最終更新時刻が新しければ警告する。
+# 体裁だけの変更では更新日を変えない決まりのため、自動では書き換えず指摘に留める。
+# ------------------------------------------------------------
+function Test-UpdatedDate {
+	param([string]$htmlPath)
+
+	$t = [IO.File]::ReadAllText($htmlPath, [Text.Encoding]::UTF8)
+	if ($t -notmatch '📅\s*作成:\s*([\d-]+)\s*/\s*更新:\s*([\d-]+)') {
+		Write-Host "  更新日の記載が見つかりません" -ForegroundColor Yellow
+		return 1
+	}
+	$written = $Matches[2]
+	$mtime   = (Get-Item $htmlPath).LastWriteTime.Date
+
+	$parsed = [datetime]::MinValue
+	if (-not [datetime]::TryParseExact($written, 'yyyy-MM-dd', $null, 'None', [ref]$parsed)) {
+		Write-Host ("  更新日の書式が不正です: {0}" -f $written) -ForegroundColor Yellow
+		return 1
+	}
+
+	if ($parsed -lt $mtime) {
+		Write-Host ("  更新日が古い可能性: ヘッダ {0} / ファイル更新 {1}" -f $written, $mtime.ToString('yyyy-MM-dd')) -ForegroundColor Yellow
+		Write-Host "    体裁だけの変更なら、このままで問題ありません" -ForegroundColor DarkGray
+		return 1
+	}
+	Write-Host ("  更新日 {0}（ファイル更新 {1}）" -f $written, $mtime.ToString('yyyy-MM-dd'))
+	return 0
+}
+
+# ------------------------------------------------------------
 # 文言の同一性の確認
 #
 # Markdown 側にしか存在しない文言が無いかを機械的に調べる。
@@ -546,10 +578,19 @@ foreach ($r in $results) {
 }
 
 Write-Host ''
-if ($ngLink -eq 0 -and $ngText -eq 0) {
+Write-Host '=== 更新日の確認 ==='
+$ngDate = 0
+foreach ($r in $results) {
+	Write-Host ("[{0}]" -f $r.Html.Replace("$root\", ''))
+	$ngDate += (Test-UpdatedDate $r.Html)
+}
+
+Write-Host ''
+if ($ngLink -eq 0 -and $ngText -eq 0 -and $ngDate -eq 0) {
 	Write-Host '変換が完了しました。'
 } else {
 	if ($ngLink -gt 0) { Write-Host ("リンク切れ {0} 件" -f $ngLink) -ForegroundColor Yellow }
 	if ($ngText -gt 0) { Write-Host ("Markdown 側だけの文言 {0} 件" -f $ngText) -ForegroundColor Yellow }
+	if ($ngDate -gt 0) { Write-Host ("更新日の要確認 {0} 件" -f $ngDate) -ForegroundColor Yellow }
 	Write-Host '変換は完了しましたが、上記を確認してください。'
 }

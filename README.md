@@ -1,13 +1,15 @@
 # ローカルLLM 実行環境
 
 > RTX 3050 Ti Laptop（VRAM 4GB）／RAM 16GB のノートPCで llama.cpp を動かす
-> 📅 作成: 2026-08-24 / 更新: 2026-08-25
+> 📅 作成: 2026-08-24 / 更新: 2026-08-27
 
 ## プロジェクトの状況
 
 ## 1. このプロジェクトについて
 
 手元のノートPCでローカルLLMを常用できる状態にする。 実行基盤は **llama.cpp**、モデルは `C:\AI_Models` にある手持ちのGGUFを流用する方針。
+
+文書は GitHub Pages でも公開している — [https://lightspeedc.com/20260824-local-llm-llama-cp/](https://lightspeedc.com/20260824-local-llm-llama-cp/)
 
 ### 現在の段階
 
@@ -65,6 +67,8 @@
 ```text
 20260824-local-llm-llama-cp/
 ├─ README.html              … このファイル
+├─ index.html               … README.html への転送（GitHub Pages 用）
+├─ .nojekyll                … Jekyll の前処理を無効化
 ├─ bin/llama.cpp/           … b10612 (CUDA 12.4) 一式
 ├─ scripts/
 │   ├─ run-server.cmd       … 常用 (Qwen3-4B)
