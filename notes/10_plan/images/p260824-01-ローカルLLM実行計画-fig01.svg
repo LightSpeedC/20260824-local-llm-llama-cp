@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 250" width="900" height="250" role="img" aria-label="配布バイナリと自前コンパイルの準備コスト比較">
+	<defs>
+		<linearGradient id="i1" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(140,78%,25%)"/>
+			<stop offset="1" stop-color="hsl(140,58%,55%)"/>
+		</linearGradient>
+		<linearGradient id="i2" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(280,78%,25%)"/>
+			<stop offset="1" stop-color="hsl(280,58%,55%)"/>
+		</linearGradient>
+		<linearGradient id="i3" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(220,78%,25%)"/>
+			<stop offset="1" stop-color="hsl(220,58%,55%)"/>
+		</linearGradient>
+		<linearGradient id="i4" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(40,78%,25%)"/>
+			<stop offset="1" stop-color="hsl(40,58%,55%)"/>
+		</linearGradient>
+	</defs>
+	<rect width="100%" height="100%" fill="#ffffff"/>
+
+	<text x="20" y="24" fill="#1c2330" font-size="15" font-weight="700">案A — 配布バイナリを展開する</text>
+	<rect x="20" y="36" width="860" height="52" rx="8" fill="#eef1f6" stroke="#d9dfe8"/>
+	<rect x="20" y="36" width="70" height="52" rx="8" fill="url(#i1)"/>
+	<text x="55" y="68" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">zip</text>
+	<text x="110" y="60" fill="#1c2330" font-size="14">追加で入れるもの: なし　／　ダウンロード 約 200 MB　／　所要 5〜10 分</text>
+	<text x="110" y="80" fill="#4a5568" font-size="13">GPUドライバ（導入済み 592.82）だけで動く</text>
+
+	<text x="20" y="126" fill="#1c2330" font-size="15" font-weight="700">案B — 自分でコンパイルする（CUDA）</text>
+	<rect x="20" y="138" width="860" height="52" rx="8" fill="#eef1f6" stroke="#d9dfe8"/>
+	<rect x="20" y="138" width="430" height="52" rx="8" fill="url(#i2)"/>
+	<text x="235" y="162" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">VS 2022 Build Tools</text>
+	<text x="235" y="181" fill="#fff" font-size="13" text-anchor="middle">約 8 GB・未導入</text>
+	<rect x="450" y="138" width="285" height="52" fill="url(#i3)"/>
+	<text x="592" y="162" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">CUDA Toolkit 12.x</text>
+	<text x="592" y="181" fill="#fff" font-size="13" text-anchor="middle">約 5 GB・未導入</text>
+	<rect x="735" y="138" width="60" height="52" fill="url(#i4)"/>
+	<text x="765" y="162" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">CMake</text>
+	<text x="765" y="181" fill="#fff" font-size="12" text-anchor="middle">0.1 GB</text>
+	<text x="800" y="168" fill="#4a5568" font-size="13">ソース</text>
+
+	<text x="20" y="216" fill="#1c2330" font-size="14">合計 約 13 GB のインストール　＋　ビルド 30〜90 分（4コアCPU）　＋　更新のたびに再ビルド</text>
+	<text x="20" y="238" fill="#4a5568" font-size="13">※ 推論速度そのものは案Aと案Bで変わらない。同じCUDAカーネルが動く</text>
+</svg>

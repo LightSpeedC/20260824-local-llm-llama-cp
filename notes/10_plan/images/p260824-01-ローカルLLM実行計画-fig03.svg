@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" width="900" height="300" role="img" aria-label="VRAM 4GB の配分イメージ">
+	<defs>
+		<linearGradient id="i1" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(105,78%,25%)"/>
+			<stop offset="1" stop-color="hsl(105,58%,55%)"/>
+		</linearGradient>
+		<linearGradient id="i2" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(200,78%,25%)"/>
+			<stop offset="1" stop-color="hsl(200,58%,55%)"/>
+		</linearGradient>
+		<linearGradient id="i3" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(30,78%,25%)"/>
+			<stop offset="1" stop-color="hsl(30,58%,55%)"/>
+		</linearGradient>
+		<linearGradient id="i4" x1="0" y1="1" x2="0" y2="0">
+			<stop offset="0" stop-color="hsl(260,78%,25%)"/>
+			<stop offset="1" stop-color="hsl(260,58%,55%)"/>
+		</linearGradient>
+	</defs>
+	<rect width="100%" height="100%" fill="#ffffff"/>
+
+	<text x="20" y="24" fill="#1c2330" font-size="15">Qwen3-4B Q4_K_M — 全層がGPUに載る。実測 56.5 tok/s</text>
+	<rect x="20" y="38" width="860" height="70" rx="8" fill="#eef1f6" stroke="#d9dfe8"/>
+	<rect x="20" y="38" width="499" height="70" rx="8" fill="url(#i1)"/>
+	<text x="269" y="70" fill="#fff" font-size="15" font-weight="700" text-anchor="middle">モデル重み 2.32 GiB</text>
+	<text x="269" y="92" fill="#fff" font-size="13" text-anchor="middle">全層をGPUへ（-ngl 99）</text>
+	<rect x="519" y="38" width="108" height="70" fill="url(#i2)"/>
+	<text x="573" y="70" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">KV＋計算</text>
+	<text x="573" y="90" fill="#fff" font-size="13" text-anchor="middle">約 0.5 GB</text>
+	<rect x="627" y="38" width="170" height="70" fill="url(#i3)"/>
+	<text x="712" y="70" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">画面表示など</text>
+	<text x="712" y="90" fill="#fff" font-size="13" text-anchor="middle">808 MiB（実測）</text>
+	<text x="838" y="78" fill="#4a5568" font-size="12" text-anchor="middle">空き</text>
+
+	<text x="20" y="160" fill="#1c2330" font-size="15">Qwen3.5-9B Q4_K_M — 重みが枠を超えるため、一部の層はCPU側に残る。実測 8.1 tok/s</text>
+	<rect x="20" y="174" width="860" height="70" rx="8" fill="#eef1f6" stroke="#d9dfe8"/>
+	<rect x="20" y="174" width="516" height="70" rx="8" fill="url(#i1)"/>
+	<text x="278" y="206" fill="#fff" font-size="15" font-weight="700" text-anchor="middle">GPUに載せる重み 約 2.4 GB</text>
+	<text x="278" y="228" fill="#fff" font-size="13" text-anchor="middle">-ngl 24（これ以上は超過する）</text>
+	<rect x="536" y="174" width="43" height="70" fill="url(#i2)"/>
+	<text x="557" y="206" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">KV</text>
+	<text x="557" y="226" fill="#fff" font-size="12" text-anchor="middle">q8_0</text>
+	<rect x="579" y="174" width="170" height="70" fill="url(#i3)"/>
+	<text x="664" y="206" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">画面表示など</text>
+	<text x="664" y="226" fill="#fff" font-size="13" text-anchor="middle">808 MiB（実測）</text>
+
+	<rect x="20" y="256" width="480" height="34" rx="6" fill="url(#i4)"/>
+	<text x="260" y="279" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">CPU側（RAM）に残る重み 約 2.8 GB ← 速度低下の原因</text>
+	<text x="510" y="279" fill="#4a5568" font-size="13">この比率が、そのまま tok/s の落ち込みになる</text>
+
+	<text x="20" y="128" fill="#4a5568" font-size="13">← 横幅全体が VRAM 4095 MiB。うち 808 MiB は起動前から使われている →</text>
+</svg>
