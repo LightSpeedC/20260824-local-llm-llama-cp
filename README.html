@@ -18,7 +18,8 @@
 	--soft:#f2f5fb;
 }
 .ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
-.ch02{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+.ch02{--accent:hsl(140,78%,25%);--accent2:hsl(140,58%,55%);--soft:hsl(140,28%,95%);}
+.ch03{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
 
 *{box-sizing:border-box;}
 body{
@@ -54,16 +55,6 @@ a.home{
 }
 a.home svg{vertical-align:-2px;}
 
-.minibar{
-	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
-	color:#fff;
-	font-size:1.15em;
-	font-weight:700;
-	padding:10px 20px;
-	border-radius:8px;
-	margin:34px 0 0;
-	box-shadow:0 3px 10px rgba(0,0,0,0.15);
-}
 
 section{
 	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
@@ -172,8 +163,6 @@ footer{
 公開ページは <a href="https://lightspeedc.com/20260824-local-llm-llama-cp/">https://lightspeedc.com/20260824-local-llm-llama-cp/</a> にある。
 </p>
 
-<div class="minibar">資料</div>
-
 <section class="ch01">
 <h1>計画</h1>
 <ul>
@@ -196,6 +185,13 @@ footer{
 </ul>
 </section>
 
+<section class="ch03">
+<h1>課題</h1>
+<ul>
+	<li><a href="notes/40_issues/issues.html">課題一覧</a> — これから解決すること</li>
+</ul>
+</section>
+
 <h2>環境</h2>
 <div class="tablewrap">
 <table>
@@ -213,10 +209,12 @@ footer{
 <pre><code>20260824-local-llm-llama-cp/
 ├─ README.html              … このファイル
 ├─ index.html               … README.html への転送（GitHub Pages 用）
+├─ cc1.cmd                  … Claude Code を llama-server に繋いで起動する
 ├─ notes/
 │   ├─ 01_research/         … 調査
-│   └─ 10_plan/             … 計画
-├─ tools/50_run/            … llama-server の起動・速度計測
+│   ├─ 10_plan/             … 計画
+│   └─ 40_issues/           … 課題
+├─ tools/50_run/            … llama-server の起動（Claude Code 向けを含む）・速度計測
 └─ bin/llama.cpp/           … 配布バイナリ（git 管理外）
 
 C:\AI_Models\                … GGUF の実体（LM Studio と共用・移動しない）</code></pre>

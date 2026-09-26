@@ -232,7 +232,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 		<h1>ローカルLLM 実行計画</h1>
 		<div class="lead">
 			RTX 3050 Ti Laptop（VRAM 4GB）／RAM 16GB のノートPCで動かすための、ソフトウェア選定・入手方法・モデル選定・導入手順<br>
-			📅 作成: 2026-08-24 / 更新: 2026-08-26
+			📅 作成: 2026-08-24 / 更新: 2026-09-27
 		</div>
 	</div>
 </div>
@@ -1341,15 +1341,38 @@ Qwen3.5 系はアーキテクチャが新しいため、配布バイナリのリ
 
 <h2>Step 5 — Claude Code からの接続に切り替える</h2>
 <p>
-<code>llama-server</code> は OpenAI 互換のエンドポイント
-（<code>http://127.0.0.1:8080/v1/chat/completions</code>）を提供する。
-LM Studio が提供していたものと同じ形式なので、<strong>これまで Claude Code から LM Studio に繋いでいた構成の接続先を差し替えるだけで済む</strong>。
+<code>llama-server</code> は OpenAI 互換のエンドポイントに加えて、Anthropic 形式の
+<code>http://127.0.0.1:8080/v1/messages</code> にも応答する。
+Claude Code は Anthropic 形式で話すため、<strong>変換の層を挟まず、環境変数で接続先を向けるだけで繋がる</strong>。
 </p>
 <ul>
-	<li>Claude Code 自体は Anthropic 形式で話すため、LM Studio に繋いだときと同じ変換の層（プロキシ／ルータ）はそのまま必要になる</li>
-	<li>変えるのは、その層が向く先を LM Studio のポートから <code>127.0.0.1:8080</code> に切り替える1点だけ</li>
-	<li>モデル名の指定が要る構成では、<code>llama-server</code> 側が返すモデル識別子に合わせる</li>
+	<li>サーバは Claude Code 向けの設定で起動する（<code>tools\50_run\run-server-cc.cmd</code>）</li>
+	<li>Claude Code は root の <code>cc1.cmd</code> から起動する。<code>ANTHROPIC_BASE_URL</code> を <code>http://127.0.0.1:8080</code> に向け、モデル名はサーバの <code>--alias</code> に合わせる</li>
 </ul>
+
+<h3>コンテキストは 65536 が要る</h3>
+<p>
+Claude Code は<strong>最初の要求だけで約 63,000 トークン</strong>ある（システムプロンプトとツール定義）。
+常用の <code>-c 8192</code> では「request (63484 tokens) exceeds the available context size (8192 tokens)」
+（要求が使えるコンテキストを超えている）で拒否される。
+</p>
+<p>
+65536 の KV キャッシュは VRAM 4GB に載らないため、<strong>RAM 側に置く</strong>（<code>-nkvo</code>）。
+q8_0 に量子化し、スロットは1つ（<code>-np 1</code>）にする。サーバの RAM 使用は約 7.6 GB。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">要求</th><th class="nowrap">読み込んだトークン</th><th class="nowrap">所要</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">サーバ起動後の1回目</td><td class="num">63,416</td><td class="num">157 秒</td></tr>
+<tr><td class="nowrap">2回目</td><td class="num">1,985</td><td class="num">14 秒</td></tr>
+</tbody>
+</table>
+</div>
+<p>
+2回目は、共通部分の KV キャッシュが再利用され、差分だけを読み込む。
+<strong>サーバを起動したままにしておけば、待たされるのは最初の1回だけ</strong>になる。
+</p>
 <p>
 LM Studio と llama.cpp のサーバは<strong>ポートを分けて同時に立てられる</strong>ので、
 接続先を行き来させながら応答を比較でき、切り替えに失敗しても元に戻せる。
@@ -1498,7 +1521,7 @@ VRAMが余っていれば値を下げていく。小さいほどエキスパー�
 	<li><span class="badge b-ok">解決</span>速度・品質の実測 → 第10章。用途による使い分けまで確定</li>
 	<li><span class="badge b-none">未定</span>常用する用途。基盤が整ったので、実際に使いながら決める段階に入った</li>
 	<li><span class="badge b-none">未定</span>モデルの更新方針。新しいモデルが出るたびに追随するか、固定するか</li>
-	<li><span class="badge b-none">未実施</span>Claude Code からの接続切り替え（第8章 Step 5）。API の動作は確認済みで、あとは接続先を向け替えるだけ</li>
+	<li><span class="badge b-ok">解決</span>Claude Code からの接続切り替え → 変換の層なしで繋がることを確かめ、スクリプトにした（第8章 Step 5）</li>
 </ul>
 </section>
 
@@ -1702,9 +1725,8 @@ API 経由の 39.5 tok/s が <code>llama-bench</code> の 56.5 tok/s より低�
 HTTP のやり取りとプロンプト処理を含んだ実効値のため。<strong>体感速度としてはこちらが実態に近い</strong>。
 </p>
 <div class="callout">
-<strong>これで第8章 Step 5 の下地が整った。</strong>
-LM Studio に繋いでいた構成の接続先を <code>127.0.0.1:8080</code> に向け替えるだけで、Claude Code から使える。
-両者はポートが違うので、並べて立てて応答を比較できる。
+<strong>Claude Code からは Anthropic 形式の <code>/v1/messages</code> で繋がる。</strong>
+変換の層は要らない。ただし Claude Code の要求は約 63,000 トークンあり、専用の設定でサーバを起動する（第8章 Step 5）。
 </div>
 
 <h2>品質評価 — 差が出るのは知識を問うときだけ</h2>
