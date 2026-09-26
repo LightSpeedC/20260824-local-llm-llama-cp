@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -12,36 +12,50 @@
 	--ink-soft:#4a5568;
 	--line:#d9dfe8;
 	--code-bg:#f4f6fa;
-	--accent:var(--navy1);
-	--accent2:var(--navy2);
+	--link:#1a4fa0;
+	--accent:#12224d;
+	--accent2:#2f5fbf;
 	--soft:#f2f5fb;
 }
-.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,65%);--soft:hsl(280,28%,95%);}
-.ch02{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,65%);--soft:hsl(0,28%,95%);}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
 
 *{box-sizing:border-box;}
 body{
 	margin:0;
 	background:#fff;
-	color:var(--ink);
+	color:var(--ink, #1c2330);
 	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
 	font-size:15.5px;
 	line-height:1.85;
 }
 .titlebar{
-	background:linear-gradient(135deg,var(--navy1),var(--navy2));
+	background:linear-gradient(135deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
 	color:#fff;
 	padding:34px 30px 30px;
 }
-.titlebar .inner{max-width:1400px;margin:0 auto;}
+.titlebar .inner{max-width:1600px;margin:0 auto;}
 .titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
-.titlebar .meta{font-size:0.88em;color:#cfe0ff;}
+.titlebar .lead{background:none;color:#dce8ff;font-size:0.95em;}
+.titlebar .date{background:none;color:#cfe0ff;font-size:0.88em;margin-top:6px;}
 .titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
 
-.wrap{max-width:1400px;margin:0 auto;padding:0 30px;}
+.wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
+
+.homelink{margin:20px 0 0;}
+a.home{
+	display:inline-block;
+	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	border-radius:6px;
+	padding:4px 11px;
+	line-height:1;
+	text-decoration:none;
+}
+a.home svg{vertical-align:-2px;}
 
 .minibar{
-	background:linear-gradient(100deg,var(--navy1),var(--navy2));
+	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
 	color:#fff;
 	font-size:1.15em;
 	font-weight:700;
@@ -52,14 +66,14 @@ body{
 }
 
 section{
-	background:linear-gradient(180deg,var(--soft),#fff);
-	border:1px solid var(--line);
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border:1px solid var(--line, #d9dfe8);
 	border-radius:10px;
 	padding:4px 26px 26px;
 	margin:16px 0 34px;
 }
 section h1{
-	background:linear-gradient(100deg,var(--accent),var(--accent2));
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
 	color:#fff;
 	font-size:1.45em;
 	padding:14px 20px;
@@ -69,20 +83,21 @@ section h1{
 }
 section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
 h2{
+	background:linear-gradient(90deg,var(--soft, #f2f5fb),#fff);
+	color:var(--accent, #12224d);
 	font-size:1.15em;
-	border-left:6px solid var(--accent);
-	background:linear-gradient(90deg,var(--soft),#fff);
+	border-left:6px solid var(--accent, #12224d);
 	padding:6px 12px;
 	margin:30px 0 12px;
-	color:var(--accent);
 }
 p{margin:8px 0;}
 ul{margin:8px 0;padding-left:1.5em;}
-li{margin:4px 0;}
+li{margin:8px 0;}
+a{background:none;color:var(--link, #1a4fa0);}
 
 code{
-	background:var(--code-bg);
-	border:1px solid var(--line);
+	background:var(--code-bg, #f4f6fa);
+	border:1px solid var(--line, #d9dfe8);
 	color:#17335f;
 	border-radius:4px;
 	padding:1px 5px;
@@ -90,10 +105,10 @@ code{
 	font-size:0.92em;
 }
 pre{
-	background:var(--code-bg);
-	color:var(--ink);
-	border:1px solid var(--line);
-	border-left:5px solid var(--accent2);
+	background:var(--code-bg, #f4f6fa);
+	color:var(--ink, #1c2330);
+	border:1px solid var(--line, #d9dfe8);
+	border-left:5px solid var(--accent2, #2f5fbf);
 	border-radius:0 8px 8px 0;
 	padding:13px 16px;
 	overflow-x:auto;
@@ -113,40 +128,28 @@ table{
 	font-size:0.95em;
 }
 th{
-	background:linear-gradient(100deg,var(--accent),var(--accent2));
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
 	color:#fff;
 	text-align:left;
 	padding:9px 12px;
 }
 th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
-td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+td{
+	background:none;
+	color:var(--ink, #1c2330);
+	padding:9px 12px;
+	border-bottom:1px solid var(--line, #d9dfe8);
+	vertical-align:top;
+}
 tr:nth-child(even) td{background:#fafbfe;}
 .nowrap{white-space:nowrap;}
 
-.badge{
-	display:inline-block;
-	color:#fff;
-	font-size:0.8em;
-	font-weight:600;
-	border-radius:5px;
-	padding:2px 9px;
-	margin-right:7px;
-	white-space:nowrap;
+footer{
+	max-width:1600px;
+	margin:40px auto;
+	padding:18px 30px 30px;
+	border-top:1px solid var(--line, #d9dfe8);
 }
-.b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
-.b-non{background:linear-gradient(100deg,#5a6472,#97a1ae);}
-.b-warn{background:linear-gradient(100deg,#b8620a,#f0a548);}
-
-.callout{
-	border-left:6px solid var(--accent);
-	background:linear-gradient(180deg,var(--soft),#fff);
-	border-radius:0 8px 8px 0;
-	padding:12px 16px;
-	margin:16px 0;
-}
-.callout strong{color:var(--accent);}
-
-a{color:var(--navy2);}
 </style>
 </head>
 <body>
@@ -154,137 +157,75 @@ a{color:var(--navy2);}
 <div class="titlebar">
 	<div class="inner">
 		<h1>ローカルLLM 実行環境</h1>
-		<div class="meta">
-			RTX 3050 Ti Laptop（VRAM 4GB）／RAM 16GB のノートPCで llama.cpp を動かす<br>
-			📅 作成: 2026-08-24 / 更新: 2026-08-27
-		</div>
+		<div class="lead">RTX 3050 Ti Laptop（VRAM 4GB）／RAM 16GB のノートPCで llama.cpp を動かす</div>
+		<div class="date">📅 作成: 2026-08-24 / 更新: 2026-09-27</div>
 	</div>
 </div>
 
 <div class="wrap">
 
-<div class="minibar">プロジェクトの状況</div>
+<p class="homelink"><a class="home" href="../" aria-label="lightspeedc.com"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+
+<p>
+手元のノートPCでローカルLLMを動かすための検討と実測をまとめている。
+実行基盤は <strong>llama.cpp</strong>、モデルは <code>C:\AI_Models</code> にある手持ちの GGUF を使う。
+公開ページは <a href="https://lightspeedc.com/20260824-local-llm-llama-cp/">https://lightspeedc.com/20260824-local-llm-llama-cp/</a> にある。
+</p>
+
+<div class="minibar">資料</div>
 
 <section class="ch01">
-<h1>このプロジェクトについて</h1>
+<h1>計画</h1>
+<ul>
+	<li><a href="notes/10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>
+		— ソフトウェアの選定、配布バイナリと自前コンパイルの比較、手持ちモデルの棚卸し、
+		量子化と VRAM 配分、最新量子化と MoE の検討、導入手順、検証計画、実測結果</li>
+	<li><a href="notes/10_plan/p260825-01-階層型エージェント構成案.html">階層型エージェント構成案</a>
+		— 大きなモデルで計画し、小さなモデルで実装する構成。VRAM 4GB では複数モデルを同時常駐できないため、
+		並列スロットで代替する設計</li>
+</ul>
+</section>
 
-<p>
-手元のノートPCでローカルLLMを常用できる状態にする。
-実行基盤は <strong>llama.cpp</strong>、モデルは <code>C:\AI_Models</code> にある手持ちのGGUFを流用する方針。
-</p>
-<p>
-文書は GitHub Pages でも公開している —
-<a href="https://lightspeedc.com/20260824-local-llm-llama-cp/">https://lightspeedc.com/20260824-local-llm-llama-cp/</a>
-</p>
-
-<h2>現在の段階</h2>
-<div class="tablewrap">
-<table>
-<thead><tr><th class="nowrap">段階</th><th>状態</th></tr></thead>
-<tbody>
-<tr><td class="nowrap">計画</td><td><span class="badge b-ok">完了</span>下記の計画書にまとめてある</td></tr>
-<tr><td class="nowrap">モデルの棚卸し</td><td><span class="badge b-ok">完了</span>重複していた 12.6 GB を整理（98.5 → 86.0 GB）</td></tr>
-<tr><td class="nowrap">llama.cpp の配置</td><td><span class="badge b-ok">完了</span>b10612（CUDA 12.4）を <code>bin\llama.cpp\</code> に展開</td></tr>
-<tr><td class="nowrap">起動スクリプト</td><td><span class="badge b-ok">完了</span><code>scripts\</code> に4種類（常用・品質重視・9B・MoE）</td></tr>
-<tr><td class="nowrap">速度の実測</td><td><span class="badge b-ok">完了</span>下記のとおり。計画書の第10章に詳細</td></tr>
-<tr><td class="nowrap">品質の評価</td><td><span class="badge b-ok">完了</span>質問セット5問すべてを Qwen3-4B と E4B で実施。使い分けの基準を確定</td></tr>
-<tr><td class="nowrap">Claude Code 接続</td><td><span class="badge b-non">未着手</span>API 動作は確認済み。接続先を <code>127.0.0.1:8080</code> に向け替えるだけ</td></tr>
-</tbody>
-</table>
-</div>
+<section class="ch02">
+<h1>調査</h1>
+<ul>
+	<li><a href="notes/01_research/r260825-01-投機的デコーディング.html">Speculative Decoding 調査</a>
+		— 小さなドラフトモデルで先読みして生成を速める手法が、VRAM 4GB で成立するかの事前検討</li>
+	<li><a href="notes/01_research/r260825-02-HP-ZGX-Nano-G1n.html">HP ZGX Nano G1n 調査</a>
+		— 128GB 統合メモリの AI ワークステーション。容量と帯域の違い、他の選択肢との比較、判断材料の整理</li>
+</ul>
+</section>
 
 <h2>環境</h2>
 <div class="tablewrap">
 <table>
 <thead><tr><th class="nowrap">項目</th><th>内容</th></tr></thead>
 <tbody>
-<tr><td class="nowrap">GPU</td><td>NVIDIA GeForce RTX 3050 Ti Laptop（VRAM 4 GB）／ドライバ 592.82</td></tr>
+<tr><td class="nowrap">GPU</td><td>NVIDIA GeForce RTX 3050 Ti Laptop（VRAM 4 GB）</td></tr>
 <tr><td class="nowrap">CPU / RAM</td><td>Intel Core i7-11370H（4コア8スレッド）／15.8 GB</td></tr>
-<tr><td class="nowrap">モデル置き場</td><td><code>C:\AI_Models</code>（LM Studio と共用・約 86.0 GB / 26ファイル）</td></tr>
-<tr><td class="nowrap">既存ツール</td><td>LM Studio 導入済み。Ollama はアンインストール済み</td></tr>
+<tr><td class="nowrap">実行基盤</td><td>llama.cpp（CUDA 12.4 の配布バイナリ）</td></tr>
+<tr><td class="nowrap">モデル置き場</td><td><code>C:\AI_Models</code>（LM Studio と共用）</td></tr>
 </tbody>
 </table>
 </div>
-
-<h2>実測した生成速度</h2>
-<div class="tablewrap">
-<table>
-<thead><tr><th class="nowrap">用途</th><th>モデルと設定</th><th class="nowrap">速度</th></tr></thead>
-<tbody>
-<tr><td class="nowrap"><span class="badge b-ok">資料を渡す作業</span></td><td class="nowrap"><strong>Qwen3-4B-Instruct-2507</strong> <code>-ngl 99 -c 8192</code></td><td class="nowrap">56.5 tok/s</td></tr>
-<tr><td class="nowrap"><span class="badge b-ok">知識を問う時</span></td><td class="nowrap"><strong>gemma-4-E4B-it</strong> <code>-ngl 99</code>（reasoning）</td><td class="nowrap">45.2 tok/s</td></tr>
-<tr><td class="nowrap"><span class="badge b-warn">用途限定</span></td><td class="nowrap">Qwen3.5-9B <code>-ngl 24</code> ＋KV量子化</td><td class="nowrap">8.1 tok/s</td></tr>
-<tr><td class="nowrap"><span class="badge b-warn">用途限定</span></td><td class="nowrap">gpt-oss-20b <code>--n-cpu-moe 18</code></td><td class="nowrap">5.9 tok/s</td></tr>
-</tbody>
-</table>
-</div>
-
-<div class="callout">
-<strong>分かれ目は「答えが渡した文章の中にあるか」。</strong>
-質問セット5問の結果、1970字の読解と413字の要約では <strong>Qwen3-4B が E4B と同じ正確さで3〜6倍速かった</strong>。
-差が出たのは知識を問う設問だけで、Qwen3-4B は「量子化とは」の説明で量子力学と混同した誤答を出している。
-<strong>資料を渡す作業は 4B、渡す資料が用意できない場面だけ E4B</strong> という切り分けになる。
-</div>
-
-<div class="callout">
-<strong>予想外だったのは gemma-4-E4B。</strong>
-ファイルは 4.95 GiB で 9B クラス扱いだったが、Per-Layer Embeddings の 2730 MiB が CPU 側に分離されるため、
-GPU には 2868 MiB しか載らず <strong>4B クラスに近い速度で動く</strong>。
-サイズだけで仕分けると取りこぼすモデルがある。詳細は計画書の第10章。
-</div>
-
-<div class="callout">
-<strong>VRAM を超えても、エラーではなく「5〜40倍遅くなる」形で現れる。</strong>
-NVIDIAドライバが共有GPUメモリに逃がすため止まらない。
-<code>-ngl</code> の付けすぎと、コンテキスト 16384 の指定がこれを起こす。8192 を上限として運用する。
-</div>
-</section>
-
-<section class="ch02">
-<h1>ドキュメント</h1>
-
-<h2>計画</h2>
-<ul>
-	<li><a href="docs/plan/local-llm-plan.html"><strong>ローカルLLM 実行計画</strong></a>
-		— ソフトウェア選定（llama.cpp / Ollama / LM Studio）、配布バイナリと自前コンパイルの比較、
-		手持ちモデルの棚卸し、量子化とVRAM配分、最新量子化とMoEの検討、導入手順、検証計画、<strong>実測結果</strong></li>
-	<li><a href="docs/plan/agent-architecture.html"><strong>階層型エージェント構成案</strong></a>
-		— 大きなモデルで計画し、小さなモデルで実装する構成。VRAM 4GB では複数モデルを同時常駐できないため、
-		<code>--parallel</code> による並列スロットで代替する設計。<span class="badge b-non">実装は未着手</span></li>
-</ul>
-
-<h2>調査</h2>
-<ul>
-	<li><a href="docs/research/speculative-decoding.html"><strong>Speculative Decoding 調査</strong></a>
-		— 小さなドラフトモデルで先読みして生成を速める手法。VRAM 4GB で成立するかの事前検討。
-		<span class="badge b-non">検証は未実施</span></li>
-	<li><a href="docs/research/hp-zgx-nano.html"><strong>HP ZGX Nano G1n 調査</strong></a>
-		— 128GB 統合メモリの AI ワークステーション。容量と帯域の違い、他の選択肢との比較、判断材料の整理</li>
-</ul>
 
 <h2>フォルダ構成</h2>
 <pre><code>20260824-local-llm-llama-cp/
 ├─ README.html              … このファイル
 ├─ index.html               … README.html への転送（GitHub Pages 用）
-├─ .nojekyll                … Jekyll の前処理を無効化
-├─ bin/llama.cpp/           … b10612 (CUDA 12.4) 一式
-├─ scripts/
-│   ├─ run-server.cmd       … 常用 (Qwen3-4B)
-│   ├─ run-server-e4b.cmd   … 品質重視 (gemma-4-E4B)
-│   ├─ run-server-9b.cmd    … Qwen3.5-9B
-│   ├─ run-server-moe.cmd   … gpt-oss-20b (MoE)
-│   └─ bench.cmd            … 速度計測
-├─ docs/
-│   ├─ plan/                … 計画書
-│   └─ research/            … 個別テーマの調査
-├─ src/scripts/70_html2md/  … HTML→Markdown 変換
-├─ etc/                     … 補助スクリプト（git管理外）
-└─ tmp/                     … ダウンロードしたzip等（git管理外）
+├─ notes/
+│   ├─ 01_research/         … 調査
+│   └─ 10_plan/             … 計画
+├─ tools/50_run/            … llama-server の起動・速度計測
+└─ bin/llama.cpp/           … 配布バイナリ（git 管理外）
 
 C:\AI_Models\                … GGUF の実体（LM Studio と共用・移動しない）</code></pre>
-</section>
 
 </div>
+
+<footer>
+	<a class="home" href="../" aria-label="lightspeedc.com"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a>
+</footer>
 
 </body>
 </html>
