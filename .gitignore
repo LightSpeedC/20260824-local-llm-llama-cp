@@ -4,10 +4,20 @@ tmp/
 # セッションログ・補助スクリプト（会話ログを含むため公開しない）
 etc/
 
+# 自動生成するログ・レポート
+logs/
+
+# 非公開フォルダ
+_*
+
 # ローカル設定
-.claude/
+.claude/*
+!.claude/settings.json
+!.claude/commands/
+!.claude/agents/
+!.claude/skills/
 
 # llama.cpp の配布バイナリ
 # NVIDIA の CUDA 再頒布DLL を含み、100MB を超えるファイルもあるため管理対象外。
-# 取得手順は docs/plan/local-llm-plan.html の第8章 Step 1 を参照。
+# 取得手順は実行計画の導入手順を参照。
 bin/
