@@ -1302,7 +1302,7 @@ llama.cpp からも同じ絶対パスで参照できる。Hugging Face から直
 <h2>Step 3 — 起動スクリプトを用意</h2>
 <p><code>tools\50_run\run-server.cmd</code> として、以下を出発点にする。</p>
 <pre><code>@echo off
-"%~dp0..\bin\llama.cpp\llama-server.exe" ^
+"%~dp0..\..\bin\llama.cpp\llama-server.exe" ^
   -m "C:\AI_Models\qwen\Qwen3-4B-Instruct-2507-GGUF\Qwen3-4B-Instruct-2507-Q4_K_M.gguf" ^
   -ngl 99 ^
   -c 8192 ^
