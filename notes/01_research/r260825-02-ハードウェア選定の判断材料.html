@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HP ZGX Nano G1n 調査</title>
+<title>ハードウェア選定の判断材料</title>
 <style>
 :root{
 	--navy1:#12224d;
@@ -40,7 +40,8 @@ body{
 }
 .titlebar .inner{max-width:1600px;margin:0 auto;}
 .titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
-.titlebar .lead{font-size:0.88em;color:#cfe0ff;}
+.titlebar .lead{background:none;color:#dce8ff;font-size:0.95em;}
+.titlebar .date{background:none;color:#cfe0ff;font-size:0.88em;margin-top:6px;}
 .titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
 
 .wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
@@ -217,10 +218,9 @@ footer a{color:var(--navy2, #2f5fbf);}
 
 <div class="titlebar">
 	<div class="inner">
-		<h1>HP ZGX Nano G1n 調査</h1>
-		<div class="lead">
-			128GB 統合メモリの AI ワークステーションが、VRAM 4GB という現在の制約をどう変えるか<br>
-			📅 作成: 2026-08-25 / 更新: 2026-08-25
+		<h1>ハードウェア選定の判断材料</h1>
+		<div class="lead">VRAM 4GB という現在の制約を、どのハードウェアで、いくらで解決できるか</div>
+		<div class="date">📅 作成: 2026-08-25 / 更新: 2026-09-27
 		</div>
 	</div>
 </div>
@@ -245,9 +245,16 @@ footer a{color:var(--navy2, #2f5fbf);}
 <p>
 <a href="../10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>の実測で、本PCの制約はすべて <strong>VRAM 4GB</strong> に集約されることが分かった。
 9Bクラスで 8 tok/s、20B MoE で 5.9 tok/s、コンテキストは 8192 が上限——いずれもここから来ている。
-この制約を金銭で解決する選択肢として、HP のキャンペーン製品を検討する。
+この制約を金銭で解決する選択肢として、128GB 統合メモリの HP ZGX Nano G1n を軸に、
+GPU（RTX 30 / 50 系・RTX PRO）、Mac Studio、NVIDIA DGX Spark を価格とあわせて比べる。
 <strong>購入を勧めるものではなく、判断材料を並べる目的の文書である。</strong>
 </p>
+<div class="callout callout-important">
+<strong>本書の「現環境」は、RAM 16GB のときの実測に基づく。</strong>
+その後 RAM を 32GB に増設し、画面表示を内蔵GPU に任せたところ、9B は 14.6 tok/s、20B MoE は 19.0 tok/s、
+コンテキストは KV を q8_0 にすれば 16384 まで使えるようになった。Qwen3-30B-A3B も RAM には載る。
+ZGX との差は本書の比較より縮まっている。
+</div>
 
 <!-- ============ 1 ============ -->
 <section class="ch01" id="ch01">
@@ -275,9 +282,10 @@ footer a{color:var(--navy2, #2f5fbf);}
 <thead><tr><th class="nowrap">項目</th><th class="nowrap">金額・条件</th></tr></thead>
 <tbody>
 <tr><td class="nowrap">HP希望販売価格</td><td class="num">¥2,125,200（税込）〜</td></tr>
-<tr><td class="nowrap"><strong>キャンペーン価格</strong></td><td class="num"><strong>¥998,800（税込）</strong></td></tr>
-<tr><td class="nowrap">割引</td><td class="num">▲¥1,126,400（約 53% オフ）</td></tr>
-<tr><td class="nowrap">台数</td><td class="nowrap">500台限定（予定数達成で終了）</td></tr>
+<tr><td class="nowrap"><strong>キャンペーン価格</strong></td><td class="num"><strong>¥1,098,900（税込）</strong></td></tr>
+<tr><td class="nowrap">割引</td><td class="num">▲¥1,026,300（約 48% オフ）</td></tr>
+<tr><td class="nowrap">期間</td><td class="nowrap">2026-09-11 〜 2026-09-30</td></tr>
+<tr><td class="nowrap">価格.com 限定モデル</td><td class="num">¥1,097,800 ＋ 送料 ¥1,650（HP 直販）</td></tr>
 </tbody>
 </table>
 </div>
@@ -350,7 +358,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 
 <div class="callout callout-important">
 <strong>今使っている 4B モデルは、ほとんど速くならない。</strong>
-100万円を投じて 56 → 70 tok/s では割に合わない。
+110万円を投じて 56 → 70 tok/s では割に合わない。
 <strong>この製品の価値は「速くなること」ではなく「今まったく動かないものが動くこと」にある</strong>。
 判断はその一点を軸にすべきで、既存モデルの高速化を期待すると外す。
 </div>
@@ -373,17 +381,17 @@ footer a{color:var(--navy2, #2f5fbf);}
 </p>
 <div class="tablewrap">
 <table>
-<thead><tr><th>モデル</th><th class="nowrap">Q4 のサイズ</th><th class="nowrap">現環境</th><th class="nowrap">ZGX（推定）</th></tr></thead>
+<thead><tr><th>モデル</th><th class="nowrap">Q4 のサイズ</th><th class="nowrap">現環境<br>RAM 16GB</th><th class="nowrap">現環境<br>RAM 32GB</th><th class="nowrap">ZGX（推定）</th></tr></thead>
 <tbody>
-<tr><td class="nowrap">Qwen3-4B（密）</td><td class="num">2.3 GB</td><td class="num">56.5 tok/s</td><td class="num">70〜80 tok/s</td></tr>
-<tr><td class="nowrap">gemma-4-E4B</td><td class="num">5.0 GB</td><td class="num">45.2 tok/s</td><td class="num">55〜65 tok/s</td></tr>
-<tr><td class="nowrap">Qwen3.5-9B（密）</td><td class="num">5.2 GB</td><td class="num">8.1 tok/s</td><td class="num"><strong>30〜35 tok/s</strong></td></tr>
-<tr><td class="nowrap">gemma-4-12B（密）</td><td class="num">6.9 GB</td><td class="num">未測定（低速）</td><td class="num">25〜28 tok/s</td></tr>
-<tr><td class="nowrap">Qwen2.5-Coder-14B（密）</td><td class="num">8.4 GB</td><td class="num">未測定（低速）</td><td class="num">20〜23 tok/s</td></tr>
-<tr><td class="nowrap"><strong>gpt-oss-20b（MoE）</strong></td><td class="num">11.3 GB</td><td class="num">5.9 tok/s</td><td class="num"><strong>50〜70 tok/s</strong></td></tr>
-<tr><td class="nowrap"><strong>Qwen3-30B-A3B（MoE）</strong></td><td class="num">18 GB</td><td class="num"><strong>動かない</strong></td><td class="num"><strong>50〜70 tok/s</strong></td></tr>
-<tr><td class="nowrap">70B クラス（密）</td><td class="num">約 40 GB</td><td class="num"><strong>動かない</strong></td><td class="num">4〜5 tok/s</td></tr>
-<tr><td class="nowrap">200B クラス（密）</td><td class="num">約 110 GB</td><td class="num"><strong>動かない</strong></td><td class="num">1.5〜2 tok/s</td></tr>
+<tr><td class="nowrap">Qwen3-4B（密）</td><td class="num">2.3 GB</td><td class="num">56.5 tok/s</td><td class="num">58.9 tok/s</td><td class="num">70〜80 tok/s</td></tr>
+<tr><td class="nowrap">gemma-4-E4B</td><td class="num">5.0 GB</td><td class="num">45.2 tok/s</td><td class="num">未測定</td><td class="num">55〜65 tok/s</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B（密）</td><td class="num">5.2 GB</td><td class="num">8.1 tok/s</td><td class="num">14.6 tok/s</td><td class="num"><strong>30〜35 tok/s</strong></td></tr>
+<tr><td class="nowrap">gemma-4-12B（密）</td><td class="num">6.9 GB</td><td class="num">未測定（低速）</td><td class="num">未測定</td><td class="num">25〜28 tok/s</td></tr>
+<tr><td class="nowrap">Qwen2.5-Coder-14B（密）</td><td class="num">8.4 GB</td><td class="num">未測定（低速）</td><td class="num">未測定</td><td class="num">20〜23 tok/s</td></tr>
+<tr><td class="nowrap"><strong>gpt-oss-20b（MoE）</strong></td><td class="num">11.3 GB</td><td class="num">5.9 tok/s</td><td class="num"><strong>19.0 tok/s</strong></td><td class="num"><strong>50〜70 tok/s</strong></td></tr>
+<tr><td class="nowrap"><strong>Qwen3-30B-A3B（MoE）</strong></td><td class="num">18 GB</td><td class="num"><strong>動かない</strong></td><td class="num">RAM には載る・未測定</td><td class="num"><strong>50〜70 tok/s</strong></td></tr>
+<tr><td class="nowrap">70B クラス（密）</td><td class="num">約 40 GB</td><td class="num"><strong>動かない</strong></td><td class="num"><strong>動かない</strong></td><td class="num">4〜5 tok/s</td></tr>
+<tr><td class="nowrap">200B クラス（密）</td><td class="num">約 110 GB</td><td class="num"><strong>動かない</strong></td><td class="num"><strong>動かない</strong></td><td class="num">1.5〜2 tok/s</td></tr>
 </tbody>
 </table>
 </div>
@@ -397,7 +405,7 @@ MoE は<strong>総パラメータをメモリに置く必要がある一方、�
 <table>
 <thead><tr><th class="nowrap">モデル</th><th class="nowrap">総 / active</th><th>現環境で起きていること</th><th>ZGX なら</th></tr></thead>
 <tbody>
-<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">21B / 3.6B</td><td>11.3 GB が RAM 15.8 GB を圧迫し、エキスパートをCPUに逃がして 5.9 tok/s</td><td>全部がメモリに収まり、読むのは 3.6B 相当だけ</td></tr>
+<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">21B / 3.6B</td><td>RAM 16GB 時は、11.3 GB が RAM 15.8 GB を圧迫し、エキスパートをCPUに逃がして 5.9 tok/s。32GB に増設後は 19.0 tok/s</td><td>全部がメモリに収まり、読むのは 3.6B 相当だけ</td></tr>
 <tr><td class="nowrap">Qwen3-30B-A3B</td><td class="nowrap">30B / 3B</td><td><strong>Q4 の 18 GB が RAM に載らず起動できない</strong></td><td>余裕をもって収まる</td></tr>
 </tbody>
 </table>
@@ -419,25 +427,40 @@ MoE は<strong>総パラメータをメモリに置く必要がある一方、�
 <section class="ch04" id="ch04">
 <h1>他の選択肢との比較</h1>
 
-<h2>同価格帯の代替</h2>
+<h2>選択肢と価格（2026-09-27 時点）</h2>
 <div class="tablewrap">
 <table>
-<thead><tr><th>選択肢</th><th class="nowrap">使えるメモリ</th><th class="nowrap">帯域（概算）</th><th class="nowrap">価格帯</th><th>性格</th></tr></thead>
+<thead><tr><th>選択肢</th><th class="nowrap">使えるメモリ</th><th class="nowrap">帯域（公称）</th><th class="nowrap">価格</th><th>性格</th></tr></thead>
 <tbody>
-<tr><td class="nowrap"><strong>HP ZGX Nano G1n</strong></td><td class="num">約 120 GB</td><td class="num">約 273 GB/s</td><td class="num">約 100 万円<br>（キャンペーン）</td><td><strong>容量で殴る</strong>。大きいモデルが載る。速度は控えめ</td></tr>
-<tr><td class="nowrap">RTX 5090 搭載PC</td><td class="num">32 GB</td><td class="num">約 1,790 GB/s</td><td class="num">60〜90 万円</td><td><strong>速度で殴る</strong>。32GB に収まる範囲なら圧倒的に速い</td></tr>
-<tr><td class="nowrap">Mac Studio<br>（M4 Max 128GB）</td><td class="num">約 120 GB</td><td class="num">約 546 GB/s</td><td class="num">70〜90 万円</td><td>容量と帯域のバランスが良い。<strong>帯域は ZGX の2倍</strong></td></tr>
-<tr><td class="nowrap">RTX 3090 中古 ×2</td><td class="num">48 GB</td><td class="num">約 936 GB/s</td><td class="num">30〜40 万円</td><td>費用対効果は高いが、消費電力と設置の手間が大きい</td></tr>
-<tr><td class="nowrap"><span class="badge b-none">現状維持</span></td><td class="num">3.21 GB</td><td class="num">約 192 GB/s</td><td class="num">0 円</td><td>4Bクラスなら 56 tok/s で不足はない</td></tr>
+<tr><td class="nowrap"><strong>HP ZGX Nano G1n</strong></td><td class="num">約 120 GB（統合）</td><td class="num">約 273 GB/s</td><td class="num">¥1,098,900<br>（9/30 まで）</td><td><strong>容量で殴る</strong>。大きいモデルが載る。速度は控えめ</td></tr>
+<tr><td class="nowrap">NVIDIA DGX Spark</td><td class="num">約 120 GB（統合）</td><td class="num">約 273 GB/s</td><td class="num">¥1,045,000</td><td>ZGX と同じ GB10 を積む NVIDIA 純正機。ZGX より約5万円安い</td></tr>
+<tr><td class="nowrap">Mac Studio<br>（M5 Max・18/40コア・128GB・1TB）</td><td class="num">約 120 GB（統合）</td><td class="num">約 614 GB/s</td><td class="num">¥941,800</td><td>容量と帯域のバランスが良い。<strong>帯域は ZGX の約2.2倍で、約16万円安い</strong></td></tr>
+<tr><td class="nowrap">RTX PRO 6000 Blackwell Max-Q</td><td class="num">96 GB</td><td class="num">約 1,790 GB/s</td><td class="num">¥2,593,800〜</td><td>1枚で 96GB。価格は桁が違う</td></tr>
+<tr><td class="nowrap">RTX 5090</td><td class="num">32 GB</td><td class="num">約 1,790 GB/s</td><td class="num">¥864,445〜</td><td><strong>速度で殴る</strong>。32GB に収まる範囲なら圧倒的に速い</td></tr>
+<tr><td class="nowrap">RTX 5080</td><td class="num">16 GB</td><td class="num">約 960 GB/s</td><td class="num">¥267,700〜</td><td>16GB の上位</td></tr>
+<tr><td class="nowrap">RTX 5070 Ti</td><td class="num">16 GB</td><td class="num">約 896 GB/s</td><td class="num">¥206,806〜</td><td>帯域は 5080 と大差ない</td></tr>
+<tr><td class="nowrap">RTX 5060 Ti 16GB</td><td class="num">16 GB</td><td class="num">約 448 GB/s</td><td class="num">¥104,800〜</td><td>16GB を最も安く手に入れる</td></tr>
+<tr><td class="nowrap">RTX 3090（中古）</td><td class="num">24 GB</td><td class="num">約 936 GB/s</td><td class="num">約 17.5〜21.2 万円</td><td>24GB を最も安く手に入れる。2枚で 48GB。消費電力と設置の手間が大きい</td></tr>
+<tr><td class="nowrap"><span class="badge b-none">現状維持</span></td><td class="num">3.87 GB</td><td class="num">約 192 GB/s</td><td class="num">0 円</td><td>RAM 32GB 後は、4B が 59 tok/s、gpt-oss-20b が 19 tok/s</td></tr>
 </tbody>
 </table>
+</div>
+<p>
+グラフィックボードの価格はカード単体で、価格.com の最安値（新品）。RTX 3090 の中古はヤフオクの落札（動作品）で、店頭（じゃんぱら）は ¥219,980〜の1点のみだった。
+帯域は各社の公称値で、本書では測っていない。
+</p>
+
+<div class="callout callout-important">
+<strong>本PCはノートなので、グラフィックボードは差し替えられない。</strong>
+表の GPU を選ぶと、カード代とは別に、それを載せるデスクトップ本体（CPU・マザーボード・電源・ケース）が要る。
+本体一式で届く ZGX・DGX Spark・Mac Studio と比べるときは、その分を足して見る。
 </div>
 
 <h2>この表から読めること</h2>
 <h3>Mac Studio が正面の競合になる</h3>
 <p>
-同じ 128GB クラスで、<strong>帯域は Mac の方が約2倍</strong>。同じモデルを動かすなら Mac の方が速い。
-価格帯も近い。ZGX が優位に立つのは以下の点になる。
+同じ 128GB クラスで、<strong>帯域は Mac の方が約2.2倍</strong>。同じモデルを動かすなら Mac の方が速い。
+<strong>価格も Mac の方が約16万円安い</strong>。ZGX が優位に立つのは以下の点になる。
 </p>
 <ul>
 	<li><strong>CUDA エコシステムがそのまま使える</strong> — 学習・ファインチューニング、NVIDIA のソフトウェアスタック</li>
@@ -449,17 +472,24 @@ MoE は<strong>総パラメータをメモリに置く必要がある一方、�
 逆に<strong>推論だけが目的なら、Mac Studio の方が素直に速い</strong>可能性が高い。
 </p>
 
+<h3>ZGX を選ぶなら DGX Spark と比べる</h3>
+<p>
+DGX Spark は ZGX と同じ GB10・128GB を積む NVIDIA 純正機で、約5万円安い。
+中身が同じなので、差は価格・保証・販売経路になる。
+</p>
+
 <h3>RTX 5090 とは用途が分かれる</h3>
 <p>
 32GB に収まるモデル（30B 密の Q4、70B の低ビット量子化まで）なら、5090 は ZGX の6倍以上の帯域で圧倒する。
 <strong>32GB を超えるかどうかが分水嶺</strong>で、超えないなら 5090、超えるなら ZGX という切り分けになる。
+ただし 5090 はカード単体で約86万円あり、デスクトップ本体を足すと ZGX を上回る。
 </p>
 
 <div class="callout callout-important">
 <strong>現状維持という選択肢を最初に潰しておく必要がある。</strong>
 計画書の結論では、Qwen3-4B が 56.5 tok/s、gemma-4-E4B が 45.2 tok/s で、
 <strong>日常的な対話とコード生成には足りている</strong>。
-100万円の判断は「今のモデルで何が不足しているか」を具体化してからで遅くない。
+110万円の判断は「今のモデルで何が不足しているか」を具体化してからで遅くない。
 </div>
 </section>
 
@@ -518,10 +548,10 @@ LAN 越しにサーバとして使い、手元の Windows から API で叩く�
 <table>
 <thead><tr><th class="nowrap">動機</th><th>内容</th></tr></thead>
 <tbody>
-<tr><td class="nowrap"><span class="badge b-ok">強い</span>MoE を本気で使う</td><td>Qwen3-30B-A3B クラスが Q4 のまま 50〜70 tok/s で動く。現環境では起動すらできない領域</td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">強い</span>MoE を本気で使う</td><td>Qwen3-30B-A3B クラスが Q4 のまま 50〜70 tok/s で動く。現環境は RAM 16GB 時は起動すらできなかった（32GB 後は RAM には載る・未測定）</td></tr>
 <tr><td class="nowrap"><span class="badge b-ok">強い</span>学習・ファインチューニング</td><td>推論だけなら他の選択肢もあるが、CUDA での学習となると 128GB は大きな武器になる</td></tr>
 <tr><td class="nowrap"><span class="badge b-warn">中</span>長いコンテキスト</td><td>現在 8192 が上限。統合メモリなら KV キャッシュの制約がほぼ消える</td></tr>
-<tr><td class="nowrap"><span class="badge b-warn">中</span>価格</td><td>53% オフは大きい。ただし 500台限定で、判断を急がされる構造でもある</td></tr>
+<tr><td class="nowrap"><span class="badge b-warn">中</span>価格</td><td>48% オフは大きい。ただし 9月30日までの期間限定で、判断を急がされる構造でもある</td></tr>
 </tbody>
 </table>
 </div>
@@ -531,7 +561,7 @@ LAN 越しにサーバとして使い、手元の Windows から API で叩く�
 <table>
 <thead><tr><th class="nowrap">懸念</th><th>内容</th></tr></thead>
 <tbody>
-<tr><td class="nowrap"><span class="badge b-ng">強い</span>今のモデルは速くならない</td><td>常用している 4B は 56 → 70 tok/s 程度。100万円の対価としては薄い</td></tr>
+<tr><td class="nowrap"><span class="badge b-ng">強い</span>今のモデルは速くならない</td><td>常用している 4B は 56 → 70 tok/s 程度。110万円の対価としては薄い</td></tr>
 <tr><td class="nowrap"><span class="badge b-ng">強い</span>用途が未確定</td><td>計画書 第9章の時点で「常用する用途」は未定のまま。<strong>何に使うかが決まる前の投資になる</strong></td></tr>
 <tr><td class="nowrap"><span class="badge b-warn">中</span>帯域では Mac に劣る</td><td>推論用途に絞れば Mac Studio の方が約2倍速い。同価格帯</td></tr>
 <tr><td class="nowrap"><span class="badge b-warn">中</span>環境の作り直し</td><td>Arm ＋ Linux。今回組んだ Windows の環境とスクリプトは引き継げない</td></tr>
@@ -552,7 +582,7 @@ LAN 越しにサーバとして使い、手元の Windows から API で叩く�
 
 <div class="callout callout-important">
 <strong>期限付きの割引は、判断の順序を狂わせやすい。</strong>
-500台限定という条件は「今決めないと損」という圧力を作るが、
+期間限定という条件は「今決めないと損」という圧力を作るが、
 上の1番——<strong>今の環境の何が不足しているか</strong>——が空欄のままでは、
 どの選択肢が正解かを決めようがない。まずそこを埋めるのが先で、
 埋まらないなら「今は買わない」が答えになる。
@@ -561,22 +591,32 @@ LAN 越しにサーバとして使い、手元の Windows から API で叩く�
 
 <h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">参考資料</h2>
 
-<h3>一次情報</h3>
+<h3>価格の出典（2026-09-27 に確認）</h3>
 <ul>
+	<li><a href="https://jp.ext.hp.com/workstations/zgx_nano_ai_station/">HP ZGX Nano G1n AI Station 製品詳細・スペック</a>
+		（日本HP）— ZGX の仕様・希望販売価格・キャンペーン価格と期間</li>
 	<li><a href="https://jp.ext.hp.com/campaign/business/workstations/zgx_campaigns/">HP ZGX Nano G1n AI Station キャンペーン</a>
-		（日本HP）— 第1章の製品仕様・価格・キャンペーン条件の出典</li>
+		（日本HP）— キャンペーンの案内</li>
+	<li><a href="https://kakaku.com/item/K0001803112/">HP ZGX Nano G1n AI Station 価格.com 限定モデル</a>（価格.com）</li>
+	<li><a href="https://shop.elsa-jp.jp/view/item/000000001031">NVIDIA DGX Spark</a>（ELSA ONLINE）</li>
+	<li><a href="https://www.apple.com/jp/shop/buy-mac/mac-studio">Mac Studio を購入</a>（Apple）— M5 Max 128GB 構成の価格は構成画面で確認</li>
+	<li><a href="https://kakaku.com/pc/videocard/itemlist.aspx?pdf_Spec103=500&amp;pdf_so=p1">GeForce RTX 5090 のグラフィックボード（安い順）</a>（価格.com）。
+		RTX 5080・5070 Ti・5060 Ti・3090 も同じ一覧でチップ種類を切り替えて確認</li>
+	<li><a href="https://search.kakaku.com/RTX%20PRO%206000%20Blackwell/">RTX PRO 6000 Blackwell の検索結果</a>（価格.com）</li>
+	<li><a href="https://auctions.yahoo.co.jp/closedsearch/closedsearch?p=RTX3090+24GB">RTX3090 24GB の落札相場</a>（Yahoo!オークション）</li>
+	<li><a href="https://www.janpara.co.jp/sale/search/result/?KEYWORDS=rtx3090&amp;CHKOUTCOM=1&amp;ORDER=3">RTX 3090 の中古販売</a>（じゃんぱら）</li>
 </ul>
 
 <h3>関連する自プロジェクトの文書</h3>
 <ul>
 	<li><a href="../10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>
-		— 第10章の実測値（56.5 / 45.2 / 8.1 / 5.9 tok/s、空き VRAM 3287 MiB）を本書の比較基準に用いている</li>
+		— 第10章の実測値（RAM 16GB 時の 56.5 / 45.2 / 8.1 / 5.9 tok/s、空き VRAM 3287 MiB）を本書の比較基準に用い、32GB での再測定の値を追記している</li>
 </ul>
 
 <div class="callout callout-important" style="border-left-color:var(--navy1, #12224d);">
-<strong>価格と在庫は 2026-08-25 時点の記載に基づく。</strong>
-500台限定のキャンペーンであり、<strong>終了後は定価 ¥2,125,200 に戻る</strong>。
-判断の際は必ず上記のページで現在の条件を確認すること。
+<strong>価格は 2026-09-27 時点の記載に基づく。</strong>
+ZGX のキャンペーンは 9月30日までで、終了後の価格は記載がない。
+グラフィックボードは値動きが大きい。判断の際は必ず上記のページで現在の価格を確認すること。
 </div>
 
 <div class="callout callout-important" style="border-left-color:var(--navy1, #12224d);">

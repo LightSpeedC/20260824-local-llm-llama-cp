@@ -1,6 +1,6 @@
 # ローカルLLM 実行環境
 
-RTX 3050 Ti Laptop（VRAM 4GB）／RAM 16GB のノートPCで llama.cpp を動かす
+RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで llama.cpp を動かす
 
 > 📅 作成: 2026-08-24 / 更新: 2026-09-27
 
@@ -16,7 +16,7 @@ RTX 3050 Ti Laptop（VRAM 4GB）／RAM 16GB のノートPCで llama.cpp を動�
 ## 2. 調査
 
 - [Speculative Decoding 調査](notes/01_research/r260825-01-投機的デコーディング.md) — 小さなドラフトモデルで先読みして生成を速める手法が、VRAM 4GB で成立するかの事前検討
-- [HP ZGX Nano G1n 調査](notes/01_research/r260825-02-HP-ZGX-Nano-G1n.md) — 128GB 統合メモリの AI ワークステーション。容量と帯域の違い、他の選択肢との比較、判断材料の整理
+- [ハードウェア選定の判断材料](notes/01_research/r260825-02-ハードウェア選定の判断材料.md) — VRAM 4GB の制約をどのハードウェアで解決できるか。HP ZGX・DGX Spark・Mac Studio・RTX 30 / 50 系の容量・帯域・価格の比較
 
 ## 3. 課題
 
@@ -27,7 +27,7 @@ RTX 3050 Ti Laptop（VRAM 4GB）／RAM 16GB のノートPCで llama.cpp を動�
 | 項目 | 内容 |
 |---|---|
 | GPU | NVIDIA GeForce RTX 3050 Ti Laptop（VRAM 4 GB） |
-| CPU / RAM | Intel Core i7-11370H（4コア8スレッド）／15.8 GB |
+| CPU / RAM | Intel Core i7-11370H（4コア8スレッド）／31.8 GB |
 | 実行基盤 | llama.cpp（CUDA 12.4 の配布バイナリ） |
 | モデル置き場 | `C:\AI_Models`（LM Studio と共用） |
 

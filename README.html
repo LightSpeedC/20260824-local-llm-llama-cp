@@ -148,7 +148,7 @@ footer{
 <div class="titlebar">
 	<div class="inner">
 		<h1>ローカルLLM 実行環境</h1>
-		<div class="lead">RTX 3050 Ti Laptop（VRAM 4GB）／RAM 16GB のノートPCで llama.cpp を動かす</div>
+		<div class="lead">RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで llama.cpp を動かす</div>
 		<div class="date">📅 作成: 2026-08-24 / 更新: 2026-09-27</div>
 	</div>
 </div>
@@ -180,8 +180,8 @@ footer{
 <ul>
 	<li><a href="notes/01_research/r260825-01-投機的デコーディング.html">Speculative Decoding 調査</a>
 		— 小さなドラフトモデルで先読みして生成を速める手法が、VRAM 4GB で成立するかの事前検討</li>
-	<li><a href="notes/01_research/r260825-02-HP-ZGX-Nano-G1n.html">HP ZGX Nano G1n 調査</a>
-		— 128GB 統合メモリの AI ワークステーション。容量と帯域の違い、他の選択肢との比較、判断材料の整理</li>
+	<li><a href="notes/01_research/r260825-02-ハードウェア選定の判断材料.html">ハードウェア選定の判断材料</a>
+		— VRAM 4GB の制約をどのハードウェアで解決できるか。HP ZGX・DGX Spark・Mac Studio・RTX 30 / 50 系の容量・帯域・価格の比較</li>
 </ul>
 </section>
 
@@ -198,7 +198,7 @@ footer{
 <thead><tr><th class="nowrap">項目</th><th>内容</th></tr></thead>
 <tbody>
 <tr><td class="nowrap">GPU</td><td>NVIDIA GeForce RTX 3050 Ti Laptop（VRAM 4 GB）</td></tr>
-<tr><td class="nowrap">CPU / RAM</td><td>Intel Core i7-11370H（4コア8スレッド）／15.8 GB</td></tr>
+<tr><td class="nowrap">CPU / RAM</td><td>Intel Core i7-11370H（4コア8スレッド）／31.8 GB</td></tr>
 <tr><td class="nowrap">実行基盤</td><td>llama.cpp（CUDA 12.4 の配布バイナリ）</td></tr>
 <tr><td class="nowrap">モデル置き場</td><td><code>C:\AI_Models</code>（LM Studio と共用）</td></tr>
 </tbody>
