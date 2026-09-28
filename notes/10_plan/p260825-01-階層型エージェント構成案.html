@@ -379,10 +379,10 @@ llama.cpp の <code>--parallel</code> がそれにあたる。詳細は第2章�
 </div>
 
 <div class="callout callout-important">
-<strong>コンテキストを増やして解決はできない。</strong>
-計画書 第10章で実測したとおり、<code>-c 16384</code> にすると KV が VRAM を超えて
-<strong>1.30 tok/s まで崩壊する</strong>。8192 が上限である以上、
-並列数を上げることは1スロットの余裕を削ることと同義になる。
+<strong>コンテキストは 16384 までしか増やせない。</strong>
+画面表示が VRAM を使っていた計画書 第10章の実測では、<code>-c 16384</code> にすると KV が VRAM を超えて
+1.30 tok/s まで崩壊した。画面表示を内蔵GPU に任せ、KV を q8_0 にすれば 16384 で 27 tok/s 出る（同章の再測定）。
+それ以上は VRAM に載らないため、並列数を上げることは1スロットの余裕を削ることと同義になる。
 </div>
 </section>
 

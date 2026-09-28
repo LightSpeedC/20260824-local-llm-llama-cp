@@ -231,7 +231,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<div class="inner">
 		<h1>ローカルLLM 実行計画</h1>
 		<div class="lead">
-			RTX 3050 Ti Laptop（VRAM 4GB）／RAM 16GB のノートPCで動かすための、ソフトウェア選定・入手方法・モデル選定・導入手順<br>
+			RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで動かすための、ソフトウェア選定・入手方法・モデル選定・導入手順<br>
 			📅 作成: 2026-08-24 / 更新: 2026-09-27
 		</div>
 	</div>
@@ -274,11 +274,11 @@ footer a{color:var(--navy2, #2f5fbf);}
 <thead><tr><th>項目</th><th>実測値</th><th>LLM実行上の意味</th></tr></thead>
 <tbody>
 <tr><td class="nowrap">CPU</td><td class="nowrap">Intel Core i7-11370H（4コア8スレッド）</td><td>CPU推論のフォールバックとしては非力。4コアなのでCPUオフロードは速度が伸びない</td></tr>
-<tr><td class="nowrap">RAM</td><td class="nowrap">15.8 GB</td><td>OS・ブラウザを差し引くと実質10GB前後。CPU側に置ける重みは上限がある</td></tr>
+<tr><td class="nowrap">RAM</td><td class="nowrap">15.8 GB → <strong>31.8 GB</strong></td><td>当初は 15.8 GB で、第10章の実測はこの状態で行った。その後 32GB に増設。CPU 側に重みや KV キャッシュを置く余裕が増えた</td></tr>
 <tr><td class="nowrap">GPU</td><td class="nowrap">NVIDIA GeForce RTX 3050 Ti Laptop</td><td>CUDA が使える。世代は Ampere で、GGUF の主要量子化はすべて対応</td></tr>
 <tr><td class="nowrap">VRAM</td><td class="nowrap">4096 MiB（4 GB）</td><td class="nowrap"><span class="badge b-warn">最大の制約</span>ここが計画全体を決める</td></tr>
 <tr><td class="nowrap">ドライバ</td><td class="nowrap">592.82</td><td>十分に新しい。CUDA 12.x 系のバイナリがそのまま動く</td></tr>
-<tr><td class="nowrap">内蔵GPU</td><td class="nowrap">Intel Iris Xe</td><td>画面表示をこちらに寄せられれば、NVIDIA側のVRAMを推論にほぼ全部使える</td></tr>
+<tr><td class="nowrap">内蔵GPU</td><td class="nowrap">Intel Iris Xe</td><td>画面表示はこちらに任せる。NVIDIA 側の VRAM をほぼ全部 LLM に使える</td></tr>
 <tr><td class="nowrap">空き容量</td><td class="num">C: 約 385 GB</td><td>モデルを何本置いても問題にならない</td></tr>
 <tr><td class="nowrap">既存環境</td><td class="nowrap">LM Studio 導入済み</td><td><code>lms</code> コマンドが存在する</td></tr>
 <tr><td class="nowrap">Ollama</td><td class="nowrap">導入後アンインストール済み</td><td>一度使ったうえで LM Studio に置き換えた経緯がある。<span class="badge b-none">再導入しない前提</span></td></tr>
@@ -295,13 +295,13 @@ VRAM 4GB は「小型モデルなら完全にGPUに載る／中型モデルは�
 </p>
 <div class="tablewrap">
 <table>
-<thead><tr><th>パラメータ数</th><th class="nowrap">Q4_K_M の重み</th><th>4GB VRAM での扱い</th><th class="nowrap">計画時の予測</th><th class="nowrap">実測</th></tr></thead>
+<thead><tr><th>パラメータ数</th><th class="nowrap">Q4_K_M の重み</th><th>4GB VRAM での扱い</th><th class="nowrap">計画時の予測</th><th class="nowrap">実測<br>RAM 16GB</th><th class="nowrap">実測<br>RAM 32GB</th></tr></thead>
 <tbody>
-<tr><td class="nowrap">3〜4B</td><td class="num">2.0〜2.6 GB</td><td><span class="badge b-ok">全層GPU</span>コンテキストも余裕をもって取れる</td><td class="nowrap">25〜40 tok/s</td><td class="nowrap"><strong>56 tok/s</strong></td></tr>
-<tr><td class="nowrap">7〜8B</td><td class="num">4.5〜5.0 GB</td><td><span class="badge b-warn">部分オフロード</span>6〜7割をGPU、残りをCPU</td><td class="nowrap">6〜10 tok/s</td><td class="nowrap"><strong>8 tok/s</strong></td></tr>
-<tr><td class="nowrap">12〜14B</td><td class="num">7.3〜9.0 GB</td><td><span class="badge b-ng">ほぼCPU実行</span>GPUは3割程度しか担えない</td><td class="nowrap">2〜3 tok/s</td><td class="nowrap">未測定</td></tr>
-<tr><td class="nowrap">30B級（密）</td><td class="num">18 GB 前後</td><td><span class="badge b-ng">不可</span>RAM 16GB にも収まらない</td><td class="nowrap">—</td><td class="nowrap">—</td></tr>
-<tr><td class="nowrap">20B級（MoE）</td><td class="num">11 GB 前後</td><td><span class="badge b-warn">エキスパートをCPUへ</span>RAMが律速になる</td><td class="nowrap">—</td><td class="nowrap"><strong>5.9 tok/s</strong></td></tr>
+<tr><td class="nowrap">3〜4B</td><td class="num">2.0〜2.6 GB</td><td><span class="badge b-ok">全層GPU</span>コンテキストも余裕をもって取れる</td><td class="nowrap">25〜40 tok/s</td><td class="nowrap"><strong>56 tok/s</strong></td><td class="nowrap"><strong>59 tok/s</strong></td></tr>
+<tr><td class="nowrap">7〜8B</td><td class="num">4.5〜5.0 GB</td><td><span class="badge b-warn">部分オフロード</span>6〜7割をGPU、残りをCPU</td><td class="nowrap">6〜10 tok/s</td><td class="nowrap"><strong>8 tok/s</strong></td><td class="nowrap"><strong>15 tok/s</strong></td></tr>
+<tr><td class="nowrap">12〜14B</td><td class="num">7.3〜9.0 GB</td><td><span class="badge b-ng">ほぼCPU実行</span>GPUは3割程度しか担えない</td><td class="nowrap">2〜3 tok/s</td><td class="nowrap">未測定</td><td class="nowrap">未測定</td></tr>
+<tr><td class="nowrap">30B級（密）</td><td class="num">18 GB 前後</td><td><span class="badge b-ng">不可</span>RAM 16GB には収まらない。32GB なら RAM には載る</td><td class="nowrap">—</td><td class="nowrap">—</td><td class="nowrap">未測定</td></tr>
+<tr><td class="nowrap">20B級（MoE）</td><td class="num">11 GB 前後</td><td><span class="badge b-warn">エキスパートをCPUへ</span>RAM 16GB では RAM が律速になる</td><td class="nowrap">—</td><td class="nowrap"><strong>5.9 tok/s</strong></td><td class="nowrap"><strong>19 tok/s</strong></td></tr>
 </tbody>
 </table>
 </div>
@@ -993,7 +993,7 @@ KVキャッシュはコンテキスト長に比例してVRAMを食う。長さ�
 <table>
 <thead><tr><th>モデル</th><th class="nowrap">コンテキスト</th><th>備考</th></tr></thead>
 <tbody>
-<tr><td class="nowrap">Qwen3-4B</td><td class="num">8192</td><td><span class="badge b-ok">実測で確定</span>16384 にすると KV が VRAM を超えて 1.30 tok/s に崩壊する（第10章）。<strong>8192 が上限</strong></td></tr>
+<tr><td class="nowrap">Qwen3-4B</td><td class="num">8192</td><td><span class="badge b-ok">実測で確定</span>画面表示が VRAM を使っていた状態では、16384 にすると KV が VRAM を超えて 1.30 tok/s に崩壊した（第10章）。<strong>画面表示を内蔵GPU に任せ、KV を q8_0 にすれば 16384 で 27 tok/s</strong>（第10章の再測定）</td></tr>
 <tr><td class="nowrap">Qwen3.5-9B</td><td class="num">4096</td><td>KVを削って重みを1層でも多くGPUに載せるほうが速い</td></tr>
 <tr><td class="nowrap">gemma-4-E4B</td><td class="num">8192</td><td>KVが 14 MiB しか要らない（SWA ＋ <code>shared_kv_layers=18</code>）ため、この系列だけは余裕がある</td></tr>
 </tbody>
@@ -1533,6 +1533,10 @@ VRAMが余っていれば値を下げていく。小さいほどエキスパー�
 第8章の Step 1〜3 を実施し、第9章の検証を <code>llama-bench</code> で測った。
 使用ビルドは <strong>b10612</strong>（CUDA 12.4 / Windows x64 の配布バイナリ）。
 </p>
+<p>
+<strong>この章の数値は、RAM 16GB（15.8 GB）で、画面表示が VRAM を 808 MiB 使っていた状態で測ったもの</strong>。
+32GB への増設と画面表示を内蔵GPU に任せたあとの測り直しは、章末の「32GB での再測定」に追記した。
+</p>
 
 <h2>環境の実測値</h2>
 <div class="tablewrap">
@@ -1664,7 +1668,7 @@ NVIDIAドライバが共有GPUメモリ（システムRAM）に自動で逃が�
 <code>-ngl</code> を大きめに設定して「なぜか遅い」ときは、まずこれを疑う。
 </div>
 
-<h3>4. MoE は動いたが、RAM が律速で伸びない</h3>
+<h3>4. MoE は動いたが、RAM が律速で伸びない（RAM 16GB 時）</h3>
 <p>
 gpt-oss-20b は <code>--n-cpu-moe</code> で確かに動き、密モデルの20Bとしてはあり得ない速度が出た。
 ただし最良でも <strong>5.89 tok/s</strong>、しかも測定のばらつきが ±2.0 と大きい。
@@ -1678,7 +1682,7 @@ gpt-oss-20b は <code>--n-cpu-moe</code> で確かに動き、密モデルの20B
 第7章の判断基準では「3〜10 tok/s：用途を限れば使える。優先度3の取得は保留」に該当する。
 </p>
 
-<h3>5. コンテキストは 8192 が上限 — 16384 は崩れる</h3>
+<h3>5. コンテキストは 8192 が上限 — 16384 は崩れる（画面表示が VRAM を使っていた時）</h3>
 <p>
 Qwen3-4B で会話の深さを変えて測ると、速度は素直には落ちず、<strong>ある点で崩壊した</strong>。
 </p>
@@ -1915,6 +1919,60 @@ E4B が要るのは、渡す資料が用意できない場面に絞られる。
 計画段階では「total 8B なので 9B クラス扱い」と見なして対象外に近い位置づけだったが、
 PLE の分離が効いて 4B クラスの速度で動いた。
 <strong>ファイルサイズだけでモデルを仕分けると、この種のアーキテクチャを取りこぼす。</strong>
+</div>
+
+<h2>32GB での再測定</h2>
+<p>
+RAM を 32GB に増設し、画面表示を内蔵GPU に任せたあとで、RAM と VRAM に左右されるものを測り直した。
+ブラウザなどを閉じ、空き RAM 19.1 GB・VRAM 空き 3962 MiB の状態で、1つずつ順番に測っている。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">項目</th><th class="nowrap">上の測定</th><th class="nowrap">再測定</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">RAM</td><td>16GB × 1枚（15.8 GB）と推定</td><td>16GB × 2枚（31.8 GB）・3200 MT/s</td></tr>
+<tr><td class="nowrap">VRAM 空き</td><td class="num">3287 MiB</td><td class="num">3962 MiB</td></tr>
+<tr><td class="nowrap">画面表示</td><td>NVIDIA 側が 808 MiB 使用</td><td>内蔵GPU（NVIDIA 側は 0 MiB）</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>結果</h3>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="nowrap">配置</th><th class="nowrap">上の測定</th><th class="nowrap">再測定</th><th class="nowrap">倍率</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Qwen3-4B</td><td class="nowrap">-ngl 99</td><td class="num">56.49</td><td class="num">58.91</td><td class="num">1.04</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B ＋KV q8_0</td><td class="nowrap">-ngl 24</td><td class="num">8.12</td><td class="num"><strong>14.64</strong></td><td class="num">1.80</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B ＋KV q8_0</td><td class="nowrap">-ngl 28</td><td class="num">1.87</td><td class="num">3.67</td><td class="num">—</td></tr>
+<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">-ncmoe 24</td><td class="num">3.63</td><td class="num">15.31</td><td class="num">4.22</td></tr>
+<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">-ncmoe 20</td><td class="num">5.19</td><td class="num">16.12</td><td class="num">3.11</td></tr>
+<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">-ncmoe 18</td><td class="num">5.89</td><td class="num"><strong>18.98</strong></td><td class="num">3.22</td></tr>
+<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">-ncmoe 16</td><td class="num">5.52</td><td class="num">11.67</td><td class="num">—</td></tr>
+<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">-ncmoe 14</td><td class="num">3.10</td><td class="num">7.77</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-4B ＋KV q8_0 ＠深さ 8192</td><td class="nowrap">-ngl 99</td><td class="num">—</td><td class="num">37.06</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-4B ＋KV q8_0 ＠深さ 16384</td><td class="nowrap">-ngl 99</td><td class="num">止まったまま20分以上</td><td class="num"><strong>26.96</strong></td><td class="num">—</td></tr>
+</tbody>
+</table>
+</div>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">単位は tok/s（tg）。Qwen3-4B の基準のみ tg128、それ以外は tg64。</p>
+
+<h3>分かったこと</h3>
+<ul>
+	<li><strong>GPU だけで動くものは変わらない</strong>。Qwen3-4B は全層が VRAM にあり、RAM を使わない</li>
+	<li><strong>重みの一部を CPU 側に置くものが大きく速くなった</strong>。Qwen3.5-9B は 1.8 倍、gpt-oss-20b は 3.2 倍。
+		1枚から2枚になってメモリの帯域が倍になったためと考えられる。gpt-oss-20b は、RAM の逼迫が解けた分もさらに上乗せされている</li>
+	<li><strong>崩れる境目は動かない</strong>。Qwen3.5-9B は 24 と 28 の間、gpt-oss-20b は 18 と 14 の間で、上の測定と同じ。
+		VRAM が 675 MiB 増えても、層をもう1段 GPU に載せるには足りない</li>
+	<li><strong>KV キャッシュを q8_0 にすれば、コンテキスト 16384 が使える</strong>。上の測定では同じ設定で止まっていた。
+		画面表示を内蔵GPU に任せて空いた分で、KV キャッシュが VRAM に収まった</li>
+	<li><strong>gpt-oss-20b は第9章の合格ライン（15 tok/s）を超えた</strong>。上の測定では「用途限定」としていたが、対話にも使える速さになった</li>
+</ul>
+
+<div class="callout callout-important">
+<strong>この章の結論と方針は、上の測定（RAM 16GB）に基づいている。</strong>
+gpt-oss-20b を「用途限定」、Qwen3-30B-A3B を「RAM 律速のため見送り」、コンテキストを「8192 が上限」とした判断は、
+再測定の結果と合わなくなっている。
 </div>
 </section>
 
