@@ -220,7 +220,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<div class="inner">
 		<h1>ハードウェア選定の判断材料</h1>
 		<div class="lead">VRAM 4GB という現在の制約を、どのハードウェアで、いくらで解決できるか</div>
-		<div class="date">📅 作成: 2026-08-25 / 更新: 2026-09-27
+		<div class="date">📅 作成: 2026-08-25 / 更新: 2026-09-30
 		</div>
 	</div>
 </div>
@@ -389,7 +389,7 @@ ZGX との差は本書の比較より縮まっている。
 <tr><td class="nowrap">gemma-4-12B（密）</td><td class="num">6.9 GB</td><td class="num">未測定（低速）</td><td class="num">未測定</td><td class="num">25〜28 tok/s</td></tr>
 <tr><td class="nowrap">Qwen2.5-Coder-14B（密）</td><td class="num">8.4 GB</td><td class="num">未測定（低速）</td><td class="num">未測定</td><td class="num">20〜23 tok/s</td></tr>
 <tr><td class="nowrap"><strong>gpt-oss-20b（MoE）</strong></td><td class="num">11.3 GB</td><td class="num">5.9 tok/s</td><td class="num"><strong>19.0 tok/s</strong></td><td class="num"><strong>50〜70 tok/s</strong></td></tr>
-<tr><td class="nowrap"><strong>Qwen3-30B-A3B（MoE）</strong></td><td class="num">18 GB</td><td class="num"><strong>動かない</strong></td><td class="num">RAM には載る・未測定</td><td class="num"><strong>50〜70 tok/s</strong></td></tr>
+<tr><td class="nowrap"><strong>Qwen3-30B-A3B（MoE）</strong></td><td class="num">18 GB</td><td class="num"><strong>動かない</strong></td><td class="num">動く（UD-Q4_K_XL・16.5 GB）・生成速度は未測定</td><td class="num"><strong>50〜70 tok/s</strong></td></tr>
 <tr><td class="nowrap">70B クラス（密）</td><td class="num">約 40 GB</td><td class="num"><strong>動かない</strong></td><td class="num"><strong>動かない</strong></td><td class="num">4〜5 tok/s</td></tr>
 <tr><td class="nowrap">200B クラス（密）</td><td class="num">約 110 GB</td><td class="num"><strong>動かない</strong></td><td class="num"><strong>動かない</strong></td><td class="num">1.5〜2 tok/s</td></tr>
 </tbody>
@@ -548,7 +548,7 @@ LAN 越しにサーバとして使い、手元の Windows から API で叩く�
 <table>
 <thead><tr><th class="nowrap">動機</th><th>内容</th></tr></thead>
 <tbody>
-<tr><td class="nowrap"><span class="badge b-ok">強い</span>MoE を本気で使う</td><td>Qwen3-30B-A3B クラスが Q4 のまま 50〜70 tok/s で動く。現環境は RAM 16GB 時は起動すらできなかった（32GB 後は RAM には載る・未測定）</td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">強い</span>MoE を本気で使う</td><td>Qwen3-30B-A3B クラスが Q4 のまま 50〜70 tok/s で動く。現環境は RAM 16GB 時は起動すらできなかった（32GB 後は Q4 のまま動き、Claude Code の読み書きの試験にも合格した。生成速度は未測定）</td></tr>
 <tr><td class="nowrap"><span class="badge b-ok">強い</span>学習・ファインチューニング</td><td>推論だけなら他の選択肢もあるが、CUDA での学習となると 128GB は大きな武器になる</td></tr>
 <tr><td class="nowrap"><span class="badge b-warn">中</span>長いコンテキスト</td><td>現在 8192 が上限。統合メモリなら KV キャッシュの制約がほぼ消える</td></tr>
 <tr><td class="nowrap"><span class="badge b-warn">中</span>価格</td><td>48% オフは大きい。ただし 9月30日までの期間限定で、判断を急がされる構造でもある</td></tr>

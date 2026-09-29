@@ -232,7 +232,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 		<h1>ローカルLLM 実行計画</h1>
 		<div class="lead">
 			RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで動かすための、ソフトウェア選定・入手方法・モデル選定・導入手順<br>
-			📅 作成: 2026-08-24 / 更新: 2026-09-28
+			📅 作成: 2026-08-24 / 更新: 2026-09-30
 		</div>
 	</div>
 </div>
@@ -1378,6 +1378,14 @@ LM Studio と llama.cpp のサーバは<strong>ポートを分けて同時に立
 接続先を行き来させながら応答を比較でき、切り替えに失敗しても元に戻せる。
 </p>
 
+<h3>その後の試験で分かったこと（2026-09-30）</h3>
+<p>
+上の 63,000 トークンのうち、利用者の共通ルールだけで約 41,000 トークンあった。
+ホームを空のフォルダに替えて読ませないと約 20,000 トークンに減り、思考も切ると、20GB 以下の 20 本中 15 本がファイルの読み書きに合格した。
+いまの <code>run-server-cc.cmd</code> と <code>cc1.cmd</code> は、この設定（gemma-4-E4B・<code>--reasoning off</code>・ホーム <code>W:\temp\cc1-home</code>）で作り直してある。
+詳細は <a href="../01_research/r260929-01-ClaudeCodeのツール利用テスト.html">Claude Code のツール利用テスト</a>、使い方は <a href="p260930-01-ClaudeCodeを使う試す手順.html">使う・試す手順</a>。
+</p>
+
 <h2>Step 6 — MoEモデル（gpt-oss-20b）を試す</h2>
 <p>
 第7章の優先度1にあたる。手持ちの gpt-oss-20b を、<strong>expert 層だけCPUに逃がす</strong>指定で起動する。
@@ -1994,7 +2002,7 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたあとで、RAM
 <tbody>
 <tr><td class="nowrap">2</td><td>Qwen3.5-9B の IQ4_XS（約 4.5 GB）</td><td><span class="badge b-warn">変更なし</span>急がない</td></tr>
 <tr><td class="nowrap">3</td><td>Qwen3-30B-A3B</td><td><span class="badge b-warn">候補に戻す</span>見送った理由は「RAM 律速」だったが、同じ MoE の gpt-oss-20b が 3.2 倍になり、理由がなくなった。
-RAM に余裕ができたので <code>IQ2_M</code>（約 11 GB）に限らず <code>Q4_K_M</code>（約 18 GB）も対象にできる。速さは測るまで分からない（課題 i260927-05）</td></tr>
+RAM に余裕ができたので <code>IQ2_M</code>（約 11 GB）に限らず Q4 も対象にできる。2026-09-29 に UD-Q4_K_XL（16.5 GB）を取得し、Claude Code の読み書きの試験に合格した。生成速度は未測定（課題 i260927-05）</td></tr>
 </tbody>
 </table>
 </div>

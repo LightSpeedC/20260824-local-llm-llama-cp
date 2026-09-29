@@ -245,7 +245,7 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたところ、CPU
 	<li><span class="badge b-ok">済</span>RAM と VRAM に左右されるものを 32GB で測り直し、実行計画・調査に追記する</li>
 	<li><span class="badge b-ok">済</span>実行計画の結論と方針（gpt-oss-20b の位置づけ、コンテキストの上限）を見直す</li>
 	<li><span class="badge b-none">未</span>gemma-4-E4B を測り直す（CPU 側に置く PLE が速くなる可能性がある）</li>
-	<li><span class="badge b-none">未</span>Qwen3-30B-A3B（Q4_K_M・約 18 GB）を取得して測る</li>
+	<li><span class="badge b-warn">着手</span>Qwen3-30B-A3B を取得して測る（UD-Q4_K_XL・16.5 GB を取得済み。Claude Code の読み書きの試験には合格。llama-bench での生成速度は未測定）</li>
 	<li><span class="badge b-ok">済</span>Claude Code 用のモデルを gpt-oss-20b で試す（25 分でタイムアウト。10GB 未満の 13 本も試し、<a href="../01_research/r260929-01-ClaudeCodeのツール利用テスト.html">ツール利用テスト</a>に記録）</li>
 </ul>
 <p>関連: <a href="../10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>（第10章の「32GB での再測定」）</p>
@@ -254,7 +254,7 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたところ、CPU
 <details class="md-flat">
 <summary><span class="badge b-ok">済</span><span class="no">i260929-01</span>AI エージェントを llama-server で使えるか比べる</summary>
 <p>
-Claude Code は共通ルールを読ませず思考を切れば、20GB 以下の 21 本中 15 本が 15 分以内に読み・書きの両方に合格した。
+Claude Code は共通ルールを読ませず思考を切れば、20GB 以下の 20 本中 15 本が 15 分以内に読み・書きの両方に合格した。
 時間切れになったモデルは Pi・OpenCode・Aider でも試した。
 </p>
 <ul>

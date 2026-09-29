@@ -217,7 +217,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<div class="inner">
 		<h1>Claude Code 以外の AI エージェント調査</h1>
 		<div class="lead">llama-server に繋いで使えそうなコーディングエージェントを洗い出す。計画 p260929-01 の事前調査</div>
-		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-09-29</div>
+		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-09-30</div>
 	</div>
 </div>
 
@@ -238,7 +238,8 @@ footer a{color:var(--navy2, #2f5fbf);}
 <p>
 <a href="r260929-01-ClaudeCodeのツール利用テスト.html">Claude Code のツール利用テスト</a>では、どのモデルも最初の要求を読み込むだけで 140〜180 秒かかり、実用にならなかった。
 本書は、これから立てる計画 <strong>p260929-01</strong>（Claude Code 以外のエージェントの検証）のための事前調査である。
-ここに書く各ツールの性質は記事・公式資料によるもので、<strong>このPCではまだ1つも試していない</strong>。
+ここに書く各ツールの性質は記事・公式資料による。
+Claude Code・Pi・OpenCode・Codex CLI・Aider はその後このPCで試した。結果は <a href="r260929-01-ClaudeCodeのツール利用テスト.html">Claude Code のツール利用テスト</a>の第 5・6 章にある。Qwen Code は試していない。
 </p>
 
 <!-- ============ 1 ============ -->
@@ -261,7 +262,8 @@ footer a{color:var(--navy2, #2f5fbf);}
 </div>
 <p>
 このPCの 60,000 のうち、記事の素の状態との差（約 27,000）は、利用者の共通ルールとメモリの分と考えられる。
-<strong>Claude Code のままでも、それらを読ませない起動方法があれば半分以下になる可能性がある</strong>（未確認）。
+<strong>Claude Code のままでも、それらを読ませない起動方法があれば半分以下になる可能性がある</strong>。
+試したところ、ホームを空のフォルダに替えるだけで 17,000〜23,600 トークンになった（2026-09-29 実測）。
 </p>
 </section>
 
