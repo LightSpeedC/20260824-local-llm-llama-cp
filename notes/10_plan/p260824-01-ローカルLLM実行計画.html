@@ -232,7 +232,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 		<h1>ローカルLLM 実行計画</h1>
 		<div class="lead">
 			RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで動かすための、ソフトウェア選定・入手方法・モデル選定・導入手順<br>
-			📅 作成: 2026-08-24 / 更新: 2026-09-27
+			📅 作成: 2026-08-24 / 更新: 2026-09-28
 		</div>
 	</div>
 </div>
@@ -1884,7 +1884,7 @@ E4B が要るのは、渡す資料が用意できない場面に絞られる。
 </table>
 </div>
 
-<h2>結論と方針</h2>
+<h2>結論と方針（RAM 16GB）</h2>
 <div class="tablewrap">
 <table>
 <thead><tr><th class="nowrap">位置づけ</th><th>モデルと設定</th><th class="nowrap">速度</th><th>用途</th></tr></thead>
@@ -1969,11 +1969,39 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたあとで、RAM
 	<li><strong>gpt-oss-20b は第9章の合格ライン（15 tok/s）を超えた</strong>。上の測定では「用途限定」としていたが、対話にも使える速さになった</li>
 </ul>
 
-<div class="callout callout-important">
-<strong>この章の結論と方針は、上の測定（RAM 16GB）に基づいている。</strong>
-gpt-oss-20b を「用途限定」、Qwen3-30B-A3B を「RAM 律速のため見送り」、コンテキストを「8192 が上限」とした判断は、
-再測定の結果と合わなくなっている。
+<h2>結論と方針（RAM 32GB）</h2>
+<p>
+上の「結論と方針（RAM 16GB）」は RAM 16GB での測定に基づく。再測定の結果を受けて、次のとおり改める。
+現在の構成（RAM 32GB・画面表示は内蔵GPU）では、こちらを正とする。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">位置づけ</th><th>モデルと設定</th><th class="nowrap">速度</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><span class="badge b-ok">常用</span></td><td class="nowrap"><strong>Qwen3-4B-Instruct-2507</strong><br><code>-ngl 99 -c 8192</code></td><td class="nowrap">59 tok/s</td><td>資料を渡す作業のすべて。変更なし</td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">長い入力</span></td><td class="nowrap">Qwen3-4B-Instruct-2507<br><code>-ngl 99 -c 16384 -ctk q8_0 -ctv q8_0 -fa on</code></td><td class="nowrap">27 tok/s<br>（深さ 16384）</td><td>8192 に収まらない資料を渡すとき。KV を q8_0 にした分、8192 のときより遅い</td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">知識を問う時</span></td><td class="nowrap"><strong>gemma-4-E4B-it</strong><br><code>-ngl 99</code>／<code>max_tokens</code> は 1500 以上</td><td class="nowrap">41 tok/s<br>（16GB での値）</td><td>変更なし。32GB では未測定（課題 i260927-05）</td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">対話に使える</span></td><td class="nowrap"><strong>gpt-oss-20b</strong><br><code>-ngl 99 --n-cpu-moe 18</code></td><td class="nowrap">19 tok/s</td><td>20B級の知識が要る場面。合格ライン（15 tok/s）を超えたので「用途限定」から上げる。<strong>回答の品質はまだ評価していない</strong></td></tr>
+<tr><td class="nowrap"><span class="badge b-warn">用途限定</span></td><td class="nowrap">Qwen3.5-9B<br><code>-ngl 24 -ctk q8_0 -ctv q8_0 -fa on</code></td><td class="nowrap">15 tok/s</td><td>合格ラインの手前。同じ速さで gpt-oss-20b が使えるため、優先しない</td></tr>
+</tbody>
+</table>
 </div>
+
+<h3>第7章の追加取得の判断（見直し）</h3>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">優先度</th><th>対象</th><th>判断</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">2</td><td>Qwen3.5-9B の IQ4_XS（約 4.5 GB）</td><td><span class="badge b-warn">変更なし</span>急がない</td></tr>
+<tr><td class="nowrap">3</td><td>Qwen3-30B-A3B</td><td><span class="badge b-warn">候補に戻す</span>見送った理由は「RAM 律速」だったが、同じ MoE の gpt-oss-20b が 3.2 倍になり、理由がなくなった。
+RAM に余裕ができたので <code>IQ2_M</code>（約 11 GB）に限らず <code>Q4_K_M</code>（約 18 GB）も対象にできる。速さは測るまで分からない（課題 i260927-05）</td></tr>
+</tbody>
+</table>
+</div>
+<p>
+コンテキストの上限は「8192」から「KV を q8_0 にすれば 16384」に改める。
+Claude Code のように 6 万トークンを超える要求は、KV を RAM 側に置く <code>-nkvo</code> で扱う（第8章 Step 5）。
+</p>
 </section>
 
 <h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">参考資料</h2>
