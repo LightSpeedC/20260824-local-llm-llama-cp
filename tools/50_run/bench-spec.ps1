@@ -5,9 +5,12 @@ param(
 	[string]$Draft = "C:/AI_Models/qwen/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
 	[int]$Context = 4096,
 	[int]$MaxTokens = 256,
-	[int]$Port = 8080
+	[int]$Port = 8080,
+	# 測る構成の番号をカンマ区切りで（"2,6"）。空なら全部。対照の No1 は常に測る
+	[string]$Only = ""
 )
 $ErrorActionPreference = 'Stop'
+Add-Type -AssemblyName System.Net.Http
 
 $root = Resolve-Path "$PSScriptRoot/../.."
 $server = Join-Path $root "bin/llama.cpp/llama-server.exe"
@@ -25,7 +28,44 @@ $configs = @(
 	@{ no = 3; name = "ドラフト n-max 4"; args = "$draftArgs --spec-draft-n-max 4" }
 	@{ no = 4; name = "ドラフト n-max 8"; args = "$draftArgs --spec-draft-n-max 8" }
 	@{ no = 5; name = "ドラフト n-max 8 ＋KV q8_0"; args = "$draftArgs --spec-draft-n-max 8 -ctk q8_0 -ctv q8_0 -ctkd q8_0 -ctvd q8_0 -fa on" }
+	# 以下は出力がずれる理由を調べるための構成（i260930-04）
+	# 単体を立て直してもう一度。毎回同じ出力になるかを見る
+	@{ no = 6; name = "単体（立て直して 2 回目）"; args = "" }
+	# 同じ問を 2 本同時に処理させ、一度に計算するトークン数を 2 にする。ドラフトの検証も複数トークンをまとめて計算する
+	@{ no = 7; name = "単体 2 本同時（np 2）"; args = ""; np = 2; concurrent = 2 }
+	# n-max 2 と 4 の検証で一度に計算するトークン数（3・5）に合わせる
+	@{ no = 8; name = "単体 3 本同時（np 3）"; args = ""; np = 3; concurrent = 3 }
+	@{ no = 9; name = "単体 5 本同時（np 5）"; args = ""; np = 5; concurrent = 5 }
 )
+if ($Only) {
+	$want = @(1) + @($Only -split ',' | ForEach-Object { [int]$_.Trim() })
+	$configs = @($configs | Where-Object { $want -contains $_.no })
+}
+
+function Invoke-Chat([string]$body, [int]$count) {
+	$client = New-Object System.Net.Http.HttpClient
+	$client.Timeout = [TimeSpan]::FromMinutes(10)
+	$tasks = @()
+	for ($i = 0; $i -lt $count; $i++) {
+		$content = New-Object System.Net.Http.StringContent($body, [Text.Encoding]::UTF8, "application/json")
+		$tasks += $client.PostAsync("$base/v1/chat/completions", $content)
+	}
+	[Threading.Tasks.Task]::WaitAll([Threading.Tasks.Task[]]$tasks)
+	$out = @()
+	foreach ($t in $tasks) {
+		$bytes = $t.Result.Content.ReadAsByteArrayAsync().Result
+		$out += ([Text.Encoding]::UTF8.GetString($bytes) | ConvertFrom-Json)
+	}
+	$client.Dispose()
+	return ,$out
+}
+
+# 先頭から何文字目まで同じか
+function Get-CommonPrefix([string]$a, [string]$b) {
+	$n = [math]::Min($a.Length, $b.Length)
+	for ($i = 0; $i -lt $n; $i++) { if ($a[$i] -cne $b[$i]) { return $i } }
+	return $n
+}
 $prompts = @(
 	@{ key = "text"; content = "Explain how a refrigerator works, step by step." }
 	@{ key = "code"; content = "Write a PowerShell function that lists the 10 largest files under a folder, with sizes in MB." }
@@ -34,7 +74,9 @@ $prompts = @(
 $reference = @{}
 foreach ($c in $configs) {
 	Write-Host "=== No$($c.no) $($c.name)"
-	$serverArgs = "-m `"$Model`" -c $Context -np 1 -ngl 99 $($c.args) --host 127.0.0.1 --port $Port"
+	$np = if ($c.np) { $c.np } else { 1 }
+	$concurrent = if ($c.concurrent) { $c.concurrent } else { 1 }
+	$serverArgs = "-m `"$Model`" -c $($Context * $np) -np $np -ngl 99 $($c.args) --host 127.0.0.1 --port $Port"
 	$log = Join-Path $logDir "$stamp-no$($c.no)-server.log"
 	$proc = Start-Process -FilePath $server -ArgumentList $serverArgs -PassThru -WindowStyle Hidden -RedirectStandardError $log -RedirectStandardOutput "$log.out"
 	try {
@@ -54,16 +96,19 @@ foreach ($c in $configs) {
 				ignore_eos = $true
 			} | ConvertTo-Json -Depth 5
 			# 1 回目で温め、2 回目を測る
-			$null = Invoke-RestMethod "$base/v1/chat/completions" -Method Post -ContentType "application/json; charset=utf-8" -Body ([Text.Encoding]::UTF8.GetBytes($body)) -TimeoutSec 600
-			$r = Invoke-RestMethod "$base/v1/chat/completions" -Method Post -ContentType "application/json; charset=utf-8" -Body ([Text.Encoding]::UTF8.GetBytes($body)) -TimeoutSec 600
+			$null = Invoke-Chat $body $concurrent
+			$rs = Invoke-Chat $body $concurrent
+			$r = $rs[0]
 			$vram = [int](nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits)
 			$text = $r.choices[0].message.content
+			[IO.File]::WriteAllText((Join-Path $logDir "$stamp-no$($c.no)-$($p.key).txt"), $text, (New-Object Text.UTF8Encoding($false)))
 			if ($c.no -eq 1) { $reference[$p.key] = $text }
 			$same = ($text -ceq $reference[$p.key])
+			$prefix = Get-CommonPrefix $text $reference[$p.key]
 			$t = $r.timings
 			$accept = if ($t.draft_n -gt 0) { [math]::Round($t.draft_n_accepted / $t.draft_n, 3) } else { $null }
-			Write-Host ("  {0}: {1:N2} tok/s  受理 {2}/{3}（{4}）  VRAM {5} MiB  対照と同じ出力 {6}" -f $p.key, $t.predicted_per_second, $t.draft_n_accepted, $t.draft_n, $accept, $vram, $same)
-			[pscustomobject]@{ no = $c.no; name = $c.name; prompt = $p.key; tps = [math]::Round([double]$t.predicted_per_second, 2); tokens = $t.predicted_n; draft_n = $t.draft_n; draft_accepted = $t.draft_n_accepted; accept_rate = $accept; vram_mib = $vram; same_as_ref = $same; args = $c.args } |
+			Write-Host ("  {0}: {1:N2} tok/s  受理 {2}/{3}（{4}）  VRAM {5} MiB  対照と同じ出力 {6}（先頭 {7} / {8} 文字が一致）" -f $p.key, $t.predicted_per_second, $t.draft_n_accepted, $t.draft_n, $accept, $vram, $same, $prefix, $text.Length)
+			[pscustomobject]@{ no = $c.no; name = $c.name; prompt = $p.key; tps = [math]::Round([double]$t.predicted_per_second, 2); tokens = $t.predicted_n; draft_n = $t.draft_n; draft_accepted = $t.draft_n_accepted; accept_rate = $accept; vram_mib = $vram; same_as_ref = $same; common_prefix = $prefix; length = $text.Length; args = $c.args } |
 				ConvertTo-Json -Compress | Add-Content -Path $resultFile -Encoding UTF8
 		}
 	}

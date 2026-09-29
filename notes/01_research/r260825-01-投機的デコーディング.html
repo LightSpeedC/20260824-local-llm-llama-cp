@@ -574,14 +574,38 @@ RAM 32GB・画面表示は内蔵GPU の構成で測った（2026-09-30）。ド�
 	<li><strong>どの構成も単体より遅い</strong>。最も良い No2 のコードでも 47 tok/s で、単体の 57 tok/s に届かない</li>
 	<li><strong>先読みを増やすほど受理率が下がる</strong>。文章は n-max 8 で 20% しか当たらず、外れた先読みの分だけ遅くなった</li>
 	<li>コードは文章より当たりやすい（同じ n-max で受理率が 13〜18 ポイント高い）が、それでも取り返せない</li>
-	<li><strong>出力は単体と一致しなかった</strong>（温度 0・同じ seed）。仕組み上は一致するはずだが、まとめて検証するときの計算順の違いで結果がずれたと考えられる（未確認）</li>
+	<li><strong>出力は単体と一致しなかった</strong>（温度 0・同じ seed）。理由は次の節</li>
 	<li>VRAM は No2〜4 で 3925 MiB と上限の手前まで使う。第4章の見積り（約 3086 MiB）より 800 MiB ほど多い</li>
 </ul>
+
+<h2>出力が単体と一致しない理由</h2>
+<p>
+出力を保存して比べ、単体でも一度にまとめて計算する形を変えて同じことが起きるかを見た（<code>bench-spec.cmd -Only</code> の No6〜9）。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>構成</th><th class="nowrap">文章</th><th class="nowrap">コード</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">単体を立て直して 2 回目</td><td><span class="badge b-ok">一致</span></td><td><span class="badge b-ok">一致</span></td></tr>
+<tr><td class="nowrap">単体 2 本同時（np 2）</td><td><span class="badge b-ok">一致</span></td><td><span class="badge b-ok">一致</span></td></tr>
+<tr><td class="nowrap">単体 3 本同時（np 3）</td><td><span class="badge b-ok">一致</span></td><td><span class="badge b-ok">一致</span></td></tr>
+<tr><td class="nowrap">単体 5 本同時（np 5）</td><td><span class="badge b-ng">不一致</span>先頭から</td><td><span class="badge b-ng">不一致</span>439 文字目から</td></tr>
+<tr><td class="nowrap">ドラフト n-max 2・4</td><td><span class="badge b-ng">不一致</span>224 文字目から</td><td><span class="badge b-ng">不一致</span>439 文字目から</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>ドラフト固有の不具合ではない</strong>。単体でも 5 本同時にすると出力が変わり、コードはドラフトありと同じ 439 文字目で、同じ文言（<code>"Path '$Path' does not exist or is not accessible."</code>）にずれた</li>
+	<li><strong>ずれるのは、1 位と 2 位の候補が拮抗している単語</strong>。「Pressurizes the Refrigerant」と「Pressurizes Refrigerant」のように、どちらでも通る箇所で分かれる。まとめて計算すると計算の経路が変わり、わずかな差で選ぶ単語が入れ替わると考えられる</li>
+	<li>単体は立て直しても毎回同じ出力で、揺れはない</li>
+	<li>一度に計算するトークン数だけでは決まらない。単体の 3 本同時は一致したが、ドラフトの n-max 2（検証は 3 トークン）ではずれた。同じ会話の続きを複数まとめて計算することが効いている可能性があるが、確かめていない</li>
+	<li><strong>温度 0 でも、並列数やドラフトの有無が違えば出力が同じになるとは限らない</strong>。出力の一致を前提にした試験を組まない</li>
+</ul>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">3 本・5 本同時は 1 スロット 4096 トークンを保つため <code>-c</code> を本数倍にしており、VRAM があふれて速度は 10〜21 tok/s に落ちた。出力の比較には影響しない。</p>
 
 <h2>この調査で分かっていないこと</h2>
 <ul>
 	<li><span class="badge b-none">未確認</span>20GB 級の MoE（gpt-oss-20b 等）を本命にした場合。本命の読み出しが重いほど効く手法なので、4B とは結果が変わりうる。ただしドラフトを載せる VRAM が残らない</li>
-	<li><span class="badge b-none">未確認</span>出力が単体と一致しない理由</li>
 </ul>
 </section>
 

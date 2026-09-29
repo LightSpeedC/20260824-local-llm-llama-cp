@@ -306,15 +306,15 @@ Claude Code で速かったモデルを Pi でも試し、どちらを使うか�
 <p>関連: <a href="../10_plan/p260825-01-階層型エージェント構成案.html">階層型エージェント構成案</a>（第6章 Phase 1）</p>
 </details>
 
-<details class="md-flat" open>
-<summary><span class="badge b-none">未</span><span class="no">i260930-04</span>Speculative Decoding で出力が単体と一致しない理由を調べる</summary>
+<details class="md-flat">
+<summary><span class="badge b-ok">済</span><span class="no">i260930-04</span>Speculative Decoding で出力が単体と一致しない理由を調べる</summary>
 <p>
 温度 0・同じ seed でも、ドラフトありの 4 構成はすべて単体と違う出力になった。仕組み上は一致するはずで、
 まとめて検証するときの計算順の違いと推測しているが、確かめていない。採用は見送ったため急がない。
 </p>
 <ul>
-	<li><span class="badge b-none">未</span>どこから出力がずれるかを見る（先頭から何トークン目か）</li>
-	<li><span class="badge b-none">未</span>単体でも <code>-ub</code>・<code>-b</code> を変えると出力が変わるかを見て、計算順の違いで説明できるかを確かめる</li>
+	<li><span class="badge b-ok">済</span>どこから出力がずれるかを見る（先頭から何トークン目か。文章 224 文字目・コード 439 文字目で、どちらも候補が拮抗する単語）</li>
+	<li><span class="badge b-ok">済</span>単体でも <code>-ub</code>・<code>-b</code> を変えると出力が変わるかを見て、計算順の違いで説明できるかを確かめる（<code>-b</code> ではなく同時に処理する本数を変えて確かめた。単体 5 本同時でもコードが同じ位置・同じ文言にずれ、ドラフト固有ではないと分かった）</li>
 </ul>
 <p>関連: <a href="../01_research/r260825-01-投機的デコーディング.html">Speculative Decoding 調査</a>（第5章の結果）</p>
 </details>
