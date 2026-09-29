@@ -1,12 +1,13 @@
 ﻿param(
-	[Parameter(Mandatory)][ValidateSet('pi', 'opencode', 'aider')][string]$Agent,
+	[Parameter(Mandatory)][ValidateSet('pi', 'opencode', 'aider', 'codex')][string]$Agent,
 	[Parameter(Mandatory)][string]$Only,
 	[string]$ModelDir = 'C:\AI_Models',
 	[int]$Ctx = 65536,
 	[int]$TimeoutSec = 600,
 	[int]$Port = 8080,
 	[switch]$UseTemplates,
-	[string]$ExtraArgs = ''
+	[string]$ExtraArgs = '',
+	[ValidateSet('responses', 'chat')][string]$CodexWireApi = 'responses'
 )
 # Claude Code 以外のエージェント（Pi・OpenCode・Aider）を llama-server に繋ぎ、読み・書きができるかを試す
 # 試験の中身は test-cc-tools.ps1 と同じ。結果は logs/test-agents/ に 1 モデル 1 行の JSON Lines で追記する
@@ -28,7 +29,8 @@ function Reset-Sandbox {
 	Copy-Item (Join-Path $root 'README.html') $work
 }
 # 設定は空のホームに置く。利用者のいつもの設定には触れない
-$agentHome = Join-Path $root "tmp/agent-home/$Agent"
+# プロジェクトの外に置く（中に置くと、そのパスからモデルがプロジェクトの場所を推測することがある）
+$agentHome = "W:/temp/llama-cp-agent-home/$Agent"
 New-Item -ItemType Directory -Force $agentHome | Out-Null
 $aider = Join-Path $env:USERPROFILE '.local/bin/aider.exe'
 
@@ -46,6 +48,9 @@ function Invoke-Agent([string]$prompt, [string]$name, [string]$tag) {
 	$cmdLine = switch ($Agent) {
 		'pi' { "pi -p --no-session --provider llamacpp --model `"$name`" `"$p`"" }
 		'opencode' { "opencode run -m `"llamacpp/$name`" `"$p`"" }
+		# Windows では -s workspace-write だと Codex のシェル実行（ファイルの読み書きに使う）が policy で止まるため、安全装置を外す。
+		# 作業フォルダは W:/temp の下のコピーなので、外に出なければ本物には届かない（出ない保証はない）
+		'codex' { "codex exec --skip-git-repo-check --ephemeral --dangerously-bypass-approvals-and-sandbox -m `"$name`" `"$p`"" }
 		'aider' { "`"$aider`" --model `"openai/$name`" --openai-api-base http://127.0.0.1:$Port/v1 --openai-api-key llamacpp --no-git --yes-always --no-show-model-warnings --no-check-update --no-pretty --message `"$p`"" }
 	}
 	$sw = [Diagnostics.Stopwatch]::StartNew()
@@ -80,6 +85,22 @@ foreach ($m in $models) {
 			$cfgPath = Join-Path $agentHome 'opencode.json'
 			[IO.File]::WriteAllText($cfgPath, ($cfg | ConvertTo-Json -Depth 8), $utf8)
 			$env:OPENCODE_CONFIG = $cfgPath
+		}
+		'codex' {
+			# CODEX_HOME を空のホームに向ける。利用者のいつもの ~/.codex（設定・AGENTS.md）は読ませない
+			$toml = @(
+				"model = `"$name`""
+				"model_provider = `"llamacpp`""
+				''
+				'[model_providers.llamacpp]'
+				'name = "llama.cpp"'
+				"base_url = `"http://127.0.0.1:$Port/v1`""
+				"wire_api = `"$CodexWireApi`""
+				'env_key = "LLAMACPP_API_KEY"'
+			) -join "`n"
+			[IO.File]::WriteAllText((Join-Path $agentHome 'config.toml'), $toml + "`n", $utf8)
+			$env:CODEX_HOME = $agentHome
+			$env:LLAMACPP_API_KEY = 'llamacpp'
 		}
 	}
 
