@@ -1951,6 +1951,8 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたあとで、RAM
 <thead><tr><th>モデル</th><th class="nowrap">配置</th><th class="nowrap">上の測定</th><th class="nowrap">再測定</th><th class="nowrap">倍率</th></tr></thead>
 <tbody>
 <tr><td class="nowrap">Qwen3-4B</td><td class="nowrap">-ngl 99</td><td class="num">56.49</td><td class="num">58.91</td><td class="num">1.04</td></tr>
+<tr><td class="nowrap">gemma-4-E4B</td><td class="nowrap">-ngl 99</td><td class="num">45.23</td><td class="num">46.87</td><td class="num">1.04</td></tr>
+<tr><td class="nowrap">gemma-4-E4B（pp512）</td><td class="nowrap">-ngl 99</td><td class="num">1149</td><td class="num"><strong>1843</strong></td><td class="num">1.60</td></tr>
 <tr><td class="nowrap">Qwen3.5-9B ＋KV q8_0</td><td class="nowrap">-ngl 24</td><td class="num">8.12</td><td class="num"><strong>14.64</strong></td><td class="num">1.80</td></tr>
 <tr><td class="nowrap">Qwen3.5-9B ＋KV q8_0</td><td class="nowrap">-ngl 28</td><td class="num">1.87</td><td class="num">3.67</td><td class="num">—</td></tr>
 <tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">-ncmoe 24</td><td class="num">3.63</td><td class="num">15.31</td><td class="num">4.22</td></tr>
@@ -1958,16 +1960,24 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたあとで、RAM
 <tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">-ncmoe 18</td><td class="num">5.89</td><td class="num"><strong>18.98</strong></td><td class="num">3.22</td></tr>
 <tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">-ncmoe 16</td><td class="num">5.52</td><td class="num">11.67</td><td class="num">—</td></tr>
 <tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">-ncmoe 14</td><td class="num">3.10</td><td class="num">7.77</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B（UD-Q4_K_XL）</td><td class="nowrap">-ncmoe 48</td><td class="num">—</td><td class="num">13.68</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B（UD-Q4_K_XL）</td><td class="nowrap">-ncmoe 44</td><td class="num">—</td><td class="num">14.80</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B（UD-Q4_K_XL）</td><td class="nowrap">-ncmoe 42</td><td class="num">—</td><td class="num">15.74</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B（UD-Q4_K_XL）</td><td class="nowrap">-ncmoe 40</td><td class="num">—</td><td class="num"><strong>16.60</strong></td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B（UD-Q4_K_XL）</td><td class="nowrap">-ncmoe 39</td><td class="num">—</td><td class="num">13.54</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B（UD-Q4_K_XL）</td><td class="nowrap">-ncmoe 38</td><td class="num">—</td><td class="num">7.10</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B（UD-Q4_K_XL）</td><td class="nowrap">-ncmoe 36</td><td class="num">—</td><td class="num">9.84</td><td class="num">—</td></tr>
 <tr><td class="nowrap">Qwen3-4B ＋KV q8_0 ＠深さ 8192</td><td class="nowrap">-ngl 99</td><td class="num">—</td><td class="num">37.06</td><td class="num">—</td></tr>
 <tr><td class="nowrap">Qwen3-4B ＋KV q8_0 ＠深さ 16384</td><td class="nowrap">-ngl 99</td><td class="num">止まったまま20分以上</td><td class="num"><strong>26.96</strong></td><td class="num">—</td></tr>
 </tbody>
 </table>
 </div>
-<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">単位は tok/s（tg）。Qwen3-4B の基準のみ tg128、それ以外は tg64。</p>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">単位は tok/s（tg）。Qwen3-4B の基準と gemma-4-E4B は tg128、それ以外は tg64。「pp512」の行はプロンプトを読む速さ。</p>
 
 <h3>分かったこと</h3>
 <ul>
 	<li><strong>GPU だけで動くものは変わらない</strong>。Qwen3-4B は全層が VRAM にあり、RAM を使わない</li>
+	<li><strong>gemma-4-E4B は、生成は変わらず、プロンプトを読む速さが 1.6 倍になった</strong>。CPU 側に置く PLE（2730 MiB）が生成を遅らせるほどではなかったことになる</li>
 	<li><strong>重みの一部を CPU 側に置くものが大きく速くなった</strong>。Qwen3.5-9B は 1.8 倍、gpt-oss-20b は 3.2 倍。
 		1枚から2枚になってメモリの帯域が倍になったためと考えられる。gpt-oss-20b は、RAM の逼迫が解けた分もさらに上乗せされている</li>
 	<li><strong>崩れる境目は動かない</strong>。Qwen3.5-9B は 24 と 28 の間、gpt-oss-20b は 18 と 14 の間で、上の測定と同じ。
@@ -1975,6 +1985,8 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたあとで、RAM
 	<li><strong>KV キャッシュを q8_0 にすれば、コンテキスト 16384 が使える</strong>。上の測定では同じ設定で止まっていた。
 		画面表示を内蔵GPU に任せて空いた分で、KV キャッシュが VRAM に収まった</li>
 	<li><strong>gpt-oss-20b は第9章の合格ライン（15 tok/s）を超えた</strong>。上の測定では「用途限定」としていたが、対話にも使える速さになった</li>
+	<li><strong>Qwen3-30B-A3B（16.5 GB）も合格ラインを超えた</strong>。<code>-ncmoe 40</code> で 16.6 tok/s（2 回測って 16.54・16.60）。39 以下は VRAM があふれて値が揺れ、7〜14 tok/s に落ちる。
+		測ったのはプロンプトを入れない tg64 なので、長いコンテキストを使うときは KV キャッシュの分だけ <code>-ncmoe</code> を増やす必要があるはず（未確認）</li>
 </ul>
 
 <h2>結論と方針（RAM 32GB）</h2>
@@ -1988,8 +2000,9 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたあとで、RAM
 <tbody>
 <tr><td class="nowrap"><span class="badge b-ok">常用</span></td><td class="nowrap"><strong>Qwen3-4B-Instruct-2507</strong><br><code>-ngl 99 -c 8192</code></td><td class="nowrap">59 tok/s</td><td>資料を渡す作業のすべて。変更なし</td></tr>
 <tr><td class="nowrap"><span class="badge b-ok">長い入力</span></td><td class="nowrap">Qwen3-4B-Instruct-2507<br><code>-ngl 99 -c 16384 -ctk q8_0 -ctv q8_0 -fa on</code></td><td class="nowrap">27 tok/s<br>（深さ 16384）</td><td>8192 に収まらない資料を渡すとき。KV を q8_0 にした分、8192 のときより遅い</td></tr>
-<tr><td class="nowrap"><span class="badge b-ok">知識を問う時</span></td><td class="nowrap"><strong>gemma-4-E4B-it</strong><br><code>-ngl 99</code>／<code>max_tokens</code> は 1500 以上</td><td class="nowrap">41 tok/s<br>（16GB での値）</td><td>変更なし。32GB では未測定（課題 i260927-05）</td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">知識を問う時</span></td><td class="nowrap"><strong>gemma-4-E4B-it</strong><br><code>-ngl 99</code>／<code>max_tokens</code> は 1500 以上</td><td class="nowrap">47 tok/s</td><td>変更なし。生成は 16GB のときとほぼ同じ</td></tr>
 <tr><td class="nowrap"><span class="badge b-ok">対話に使える</span></td><td class="nowrap"><strong>gpt-oss-20b</strong><br><code>-ngl 99 --n-cpu-moe 18</code></td><td class="nowrap">19 tok/s</td><td>20B級の知識が要る場面。合格ライン（15 tok/s）を超えたので「用途限定」から上げる。<strong>回答の品質はまだ評価していない</strong></td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">対話に使える</span></td><td class="nowrap"><strong>Qwen3-30B-A3B-Instruct-2507</strong>（UD-Q4_K_XL）<br><code>-ngl 99 --n-cpu-moe 40</code></td><td class="nowrap">17 tok/s</td><td>gpt-oss-20b と同じ枠の候補。<strong>回答の品質はまだ評価していない</strong></td></tr>
 <tr><td class="nowrap"><span class="badge b-warn">用途限定</span></td><td class="nowrap">Qwen3.5-9B<br><code>-ngl 24 -ctk q8_0 -ctv q8_0 -fa on</code></td><td class="nowrap">15 tok/s</td><td>合格ラインの手前。同じ速さで gpt-oss-20b が使えるため、優先しない</td></tr>
 </tbody>
 </table>
@@ -2002,7 +2015,7 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたあとで、RAM
 <tbody>
 <tr><td class="nowrap">2</td><td>Qwen3.5-9B の IQ4_XS（約 4.5 GB）</td><td><span class="badge b-warn">変更なし</span>急がない</td></tr>
 <tr><td class="nowrap">3</td><td>Qwen3-30B-A3B</td><td><span class="badge b-warn">候補に戻す</span>見送った理由は「RAM 律速」だったが、同じ MoE の gpt-oss-20b が 3.2 倍になり、理由がなくなった。
-RAM に余裕ができたので <code>IQ2_M</code>（約 11 GB）に限らず Q4 も対象にできる。2026-09-29 に UD-Q4_K_XL（16.5 GB）を取得し、Claude Code の読み書きの試験に合格した。生成速度は未測定（課題 i260927-05）</td></tr>
+RAM に余裕ができたので <code>IQ2_M</code>（約 11 GB）に限らず Q4 も対象にできる。2026-09-29 に UD-Q4_K_XL（16.5 GB）を取得し、Claude Code の読み書きの試験に合格した。生成は <code>-ncmoe 40</code> で 16.6 tok/s（「32GB での再測定」）</td></tr>
 </tbody>
 </table>
 </div>

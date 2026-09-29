@@ -328,7 +328,7 @@ Claude Code を共通ルールなし・思考なし（<code>--reasoning off</cod
 </div>
 <ul>
 	<li>読み・書きの両方に合格したのは 16 本。15 分以内に限ると 15 本（Qwen3-4B-Thinking の書きは約 20 分）</li>
-	<li>20GB 級の MoE（gemma-4-26B-A4B・Qwen3-30B-A3B・Qwen3.6-35B-A3B・Qwen3-Coder-30B・GLM-4.7-Flash）は合格したが、読みに 127〜203 秒かかる。生成速度（tok/s）は測っていない</li>
+	<li>20GB 級の MoE（gemma-4-26B-A4B・Qwen3-30B-A3B・Qwen3.6-35B-A3B・Qwen3-Coder-30B・GLM-4.7-Flash）は合格したが、読みに 127〜203 秒かかる。生成速度は Qwen3-30B-A3B が 16.6 tok/s（<code>-ncmoe 40</code>。<a href="../10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>の「32GB での再測定」）。ほかの 4 本は測っていない</li>
 	<li>「ホームを外に移してから合格」の 3 本は、ホームがプロジェクトの中にあった回では、プロジェクトの本物のファイルを読み書きしにいって不合格だった（第 4 章）</li>
 </ul>
 </section>
@@ -423,7 +423,7 @@ Codex はファイルの読み書きに PowerShell のコマンドを使う。<c
 	<li><strong>Pi で試したのは 6 本だけ</strong>。20GB 級の MoE や、Claude Code で遅かったモデルを Pi で動かしたときの速さは測っていない</li>
 	<li>Pi で gemma-4-E2B が答えを書かずに終わる理由は調べていない。Codex CLI でも、E2B の読みは「これから読む」と答えたところで終わった</li>
 	<li><strong>試験は 1 ファイルを読む・1 行書くだけ</strong>。複数のファイルにまたがる編集や、コードを書く作業での品質は評価していない</li>
-	<li><strong>20GB 級の MoE の生成速度（tok/s）は測っていない</strong>。Qwen3-30B-A3B は課題 i260927-05 で測る</li>
+	<li><strong>20GB 級の MoE の生成速度は、Qwen3-30B-A3B のほかは測っていない</strong></li>
 	<li>Nemotron が Claude Code でだけ読み書きしない理由は調べていない。Pi・OpenCode では通る</li>
 	<li>チャットテンプレートで 500 エラーになった 4 本が、モデル側の問題か、llama-server のテンプレート処理の問題かは切り分けていない</li>
 </ul>
