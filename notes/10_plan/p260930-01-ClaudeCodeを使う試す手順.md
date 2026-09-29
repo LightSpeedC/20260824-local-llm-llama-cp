@@ -9,13 +9,14 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
 ## 目次
 
 1. [置き場所](#1-置き場所)
-2. [cc1.cmd で対話に使う](#2-cc1cmd-で対話に使う)
-3. [Claude Code の試験を流す](#3-claude-code-の試験を流す)
-4. [ほかのエージェントの試験を流す](#4-ほかのエージェントの試験を流す)
+2. [設定の中身](#2-設定の中身)
+3. [cc1.cmd で対話に使う](#3-cc1cmd-で対話に使う)
+4. [Claude Code の試験を流す](#4-claude-code-の試験を流す)
+5. [ほかのエージェントの試験を流す](#5-ほかのエージェントの試験を流す)
 
 ## この文書の位置づけ
 
-設定の根拠と試験結果は [Claude Code のツール利用テスト](../01_research/r260929-01-ClaudeCodeのツール利用テスト.md)にある。 本書はその設定を自分で動かすための手順だけを書く。コマンドはすべてプロジェクトのフォルダ（`W:\2026\20260824-local-llm-llama-cp`）で実行する。
+試験結果と、どのモデル・エージェントを使うかは [ローカルLLM で AI エージェントを使う — 試験結果](../01_research/r260929-01-AIエージェントの試験結果.md)にある。 本書は、その設定の中身と、自分で動かすための手順を書く。コマンドはすべてプロジェクトのフォルダ（`W:\2026\20260824-local-llm-llama-cp`）で実行する。
 
 ## 1. 置き場所
 
@@ -28,7 +29,51 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
 | 試験の作業用コピー | `W:\temp\llama-cp-sandbox` | 1 問ごとに中身を消して作り直す |
 | 試験の記録 | `logs\test-cc-tools\`・`logs\test-agents\` | git 管理外 |
 
-## 2. cc1.cmd で対話に使う
+## 2. 設定の中身
+
+`tools\50_run\run-server-cc.cmd` と `cc1.cmd` が渡している値。試験スクリプトも、1 問の待ち時間とホームの置き場所のほかは同じ値を使う。
+
+### llama-server
+
+```batch
+"bin\llama.cpp\llama-server.exe" ^
+  -m "C:\AI_Models\Gemma\gemma-4-E4B-it-GGUF\gemma-4-E4B-it-Q4_K_M.gguf" ^
+  -c 65536 -np 1 ^
+  -nkvo -ctk q8_0 -ctv q8_0 -fa on ^
+  --reasoning off ^
+  --alias gemma-4-E4B-it-Q4_K_M ^
+  --host 127.0.0.1 --port 8080
+```
+
+| 引数 | 意味 |
+|---|---|
+| `-c 65536` | コンテキスト長。Claude Code は最初の要求だけで 17,000〜23,600 トークンある |
+| `-np 1` | スロットを 1 つにする |
+| `-nkvo` | KV キャッシュを RAM 側に置く。65536 分は VRAM 4GB に載らない |
+| `-ctk q8_0 -ctv q8_0` | KV キャッシュを q8_0 に量子化する |
+| `-fa on` | Flash Attention を使う |
+| `--reasoning off` | 思考を切る。長く考えて時間切れになるのを防ぐ |
+| `--alias` | Claude Code から呼ぶときのモデル名 |
+| `-ngl 99` | 全層を GPU に載せる。3.2 GB 以下のモデルだけ付け、それより大きいモデルは付けずに自動配置に任せる（gemma-4-E4B は付けない） |
+| `--chat-template-file` | 差し替えたテンプレート。Ministral 2 本・Bonsai・Qwen3.5-9B だけ付ける |
+
+### Claude Code（cc1.cmd）
+
+| 環境変数 | 値 |
+|---|---|
+| `ANTHROPIC_BASE_URL` | `http://127.0.0.1:8080` |
+| `ANTHROPIC_AUTH_TOKEN` | 任意の文字列（llama-server は確かめない） |
+| `ANTHROPIC_MODEL`・`ANTHROPIC_SMALL_FAST_MODEL` | サーバの `--alias` と同じ値 |
+| `CLAUDE_CODE_MAX_CONTEXT_TOKENS` | サーバの `-c` と同じ値（65536） |
+| `API_TIMEOUT_MS` | 1 回の要求を待つ長さ。`cc1.cmd` は 3600000（1 時間） |
+| `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` | `1` |
+| `CLAUDE_CODE_ATTRIBUTION_HEADER` | `0`。ホームを替えるとプロジェクトの `.claude/settings.json` しか効かないため、`cc1.cmd` でも渡す |
+| `USERPROFILE`・`HOME` | **プロジェクトの外にある空のフォルダ**（`cc1.cmd` は `W:\temp\cc1-home`）。共通ルール・メモリ・フックを読ませない |
+
+> [!WARNING]
+> **空のホームも試験の作業フォルダも、プロジェクトの中に置かない。** 中に置くと、モデルがプロジェクトの場所を推測し、本物のファイルに読み書きしにいく（理由は[試験結果の第 4 章](../01_research/r260929-01-AIエージェントの試験結果.md#4-効いた設定とその理由)）。
+
+## 3. cc1.cmd で対話に使う
 
 ### 手順
 
@@ -43,10 +88,9 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
 - `tools\50_run\run-server-cc.cmd` の `-m`（モデルのファイル）と `--alias`（名前）。3.2 GB 以下のモデルは `-ngl 99` を足す。テンプレートを差し替えるモデルは `--chat-template-file "tools\50_run\templates\<名前>.jinja"` を足す
 - `cc1.cmd` の `ANTHROPIC_MODEL` と `ANTHROPIC_SMALL_FAST_MODEL`（`--alias` と同じ値）
 
-> [!TIP]
-> **速さで選ぶなら gemma-4-E2B、知識で選ぶなら gpt-oss-20b。** 試験では gemma-4-E2B が読み 13 秒・書き 10 秒、gpt-oss-20b が読み 84 秒・書き 40 秒だった。
+どのモデルにするかは[試験結果の第 1 章](../01_research/r260929-01-AIエージェントの試験結果.md#1-結論)にある。
 
-## 3. Claude Code の試験を流す
+## 4. Claude Code の試験を流す
 
 モデルを 1 本ずつ起動し、Claude Code に「README の h1 を読む」「決めた 1 行を書く」の 2 問を投げる。サーバの起動と停止もスクリプトが行う。
 
@@ -76,7 +120,7 @@ tools\50_run\test-cc-tools.cmd -MaxSizeGB 20 -NoRules -UseTemplates -ExtraArgs "
 - まとめは `logs\test-cc-tools\<日時>-norules-results.jsonl`（1 モデル 1 行）。1 問ごとの生の出力は `…-raw.json`
 - **ターン 1 で合格 False** は、ツールを呼ばずに答えを作ったということ。**ファイルなし**は、作ったと答えても実際にはできていないということ
 
-## 4. ほかのエージェントの試験を流す
+## 5. ほかのエージェントの試験を流す
 
 Pi・OpenCode・Aider・Codex CLI を、同じ 2 問で試す。各エージェントの設定は `W:\temp\llama-cp-agent-home\` に書き、いつもの設定には触れない。
 

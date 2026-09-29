@@ -18,9 +18,10 @@
 	--soft:#f2f5fb;
 }
 .ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
-.ch02{--accent:hsl(186.7,78%,25%);--accent2:hsl(186.7,58%,55%);--soft:hsl(186.7,28%,95%);}
-.ch03{--accent:hsl(93.3,78%,25%);--accent2:hsl(93.3,58%,55%);--soft:hsl(93.3,28%,95%);}
-.ch04{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+.ch02{--accent:hsl(210,78%,25%);--accent2:hsl(210,58%,55%);--soft:hsl(210,28%,95%);}
+.ch03{--accent:hsl(140,78%,25%);--accent2:hsl(140,58%,55%);--soft:hsl(140,28%,95%);}
+.ch04{--accent:hsl(70,78%,25%);--accent2:hsl(70,58%,55%);--soft:hsl(70,28%,95%);}
+.ch05{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
 
 *{box-sizing:border-box;}
 body{
@@ -230,16 +231,17 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">目次</h2>
 	<ol>
 		<li class="ch01"><a href="#ch01">置き場所</a></li>
-		<li class="ch02"><a href="#ch02">cc1.cmd で対話に使う</a></li>
-		<li class="ch03"><a href="#ch03">Claude Code の試験を流す</a></li>
-		<li class="ch04"><a href="#ch04">ほかのエージェントの試験を流す</a></li>
+		<li class="ch02"><a href="#ch02">設定の中身</a></li>
+		<li class="ch03"><a href="#ch03">cc1.cmd で対話に使う</a></li>
+		<li class="ch04"><a href="#ch04">Claude Code の試験を流す</a></li>
+		<li class="ch05"><a href="#ch05">ほかのエージェントの試験を流す</a></li>
 	</ol>
 </div>
 
 <h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">この文書の位置づけ</h2>
 <p>
-設定の根拠と試験結果は <a href="../01_research/r260929-01-ClaudeCodeのツール利用テスト.html">Claude Code のツール利用テスト</a>にある。
-本書はその設定を自分で動かすための手順だけを書く。コマンドはすべてプロジェクトのフォルダ（<code>W:\2026\20260824-local-llm-llama-cp</code>）で実行する。
+試験結果と、どのモデル・エージェントを使うかは <a href="../01_research/r260929-01-AIエージェントの試験結果.html">ローカルLLM で AI エージェントを使う — 試験結果</a>にある。
+本書は、その設定の中身と、自分で動かすための手順を書く。コマンドはすべてプロジェクトのフォルダ（<code>W:\2026\20260824-local-llm-llama-cp</code>）で実行する。
 </p>
 
 <!-- ============ 1 ============ -->
@@ -262,6 +264,58 @@ footer a{color:var(--navy2, #2f5fbf);}
 
 <!-- ============ 2 ============ -->
 <section class="ch02" id="ch02">
+<h1>設定の中身</h1>
+<p><code>tools\50_run\run-server-cc.cmd</code> と <code>cc1.cmd</code> が渡している値。試験スクリプトも、1 問の待ち時間とホームの置き場所のほかは同じ値を使う。</p>
+
+<h2>llama-server</h2>
+<pre><code class="language-batch">"bin\llama.cpp\llama-server.exe" ^
+  -m "C:\AI_Models\Gemma\gemma-4-E4B-it-GGUF\gemma-4-E4B-it-Q4_K_M.gguf" ^
+  -c 65536 -np 1 ^
+  -nkvo -ctk q8_0 -ctv q8_0 -fa on ^
+  --reasoning off ^
+  --alias gemma-4-E4B-it-Q4_K_M ^
+  --host 127.0.0.1 --port 8080</code></pre>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">引数</th><th>意味</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><code>-c 65536</code></td><td>コンテキスト長。Claude Code は最初の要求だけで 17,000〜23,600 トークンある</td></tr>
+<tr><td class="nowrap"><code>-np 1</code></td><td>スロットを 1 つにする</td></tr>
+<tr><td class="nowrap"><code>-nkvo</code></td><td>KV キャッシュを RAM 側に置く。65536 分は VRAM 4GB に載らない</td></tr>
+<tr><td class="nowrap"><code>-ctk q8_0 -ctv q8_0</code></td><td>KV キャッシュを q8_0 に量子化する</td></tr>
+<tr><td class="nowrap"><code>-fa on</code></td><td>Flash Attention を使う</td></tr>
+<tr><td class="nowrap"><code>--reasoning off</code></td><td>思考を切る。長く考えて時間切れになるのを防ぐ</td></tr>
+<tr><td class="nowrap"><code>--alias</code></td><td>Claude Code から呼ぶときのモデル名</td></tr>
+<tr><td class="nowrap"><code>-ngl 99</code></td><td>全層を GPU に載せる。3.2 GB 以下のモデルだけ付け、それより大きいモデルは付けずに自動配置に任せる（gemma-4-E4B は付けない）</td></tr>
+<tr><td class="nowrap"><code>--chat-template-file</code></td><td>差し替えたテンプレート。Ministral 2 本・Bonsai・Qwen3.5-9B だけ付ける</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Claude Code（cc1.cmd）</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">環境変数</th><th>値</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><code>ANTHROPIC_BASE_URL</code></td><td><code>http://127.0.0.1:8080</code></td></tr>
+<tr><td class="nowrap"><code>ANTHROPIC_AUTH_TOKEN</code></td><td>任意の文字列（llama-server は確かめない）</td></tr>
+<tr><td class="nowrap"><code>ANTHROPIC_MODEL</code>・<code>ANTHROPIC_SMALL_FAST_MODEL</code></td><td>サーバの <code>--alias</code> と同じ値</td></tr>
+<tr><td class="nowrap"><code>CLAUDE_CODE_MAX_CONTEXT_TOKENS</code></td><td>サーバの <code>-c</code> と同じ値（65536）</td></tr>
+<tr><td class="nowrap"><code>API_TIMEOUT_MS</code></td><td>1 回の要求を待つ長さ。<code>cc1.cmd</code> は 3600000（1 時間）</td></tr>
+<tr><td class="nowrap"><code>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC</code></td><td><code>1</code></td></tr>
+<tr><td class="nowrap"><code>CLAUDE_CODE_ATTRIBUTION_HEADER</code></td><td><code>0</code>。ホームを替えるとプロジェクトの <code>.claude/settings.json</code> しか効かないため、<code>cc1.cmd</code> でも渡す</td></tr>
+<tr><td class="nowrap"><code>USERPROFILE</code>・<code>HOME</code></td><td><strong>プロジェクトの外にある空のフォルダ</strong>（<code>cc1.cmd</code> は <code>W:\temp\cc1-home</code>）。共通ルール・メモリ・フックを読ませない</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout callout-warning">
+<strong>空のホームも試験の作業フォルダも、プロジェクトの中に置かない。</strong>
+中に置くと、モデルがプロジェクトの場所を推測し、本物のファイルに読み書きしにいく（理由は<a href="../01_research/r260929-01-AIエージェントの試験結果.html#ch04">試験結果の第 4 章</a>）。
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
 <h1>cc1.cmd で対話に使う</h1>
 <h2>手順</h2>
 <ol>
@@ -279,14 +333,11 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<li><code>tools\50_run\run-server-cc.cmd</code> の <code>-m</code>（モデルのファイル）と <code>--alias</code>（名前）。3.2 GB 以下のモデルは <code>-ngl 99</code> を足す。テンプレートを差し替えるモデルは <code>--chat-template-file "tools\50_run\templates\&lt;名前&gt;.jinja"</code> を足す</li>
 	<li><code>cc1.cmd</code> の <code>ANTHROPIC_MODEL</code> と <code>ANTHROPIC_SMALL_FAST_MODEL</code>（<code>--alias</code> と同じ値）</li>
 </ul>
-<div class="callout callout-tip">
-<strong>速さで選ぶなら gemma-4-E2B、知識で選ぶなら gpt-oss-20b。</strong>
-試験では gemma-4-E2B が読み 13 秒・書き 10 秒、gpt-oss-20b が読み 84 秒・書き 40 秒だった。
-</div>
+<p>どのモデルにするかは<a href="../01_research/r260929-01-AIエージェントの試験結果.html#ch01">試験結果の第 1 章</a>にある。</p>
 </section>
 
-<!-- ============ 3 ============ -->
-<section class="ch03" id="ch03">
+<!-- ============ 4 ============ -->
+<section class="ch04" id="ch04">
 <h1>Claude Code の試験を流す</h1>
 <p>モデルを 1 本ずつ起動し、Claude Code に「README の h1 を読む」「決めた 1 行を書く」の 2 問を投げる。サーバの起動と停止もスクリプトが行う。</p>
 <h2>よく使う形</h2>
@@ -317,8 +368,8 @@ tools\50_run\test-cc-tools.cmd -MaxSizeGB 20 -NoRules -UseTemplates -ExtraArgs "
 </ul>
 </section>
 
-<!-- ============ 4 ============ -->
-<section class="ch04" id="ch04">
+<!-- ============ 5 ============ -->
+<section class="ch05" id="ch05">
 <h1>ほかのエージェントの試験を流す</h1>
 <p>Pi・OpenCode・Aider・Codex CLI を、同じ 2 問で試す。各エージェントの設定は <code>W:\temp\llama-cp-agent-home\</code> に書き、いつもの設定には触れない。</p>
 <pre><code class="language-batch">tools\50_run\test-agents.cmd -Agent pi -Only "Nemotron,Qwen3-4B-Thinking" -UseTemplates -ExtraArgs "--reasoning off"

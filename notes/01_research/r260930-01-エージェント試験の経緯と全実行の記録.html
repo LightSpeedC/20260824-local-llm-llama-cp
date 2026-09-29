@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Claude Code のツール利用テスト</title>
+<title>AI エージェント試験の経緯と全実行の記録</title>
 <style>
 :root{
 	--navy1:#12224d;
@@ -18,12 +18,8 @@
 	--soft:#f2f5fb;
 }
 .ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
-.ch02{--accent:hsl(233.3,78%,25%);--accent2:hsl(233.3,58%,55%);--soft:hsl(233.3,28%,95%);}
-.ch03{--accent:hsl(186.7,78%,25%);--accent2:hsl(186.7,58%,55%);--soft:hsl(186.7,28%,95%);}
-.ch04{--accent:hsl(140,78%,25%);--accent2:hsl(140,58%,55%);--soft:hsl(140,28%,95%);}
-.ch05{--accent:hsl(93.3,78%,25%);--accent2:hsl(93.3,58%,55%);--soft:hsl(93.3,28%,95%);}
-.ch06{--accent:hsl(46.7,78%,25%);--accent2:hsl(46.7,58%,55%);--soft:hsl(46.7,28%,95%);}
-.ch07{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+.ch02{--accent:hsl(140,78%,25%);--accent2:hsl(140,58%,55%);--soft:hsl(140,28%,95%);}
+.ch03{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
 
 *{box-sizing:border-box;}
 body{
@@ -219,9 +215,9 @@ footer a{color:var(--navy2, #2f5fbf);}
 
 <div class="titlebar">
 	<div class="inner">
-		<h1>Claude Code のツール利用テスト</h1>
-		<div class="lead">llama-server に繋いだ Claude Code で、手持ちモデルがファイルを読み書きできるかを試す</div>
-		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-09-30</div>
+		<h1>AI エージェント試験の経緯と全実行の記録</h1>
+		<div class="lead">ローカルLLM で AI エージェントを使う試験の、試し方・途中で起きたこと・流したすべての試験</div>
+		<div class="date">📅 作成: 2026-09-30 / 更新: 2026-09-30</div>
 	</div>
 </div>
 
@@ -232,106 +228,33 @@ footer a{color:var(--navy2, #2f5fbf);}
 <div class="toc">
 	<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">目次</h2>
 	<ol>
-		<li class="ch01"><a href="#ch01">結論</a></li>
-		<li class="ch02"><a href="#ch02">使える設定</a></li>
-		<li class="ch03"><a href="#ch03">試験の方法と経緯</a></li>
-		<li class="ch04"><a href="#ch04">最初の試験の結果（ルールあり）</a></li>
-		<li class="ch05"><a href="#ch05">ルールなし・思考なしの結果</a></li>
-		<li class="ch06"><a href="#ch06">Pi・OpenCode・Aider・Codex で試した結果</a></li>
-		<li class="ch07"><a href="#ch07">全実行の記録</a></li>
+		<li class="ch01"><a href="#ch01">試験の方法と経緯</a></li>
+		<li class="ch02"><a href="#ch02">最初の試験の結果（ルールあり）</a></li>
+		<li class="ch03"><a href="#ch03">全実行の記録</a></li>
 	</ol>
 </div>
 
 <h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">この文書の位置づけ</h2>
 <p>
-<a href="../10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>の Step 5 で、Claude Code を llama-server に繋いで応答が返ることは確かめた。
-本書は、その先の<strong>ツール（Read・Write）を実際に使えるか</strong>を、手持ちの 13 本とダウンロードした 20GB 以下の 6 本などで試した記録である。
-環境は RAM 32GB・VRAM 4GB（画面表示は内蔵GPU）。
+<a href="r260929-01-AIエージェントの試験結果.html">ローカルLLM で AI エージェントを使う — 試験結果</a>の根拠となる記録である。
+試し方、試験の途中で起きたことと対処、最初に流した試験（共通ルールを読ませた状態）の結果、流したすべての試験を残す。
+設定の中身と動かし方は<a href="../10_plan/p260930-01-ClaudeCodeを使う試す手順.html">使う・試す手順</a>にある。
 </p>
 
 <!-- ============ 1 ============ -->
 <section class="ch01" id="ch01">
-<h1>結論</h1>
-<p>
-<strong>共通ルールを読ませなければ、Claude Code はこのPCでも使える。</strong>
-最初の試験（ルールあり）では読み・書きの両方に合格したモデルが 1 本も無かったが、
-ルールを読ませず、思考を切った設定では <strong>20 本中 15 本</strong>が 15 分以内に両方に合格した（1 時間まで待てば 16 本）。
-</p>
-<div class="tablewrap">
-<table>
-<thead><tr><th>変えたこと</th><th>効果</th></tr></thead>
-<tbody>
-<tr><td class="nowrap">共通ルールを読ませない（空のホーム）</td><td>最初に送る量が約 60,000 → 17,000〜23,600 トークン。1 往復が数分から数十秒になり、ツールを呼ぶようになった</td></tr>
-<tr><td class="nowrap">思考を切る（<code>--reasoning off</code>）</td><td>思考を長く出して時間切れになるのを防ぐ</td></tr>
-<tr><td class="nowrap">チャットテンプレートの差し替え</td><td>途中の system で 500 エラーになる 4 本（Ministral 2 本・Bonsai・Qwen3.5-9B）が通るようになった</td></tr>
-<tr><td class="nowrap">ホームと作業フォルダをプロジェクトの外に置く</td><td>Qwen 系がプロジェクトのパスを推測して外に書きにいくのを防ぐ（第 3 章）</td></tr>
-</tbody>
-</table>
-</div>
-
-<h2>速く使えるモデル</h2>
-<div class="tablewrap">
-<table>
-<thead><tr><th>モデル</th><th class="nowrap">サイズ</th><th class="nowrap">読み</th><th class="nowrap">書き</th></tr></thead>
-<tbody>
-<tr><td class="nowrap">gemma-4-E2B-it</td><td class="num">3.19 GB</td><td class="num">13 秒</td><td class="num">10 秒</td></tr>
-<tr><td class="nowrap">gemma-4-E4B-it</td><td class="num">4.97 GB</td><td class="num">38 秒</td><td class="num">26 秒</td></tr>
-<tr><td class="nowrap">Ministral-3-3B-Instruct-2512（テンプレート差し替え）</td><td class="num">2.00 GB</td><td class="num">28 秒</td><td class="num">54 秒</td></tr>
-<tr><td class="nowrap">gpt-oss-20b</td><td class="num">11.28 GB</td><td class="num">84 秒</td><td class="num">40 秒</td></tr>
-</tbody>
-</table>
-</div>
-<p>全モデルの結果は第 5 章。Claude Code で通らなかったモデルも、Pi・OpenCode なら通るものがある（第 6 章）。</p>
-</section>
-
-<!-- ============ 2 ============ -->
-<section class="ch02" id="ch02">
-<h1>使える設定</h1>
-<p>gemma-4-E2B-it を例にする。ほかのモデルも <code>-m</code> と <code>--alias</code> を替えるだけでよい（差し替えたテンプレートがあるモデルは <code>--chat-template-file</code> を足す）。</p>
-
-<h3>llama-server</h3>
-<pre><code class="language-batch">"bin\llama.cpp\llama-server.exe" ^
-  -m "C:\AI_Models\Gemma\gemma-4-E2B-it-GGUF\gemma-4-E2B-it-Q4_K_M.gguf" ^
-  -c 65536 -np 1 -ngl 99 ^
-  -nkvo -ctk q8_0 -ctv q8_0 -fa on ^
-  --reasoning off ^
-  --alias gemma-4-E2B-it-Q4_K_M ^
-  --host 127.0.0.1 --port 8080</code></pre>
-<p>3.2 GB を超えるモデルは <code>-ngl</code> を渡さず、llama-server の自動配置に任せた。テンプレートは <code>tools/50_run/templates/</code> にある。</p>
-
-<h3>Claude Code</h3>
-<div class="tablewrap">
-<table>
-<thead><tr><th class="nowrap">環境変数</th><th>値</th></tr></thead>
-<tbody>
-<tr><td class="nowrap"><code>ANTHROPIC_BASE_URL</code></td><td><code>http://127.0.0.1:8080</code></td></tr>
-<tr><td class="nowrap"><code>ANTHROPIC_AUTH_TOKEN</code></td><td>任意の文字列（llama-server は確かめない）</td></tr>
-<tr><td class="nowrap"><code>ANTHROPIC_MODEL</code>・<code>ANTHROPIC_SMALL_FAST_MODEL</code></td><td>サーバの <code>--alias</code> と同じ値</td></tr>
-<tr><td class="nowrap"><code>CLAUDE_CODE_MAX_CONTEXT_TOKENS</code></td><td>サーバの <code>-c</code> と同じ値</td></tr>
-<tr><td class="nowrap"><code>API_TIMEOUT_MS</code></td><td>1 回の要求を待つ長さ（試験では 600000〜900000）</td></tr>
-<tr><td class="nowrap"><code>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC</code></td><td><code>1</code></td></tr>
-<tr><td class="nowrap"><code>USERPROFILE</code>・<code>HOME</code></td><td><strong>プロジェクトの外にある空のフォルダ</strong>。共通ルール・メモリ・フックを読ませない</td></tr>
-<tr><td class="nowrap"><code>CLAUDE_CODE_ATTRIBUTION_HEADER</code></td><td><code>0</code>（プロジェクトの <code>.claude/settings.json</code> に書く）</td></tr>
-</tbody>
-</table>
-</div>
-<div class="callout callout-warning">
-<strong>空のホームをプロジェクトの中に置かない。</strong>
-Claude Code は指示文にメモリの置き場（ホームの下）を書き込むため、そこからモデルがプロジェクトの場所を推測し、作業フォルダの外に読み書きしにいく。
-試験では、ホームを <code>W:/temp/llama-cp-home</code>、作業フォルダを <code>W:/temp/llama-cp-sandbox</code> に置いて防いだ。
-</div>
-</section>
-
-<!-- ============ 3 ============ -->
-<section class="ch03" id="ch03">
 <h1>試験の方法と経緯</h1>
 
 <h2>スクリプト</h2>
 <ul>
 	<li><code>tools/50_run/test-cc.ps1</code> — 1 モデルを起動し、Claude Code に 1 問投げる。所要時間・ターン数・回答を <code>logs/test-cc/</code> に残す</li>
-	<li><code>tools/50_run/test-cc-tools.ps1</code> — 10GB 未満のモデルを小さい順に 1 本ずつ起動し、読みと書きの 2 問を試す。結果は <code>logs/test-cc-tools/</code> に JSON Lines で残す</li>
+	<li><code>tools/50_run/test-cc-tools.ps1</code> — モデルを小さい順（<code>-Only</code> を渡したときは書いた順）に 1 本ずつ起動し、Claude Code で読みと書きの 2 問を試す。結果は <code>logs/test-cc-tools/</code> に JSON Lines で残す</li>
+	<li><code>tools/50_run/test-agents.ps1</code> — 同じ 2 問を Pi・OpenCode・Aider・Codex CLI で試す。質問はコマンド行に載せるため英語にした。結果は <code>logs/test-agents/</code></li>
 </ul>
-<p>どちらも環境変数（<code>ANTHROPIC_BASE_URL</code> ほか、root の <code>cc1.cmd</code> と同じもの）で接続先を切り替え、<code>claude -p</code> を非対話で走らせる。</p>
+<p>
+Claude Code は環境変数（<code>ANTHROPIC_BASE_URL</code> ほか、root の <code>cc1.cmd</code> と同じもの）で接続先を切り替え、<code>claude -p</code> を非対話で走らせる。
+経緯の 10 より後は、どのエージェントもリポジトリの外に置いた作業用のコピー（<code>W:/temp/llama-cp-sandbox</code>）の中で動かし、コピーは 1 問ごとに作り直した。
+</p>
 
 <h3>サーバの設定（全モデル共通）</h3>
 <pre><code class="language-text">-c 65536 -np 1 -nkvo -ctk q8_0 -ctv q8_0 -fa on
@@ -347,7 +270,7 @@ Claude Code は指示文にメモリの置き場（ホームの下）を書き�
 </tbody>
 </table>
 </div>
-<p>1 問の待ち時間は 10 分。超えたものはタイムアウトとして記録した。</p>
+<p>1 問の待ち時間は 10〜15 分。超えたものは時間切れとして記録し、あとで 1 時間の枠で試し直した。</p>
 
 <h2>経緯</h2>
 <div class="tablewrap">
@@ -358,13 +281,15 @@ Claude Code は指示文にメモリの置き場（ホームの下）を書き�
 <tr><td class="num">2</td><td>168 秒で応答が返ったが、答えが README と違い、出力も文字化けしていた</td><td>出力を <code>--output-format json</code> でファイルに受け、UTF-8 として読むようにした</td></tr>
 <tr><td class="num">3</td><td>206 秒で返ったが、質問そのものが化けていた（コマンド行に載せると CP932 になる）</td><td>質問を UTF-8 のファイルにし、標準入力から渡すようにした</td></tr>
 <tr><td class="num">4</td><td>質問は正しく届いた。171 秒で返ったが、ターン数 1 でツールを呼ばずに答えを作っていた（Qwen3-4B-Instruct）</td><td>モデルを替える</td></tr>
-<tr><td class="num">5</td><td>gpt-oss-20b（<code>--n-cpu-moe 18</code>）は 25 分でタイムアウト。やり取りは続いていたが、深いコンテキストで生成が 2.8 tok/s まで落ちた（短い文脈では 19 tok/s）</td><td>10GB 未満の全モデルで試す（第 4 章）</td></tr>
+<tr><td class="num">5</td><td>gpt-oss-20b（<code>--n-cpu-moe 18</code>）は 25 分でタイムアウト。やり取りは続いていたが、深いコンテキストで生成が 2.8 tok/s まで落ちた（短い文脈では 19 tok/s）</td><td>10GB 未満の全モデルで試す（第 2 章）</td></tr>
 <tr><td class="num">6</td><td>13 本とも読み・書きの両方には通らない。4 本はチャットテンプレートが途中の system を例外にして 500 エラー</td><td>テンプレートを取り出し、途中の system を通すように直した</td></tr>
 <tr><td class="num">7</td><td>最初に送る 60,000 トークンのうち、共通ルールだけで 41,320 トークンあった（gpt-oss-20b のトークナイザで計数）</td><td><code>USERPROFILE</code>・<code>HOME</code> を空のフォルダに向け、ルールを読ませない</td></tr>
-<tr><td class="num">8</td><td>ルールなしで多くが合格。思考を出すモデルは長く考えて時間切れになる</td><td><code>--reasoning off</code> を足す（第 5 章）</td></tr>
-<tr><td class="num">9</td><td>エージェントの試験で、Aider がプロジェクトの README.html を 2 行に上書きした</td><td>git から戻し、試験は作業用のコピーの中で動かすようにした</td></tr>
-<tr><td class="num">10</td><td>作業用のコピーをリポジトリの中に置くと、Qwen 系がリポジトリの root を推測して本物に読み書きしにいった（Claude Code が作業フォルダの外として拒否）</td><td>作業用のコピーをリポジトリの外（<code>W:/temp</code>）へ</td></tr>
-<tr><td class="num">11</td><td>それでもプロジェクトのパスへ書きにいった。指示文に書かれるメモリの置き場が、プロジェクトの中の空のホームだったため</td><td>空のホームも外へ移した。以後は本物を狙う呼び出しが無くなった</td></tr>
+<tr><td class="num">8</td><td>ルールなしで多くが合格。思考を出すモデルは長く考えて時間切れになる</td><td><code>--reasoning off</code> を足す（結果は<a href="r260929-01-AIエージェントの試験結果.html#ch02">試験結果の第 2 章</a>）</td></tr>
+<tr><td class="num">9</td><td>Claude Code の試験が二重に走り、並行して始めたエージェントの試験とも重なった。起動に使った cmd ファイルが実行中に書き換えられたため（cmd.exe はバッチファイルを 1 行ずつ読む）。Windows では 2 つの llama-server が同じポートを取れてしまい、エラーにならずに結果が混ざった</td><td>重なった回を無効にし、1 つずつ流し直した。長い試験は ps1 を直接呼ぶ</td></tr>
+<tr><td class="num">10</td><td>エージェントの試験で、Aider がプロジェクトの README.html を 2 行に上書きした</td><td>git から戻し、試験は作業用のコピーの中で動かすようにした</td></tr>
+<tr><td class="num">11</td><td>作業用のコピーをリポジトリの中に置くと、Qwen 系がリポジトリの root を推測して本物に読み書きしにいった（Claude Code が作業フォルダの外として拒否）</td><td>作業用のコピーをリポジトリの外（<code>W:/temp</code>）へ</td></tr>
+<tr><td class="num">12</td><td>それでもプロジェクトのパスへ書きにいった。指示文に書かれるメモリの置き場が、プロジェクトの中の空のホームだったため</td><td>空のホームも外へ移した。以後は本物を狙う呼び出しが無くなった</td></tr>
+<tr><td class="num">13</td><td>Codex CLI は <code>-s workspace-write</code> では、ファイルを読み書きする PowerShell のコマンドが policy で止められた（<code>rejected: blocked by policy</code>）</td><td><code>--dangerously-bypass-approvals-and-sandbox</code> を付け、作業用のコピーの中で利用者が実行した</td></tr>
 </tbody>
 </table>
 </div>
@@ -375,8 +300,8 @@ Aider は渡されていないファイルを「作り直してよい」と受�
 </div>
 </section>
 
-<!-- ============ 4 ============ -->
-<section class="ch04" id="ch04">
+<!-- ============ 2 ============ -->
+<section class="ch02" id="ch02">
 <h1>最初の試験の結果（ルールあり）</h1>
 <p>2026-09-28 22:28 から流した 1 回分。秒数は <code>claude -p</code> が終わるまでの時間。</p>
 <div class="tablewrap">
@@ -410,96 +335,12 @@ Aider は渡されていないファイルを「作り直してよい」と受�
 <div class="callout callout-important">
 <strong>時間切れは「使えない」ではない。</strong>
 この章の時点では、10 分を超えたものを打ち切っただけだった。
-その後、ルールを読ませない設定と 1 時間の枠で試し直し、テンプレートのエラーも差し替えで解消した（第 5 章）。
+その後、ルールを読ませない設定と 1 時間の枠で試し直し、テンプレートのエラーも差し替えで解消した（<a href="r260929-01-AIエージェントの試験結果.html#ch02">試験結果の第 2 章</a>）。
 </div>
 </section>
 
-<!-- ============ 5 ============ -->
-<section class="ch05" id="ch05">
-<h1>ルールなし・思考なしの結果</h1>
-<p>
-2026-09-29 に流した。共通ルールを読ませず（空のホーム）、<code>--reasoning off</code>、差し替えたテンプレートがあるモデルはそれを使った。1 問の待ち時間は 10〜15 分。
-最初に送った量はどのモデルも 17,000〜23,600 トークン。
-</p>
-<div class="tablewrap">
-<table>
-<thead><tr><th>モデル</th><th class="nowrap">サイズ</th><th class="nowrap">読み</th><th class="nowrap">書き</th><th>備考</th></tr></thead>
-<tbody>
-<tr><td class="nowrap">gemma-4-E2B-it</td><td class="num">3.19 GB</td><td class="nowrap"><span class="badge b-ok">13 秒</span></td><td class="nowrap"><span class="badge b-ok">10 秒</span></td><td></td></tr>
-<tr><td class="nowrap">gemma-4-E4B-it</td><td class="num">4.97 GB</td><td class="nowrap"><span class="badge b-ok">38 秒</span></td><td class="nowrap"><span class="badge b-ok">26 秒</span></td><td></td></tr>
-<tr><td class="nowrap">Ministral-3-3B-Instruct-2512</td><td class="num">2.00 GB</td><td class="nowrap"><span class="badge b-ok">28 秒</span></td><td class="nowrap"><span class="badge b-ok">54 秒</span></td><td>テンプレート差し替え。思考を切る前の回</td></tr>
-<tr><td class="nowrap">Qwen3-4B-Instruct-2507</td><td class="num">2.33 GB</td><td class="nowrap"><span class="badge b-ok">53 秒</span></td><td class="nowrap"><span class="badge b-ok">66 秒</span></td><td>思考を切る前の回</td></tr>
-<tr><td class="nowrap">gpt-oss-20b</td><td class="num">11.28 GB</td><td class="nowrap"><span class="badge b-ok">84 秒</span></td><td class="nowrap"><span class="badge b-ok">40 秒</span></td><td></td></tr>
-<tr><td class="nowrap">gemma-4-12B-it-QAT</td><td class="num">6.50 GB</td><td class="nowrap"><span class="badge b-ok">104 秒</span></td><td class="nowrap"><span class="badge b-ok">84 秒</span></td><td></td></tr>
-<tr><td class="nowrap">gemma-4-12B-it</td><td class="num">6.87 GB</td><td class="nowrap"><span class="badge b-ok">113 秒</span></td><td class="nowrap"><span class="badge b-ok">86 秒</span></td><td></td></tr>
-<tr><td class="nowrap">gemma-4-26B-A4B-it</td><td class="num">15.84 GB</td><td class="nowrap"><span class="badge b-ok">127 秒</span></td><td class="nowrap"><span class="badge b-ok">59 秒</span></td><td>ダウンロード</td></tr>
-<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507</td><td class="num">16.48 GB</td><td class="nowrap"><span class="badge b-ok">140 秒</span></td><td class="nowrap"><span class="badge b-ok">73 秒</span></td><td>ダウンロード。ホームを外に移してから合格</td></tr>
-<tr><td class="nowrap">Bonsai-27B（Q1_0）</td><td class="num">3.54 GB</td><td class="nowrap"><span class="badge b-ok">141 秒</span></td><td class="nowrap"><span class="badge b-ok">121 秒</span></td><td>テンプレート差し替え</td></tr>
-<tr><td class="nowrap">Qwen3.6-35B-A3B（UD-Q3_K_XL）</td><td class="num">15.69 GB</td><td class="nowrap"><span class="badge b-ok">164 秒</span></td><td class="nowrap"><span class="badge b-ok">123 秒</span></td><td>ダウンロード。ホームを外に移してから合格</td></tr>
-<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct</td><td class="num">16.45 GB</td><td class="nowrap"><span class="badge b-ok">166 秒</span></td><td class="nowrap"><span class="badge b-ok">64 秒</span></td><td>ダウンロード。ホームを外に移してから合格</td></tr>
-<tr><td class="nowrap">GLM-4.7-Flash</td><td class="num">16.32 GB</td><td class="nowrap"><span class="badge b-ok">203 秒</span></td><td class="nowrap"><span class="badge b-ok">60 秒</span></td><td>ダウンロード</td></tr>
-<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512</td><td class="num">7.67 GB</td><td class="nowrap"><span class="badge b-ok">226 秒</span></td><td class="nowrap"><span class="badge b-ok">331 秒</span></td><td>テンプレート差し替え</td></tr>
-<tr><td class="nowrap">Devstral-Small-2507（24B）</td><td class="num">13.55 GB</td><td class="nowrap"><span class="badge b-ok">246 秒</span></td><td class="nowrap"><span class="badge b-ok">320 秒</span></td><td>ダウンロード</td></tr>
-<tr><td class="nowrap">Qwen3.5-9B</td><td class="num">5.24 GB</td><td class="nowrap"><span class="badge b-warn">78 秒</span></td><td class="nowrap"><span class="badge b-ok">49 秒</span></td><td>テンプレート差し替え。読めているが、答えを「ローカル LLM 実行環境」と空白を足して書き写す（2 回とも）</td></tr>
-<tr><td class="nowrap">Qwen3-4B-Thinking-2507</td><td class="num">2.33 GB</td><td class="nowrap"><span class="badge b-ok">291 秒</span></td><td class="nowrap"><span class="badge b-warn">1199 秒</span></td><td>思考を切れない版。書きは 10 分で時間切れ、1 時間の枠で約 20 分かけて合格</td></tr>
-<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B</td><td class="num">2.64 GB</td><td class="nowrap"><span class="badge b-ng">不可</span></td><td class="nowrap"><span class="badge b-ng">不可</span></td><td>1 時間の枠でも、読まずに「準備はできています」と答えるだけ。Pi・OpenCode では通る（第 6 章）</td></tr>
-<tr><td class="nowrap">GLM-4.6V-Flash</td><td class="num">5.74 GB</td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td>1 時間の枠でも返らない。OpenCode・Aider で書きだけ通る（第 6 章）</td></tr>
-<tr><td class="nowrap">Qwen2.5-Coder-14B-Instruct</td><td class="num">8.37 GB</td><td class="nowrap"><span class="badge b-ng">不可</span></td><td class="nowrap"><span class="badge b-ng">不可</span></td><td>道具の呼び出しを <code>&lt;tool_call&gt;</code> で囲まず JSON の文章として出すため、llama-server が呼び出しと読み取れない。Qwen3 のテンプレートに差し替えても同じ</td></tr>
-</tbody>
-</table>
-</div>
-<p>
-秒数は <code>claude -p</code> が終わるまでの時間。10〜15 分で時間切れになった問は、1 時間の枠で試し直した（Nemotron・GLM-4.6V・Qwen3-4B-Thinking の書き）。
-読み・書きの両方に合格したのは 16 本（Qwen3-4B-Thinking は時間をかければ合格）。
-</p>
-</section>
-
-<!-- ============ 6 ============ -->
-<section class="ch06" id="ch06">
-<h1>Pi・OpenCode・Aider・Codex で試した結果</h1>
-<p>
-Claude Code（ルールなし）で時間切れになった 3 本を、別のエージェントで試した。サーバの設定は第 5 章と同じ。
-質問はコマンド行に載せるため英語にした。スクリプトは <code>tools/50_run/test-agents.ps1</code>。
-</p>
-<div class="tablewrap">
-<table>
-<thead><tr><th>モデル</th><th class="nowrap">Pi</th><th class="nowrap">OpenCode</th><th class="nowrap">Aider</th></tr></thead>
-<tbody>
-<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B</td><td><span class="badge b-ok">両方合格</span>読み 18 秒・書き 19 秒</td><td><span class="badge b-ok">両方合格</span>読み 431 秒・書き 58 秒</td><td><span class="badge b-warn">書きのみ</span>書き 11 秒</td></tr>
-<tr><td class="nowrap">GLM-4.6V-Flash</td><td><span class="badge b-ng">不可</span>読みは時間切れ、書きは作ったと答えたがファイルなし</td><td><span class="badge b-warn">書きのみ</span>書き 152 秒</td><td><span class="badge b-warn">書きのみ</span>書き 16 秒</td></tr>
-<tr><td class="nowrap">Qwen3-4B-Thinking-2507</td><td><span class="badge b-ok">両方合格</span>読み 145 秒・書き 88 秒</td><td><span class="badge b-none">時間切れ</span></td><td><span class="badge b-warn">書きのみ</span>書き 311 秒</td></tr>
-</tbody>
-</table>
-</div>
-<ul>
-	<li><strong>Pi がいちばん速い</strong>。Nemotron は Claude Code では 1 時間の枠でも読み書きしなかったが、Pi では 18 秒で答えた</li>
-	<li><strong>Aider はファイルを先に渡して使う道具</strong>。ファイルを渡さずに「読め」と頼むと、読めないと答えるか、中身を作り上げる。書きは 3 本とも通った（送る量は約 650 トークン）</li>
-	<li>合うエージェントはモデルによって違う。同じモデルでも Pi と OpenCode で結果が逆になった</li>
-</ul>
-
-<h2>Codex CLI（ルールなし）</h2>
-<p>
-<code>CODEX_HOME</code> を空のフォルダに向け、利用者の設定と <code>AGENTS.md</code> を読ませずに試した（2026-09-30）。
-接続は <code>config.toml</code> の <code>[model_providers.*]</code> に <code>wire_api = "responses"</code> で書いた。
-</p>
-<div class="tablewrap">
-<table>
-<thead><tr><th>モデル</th><th class="nowrap">読み</th><th class="nowrap">書き</th><th>備考</th></tr></thead>
-<tbody>
-<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap"><span class="badge b-ok">53 秒</span></td><td class="nowrap"><span class="badge b-ok">128 秒</span></td><td></td></tr>
-<tr><td class="nowrap">gemma-4-E2B-it</td><td class="nowrap"><span class="badge b-ng">不可</span></td><td class="nowrap"><span class="badge b-ok">7 秒</span></td><td>読みは「これから読む」と答えたところで終わった</td></tr>
-</tbody>
-</table>
-</div>
-<div class="callout callout-warning">
-<strong>Windows では安全装置を外さないと動かない。</strong>
-Codex はファイルの読み書きに PowerShell のコマンドを使う。<code>-s workspace-write</code> ではそのコマンドが policy で止められ（<code>rejected: blocked by policy</code>）、読みも書きもできなかった。
-試験は <code>--dangerously-bypass-approvals-and-sandbox</code> を付け、作業フォルダを <code>W:/temp</code> の下のコピーにして利用者が実行した。安全装置が無いので、モデルは作業フォルダの外にも手を出せる。
-</div>
-</section>
-
-<!-- ============ 7 ============ -->
-<section class="ch07" id="ch07">
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
 <h1>全実行の記録</h1>
 <p>
 2026-09-28 21:34 から 09-30 03:41 までに流した試験を、1 モデル 1 行で残す（87 行）。
