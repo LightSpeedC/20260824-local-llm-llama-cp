@@ -251,8 +251,8 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたところ、CPU
 <p>関連: <a href="../10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>（第10章の「32GB での再測定」）</p>
 </details>
 
-<details class="md-flat" open>
-<summary><span class="badge b-warn">着手</span><span class="no">i260929-01</span>AI エージェントを llama-server で使えるか比べる</summary>
+<details class="md-flat">
+<summary><span class="badge b-ok">済</span><span class="no">i260929-01</span>AI エージェントを llama-server で使えるか比べる</summary>
 <p>
 Claude Code は共通ルールを読ませず思考を切れば、20GB 以下の 21 本中 15 本が 15 分以内に読み・書きの両方に合格した。
 時間切れになったモデルは Pi・OpenCode・Aider でも試した。
@@ -261,8 +261,8 @@ Claude Code は共通ルールを読ませず思考を切れば、20GB 以下の
 	<li><span class="badge b-ok">済</span>Claude Code（ルールなし・思考なし・テンプレート差し替え）で全モデルを試す</li>
 	<li><span class="badge b-ok">済</span>時間切れの 3 本を Pi・OpenCode・Aider で試す</li>
 	<li><span class="badge b-ok">済</span>時間切れだった問を 1 問 1 時間で試し直す（Qwen3-4B-Thinking の書きだけが約 20 分で合格）</li>
-	<li><span class="badge b-none">未</span>Codex CLI（ルールなし）で試す</li>
-	<li><span class="badge b-none">未</span>使える設定で <code>cc1.cmd</code> を作り直す（ルールなしのホーム・テンプレート・思考なし）</li>
+	<li><span class="badge b-ok">済</span>Codex CLI（ルールなし）で試す（gpt-oss-20b が両方合格。Windows では安全装置を外す必要がある）</li>
+	<li><span class="badge b-ok">済</span>使える設定で <code>cc1.cmd</code> を作り直す（gemma-4-E4B・思考なし・ホーム <code>W:\temp\cc1-home</code>。読みの 1 問が 40 秒・2 ターンで正答）</li>
 </ul>
 <p>関連: <a href="../10_plan/p260929-01-AIエージェント比較の検証計画.html">AI エージェント比較の検証計画</a>／<a href="../01_research/r260929-01-ClaudeCodeのツール利用テスト.html">Claude Code のツール利用テスト</a></p>
 </details>

@@ -1,0 +1,353 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ローカルLLM で Claude Code を使う・試す手順</title>
+<style>
+:root{
+	--navy1:#12224d;
+	--navy2:#2f5fbf;
+	--ink:#1c2330;
+	--ink-soft:#4a5568;
+	--line:#d9dfe8;
+	--code-bg:#f4f6fa;
+	--link:#1a4fa0;
+	--accent:var(--navy1, #12224d);
+	--accent2:var(--navy2, #2f5fbf);
+	--soft:#f2f5fb;
+}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(186.7,78%,25%);--accent2:hsl(186.7,58%,55%);--soft:hsl(186.7,28%,95%);}
+.ch03{--accent:hsl(93.3,78%,25%);--accent2:hsl(93.3,58%,55%);--soft:hsl(93.3,28%,95%);}
+.ch04{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+
+*{box-sizing:border-box;}
+body{
+	margin:0;
+	background:#fff;
+	color:var(--ink, #1c2330);
+	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+	font-size:15.5px;
+	line-height:1.85;
+}
+.titlebar{
+	background:linear-gradient(135deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	padding:34px 30px 30px;
+}
+.titlebar .inner{max-width:1600px;margin:0 auto;}
+.titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
+.titlebar .lead{font-size:0.88em;color:#cfe0ff;}
+.titlebar .date{font-size:0.88em;color:#cfe0ff;margin-top:4px;}
+.titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+
+.wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
+
+section{
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:4px 26px 26px;
+	margin:34px 0;
+}
+section h1{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	font-size:1.45em;
+	padding:14px 20px;
+	margin:26px 0 20px;
+	border-radius:8px;
+	box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+h2{
+	font-size:1.15em;
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(90deg,var(--soft, #f2f5fb),#fff);
+	padding:6px 12px;
+	margin:30px 0 12px;
+	color:var(--accent, #12224d);
+}
+h3{
+	font-size:1.02em;
+	display:inline-block;
+	border-bottom:2px dotted var(--accent2, #2f5fbf);
+	padding-bottom:3px;
+	margin:20px 0 8px;
+	color:var(--ink, #1c2330);
+}
+p{margin:8px 0;}
+ul,ol{margin:8px 0;padding-left:1.5em;}
+li{margin:4px 0;}
+
+code{
+	background:var(--code-bg, #f4f6fa);
+	border:1px solid var(--line, #d9dfe8);
+	color:#17335f;
+	border-radius:4px;
+	padding:1px 5px;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+}
+pre{
+	background:var(--code-bg, #f4f6fa);
+	color:var(--ink, #1c2330);
+	border:1px solid var(--line, #d9dfe8);
+	border-left:5px solid var(--accent2, #2f5fbf);
+	border-radius:0 8px 8px 0;
+	padding:13px 16px;
+	overflow-x:auto;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+	line-height:1.6;
+}
+pre code{background:none;border:none;padding:0;color:inherit;}
+
+.tablewrap{overflow-x:auto;margin:12px 0;}
+table{
+	border-collapse:collapse;
+	width:100%;
+	border-radius:8px;
+	overflow:hidden;
+	box-shadow:0 2px 7px rgba(0,0,0,0.09);
+	font-size:0.95em;
+}
+th{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-align:left;
+	padding:9px 12px;
+}
+th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line, #d9dfe8);vertical-align:top;}
+tr:nth-child(even) td{background:#fafbfe;}
+.nowrap{white-space:nowrap;}
+.num{text-align:right;white-space:nowrap;}
+
+.badge{
+	display:inline-block;
+	color:#fff;
+	font-size:0.8em;
+	font-weight:600;
+	border-radius:5px;
+	padding:2px 9px;
+	margin-right:7px;
+	white-space:nowrap;
+}
+.b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
+.b-ng{background:linear-gradient(100deg,#a51f22,#e05a5c);}
+.b-none{background:linear-gradient(100deg,#5a6472,#97a1ae);}
+.b-warn{background:linear-gradient(100deg,#b8620a,#f0a548);}
+
+.callout{
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border-radius:0 8px 8px 0;
+	padding:12px 16px;
+	margin:16px 0;
+}
+.callout strong{color:var(--accent, #12224d);}
+
+.toc{
+	background:linear-gradient(180deg,#f2f5fb,#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:6px 26px 22px;
+	margin:34px 0;
+}
+.toc ol{
+	list-style:none;
+	display:flex;
+	flex-wrap:wrap;
+	gap:8px;
+	padding:0;
+	margin:12px 0 0;
+	counter-reset:toc;
+}
+.toc li{counter-increment:toc;margin:0;}
+.toc a{
+	display:-webkit-box;
+	-webkit-line-clamp:2;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:normal;
+	width:310px;
+	max-width:100%;
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-decoration:none;
+	border-radius:7px;
+	padding:8px 12px;
+	font-size:0.92em;
+	line-height:1.4;
+}
+.toc a::before{content:counter(toc) ". ";font-weight:700;}
+
+svg{max-width:100%;height:auto;display:block;margin:16px 0;}
+
+.homelink{margin:20px 0 0;}
+a.home{
+	display:inline-block;
+	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	border-radius:6px;
+	padding:4px 11px;
+	line-height:1;
+	text-decoration:none;
+}
+a.home svg{vertical-align:-2px;}
+a{background:none;color:var(--link, #1a4fa0);}
+footer{
+	max-width:1600px;
+	margin:0 auto;
+	padding:18px 30px 30px;
+	border-top:1px solid var(--line, #d9dfe8);
+	color:var(--ink-soft, #4a5568);
+	font-size:0.9em;
+	margin-top:40px;
+	margin-bottom:40px;
+}
+footer a{color:var(--navy2, #2f5fbf);}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+	<div class="inner">
+		<h1>ローカルLLM で Claude Code を使う・試す手順</h1>
+		<div class="lead">cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエージェントを試す手順</div>
+		<div class="date">📅 作成: 2026-09-30 / 更新: 2026-09-30</div>
+	</div>
+</div>
+
+<div class="wrap">
+
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+
+<div class="toc">
+	<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">目次</h2>
+	<ol>
+		<li class="ch01"><a href="#ch01">置き場所</a></li>
+		<li class="ch02"><a href="#ch02">cc1.cmd で対話に使う</a></li>
+		<li class="ch03"><a href="#ch03">Claude Code の試験を流す</a></li>
+		<li class="ch04"><a href="#ch04">ほかのエージェントの試験を流す</a></li>
+	</ol>
+</div>
+
+<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">この文書の位置づけ</h2>
+<p>
+設定の根拠と試験結果は <a href="../01_research/r260929-01-ClaudeCodeのツール利用テスト.html">Claude Code のツール利用テスト</a>にある。
+本書はその設定を自分で動かすための手順だけを書く。コマンドはすべてプロジェクトのフォルダ（<code>W:\2026\20260824-local-llm-llama-cp</code>）で実行する。
+</p>
+
+<!-- ============ 1 ============ -->
+<section class="ch01" id="ch01">
+<h1>置き場所</h1>
+<div class="tablewrap">
+<table>
+<thead><tr><th>もの</th><th>場所</th><th>備考</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">llama-server</td><td><code>bin\llama.cpp\llama-server.exe</code></td><td>一度置いたものを使い続ける。起動のたびにダウンロードはしない（git 管理外）</td></tr>
+<tr><td class="nowrap">モデル</td><td><code>C:\AI_Models\&lt;作者&gt;\&lt;名前&gt;-GGUF\</code></td><td>起動のたびにディスクから読むだけ。追加の取得は <code>tools\10_setup\download-models.cmd</code></td></tr>
+<tr><td class="nowrap">差し替えたテンプレート</td><td><code>tools\50_run\templates\</code></td><td>Ministral 2 本・Bonsai・Qwen3.5-9B 用</td></tr>
+<tr><td class="nowrap">ルールなしのホーム</td><td><code>W:\temp\cc1-home</code>（cc1）<br><code>W:\temp\llama-cp-home</code>（試験）</td><td>無ければ自動で作る</td></tr>
+<tr><td class="nowrap">試験の作業用コピー</td><td><code>W:\temp\llama-cp-sandbox</code></td><td>1 問ごとに中身を消して作り直す</td></tr>
+<tr><td class="nowrap">試験の記録</td><td><code>logs\test-cc-tools\</code>・<code>logs\test-agents\</code></td><td>git 管理外</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="ch02" id="ch02">
+<h1>cc1.cmd で対話に使う</h1>
+<h2>手順</h2>
+<ol>
+	<li>サーバを起動する。窓が開いたままになり、<code>listening on http://127.0.0.1:8080</code> と出れば準備完了
+<pre><code class="language-batch">tools\50_run\run-server-cc.cmd</code></pre></li>
+	<li>別の窓で Claude Code を起動する。<strong><code>.\</code> を付ける</strong>（このPCはカレントフォルダの cmd を名前だけでは探さない）
+<pre><code class="language-batch">.\cc1.cmd
+.\cc1.cmd -p "README.html の h1 を答えて"</code></pre></li>
+	<li>使い終わったら、サーバの窓で Ctrl+C</li>
+</ol>
+
+<h2>モデルを替えるとき</h2>
+<p>2 か所を同じ名前にそろえる。</p>
+<ul>
+	<li><code>tools\50_run\run-server-cc.cmd</code> の <code>-m</code>（モデルのファイル）と <code>--alias</code>（名前）。3.2 GB 以下のモデルは <code>-ngl 99</code> を足す。テンプレートを差し替えるモデルは <code>--chat-template-file "tools\50_run\templates\&lt;名前&gt;.jinja"</code> を足す</li>
+	<li><code>cc1.cmd</code> の <code>ANTHROPIC_MODEL</code> と <code>ANTHROPIC_SMALL_FAST_MODEL</code>（<code>--alias</code> と同じ値）</li>
+</ul>
+<div class="callout callout-tip">
+<strong>速さで選ぶなら gemma-4-E2B、知識で選ぶなら gpt-oss-20b。</strong>
+試験では gemma-4-E2B が読み 13 秒・書き 10 秒、gpt-oss-20b が読み 84 秒・書き 40 秒だった。
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
+<h1>Claude Code の試験を流す</h1>
+<p>モデルを 1 本ずつ起動し、Claude Code に「README の h1 を読む」「決めた 1 行を書く」の 2 問を投げる。サーバの起動と停止もスクリプトが行う。</p>
+<h2>よく使う形</h2>
+<pre><code class="language-batch">rem 決めたモデルだけ（名前の一部をカンマ区切り。書いた順に流れる）
+tools\50_run\test-cc-tools.cmd -Only "gemma-4-E2B,gpt-oss-20b" -NoRules -UseTemplates -ExtraArgs "--reasoning off" -TimeoutSec 900
+
+rem 20GB 以下の全モデル（小さい順）
+tools\50_run\test-cc-tools.cmd -MaxSizeGB 20 -NoRules -UseTemplates -ExtraArgs "--reasoning off" -TimeoutSec 900</code></pre>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">引数</th><th>意味</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><code>-Only</code></td><td>試すモデル。ファイル名の一部をカンマ区切りで書く</td></tr>
+<tr><td class="nowrap"><code>-MaxSizeGB</code></td><td>このサイズ未満を対象にする（既定 10）</td></tr>
+<tr><td class="nowrap"><code>-NoRules</code></td><td>ルールなし（ホームを <code>W:\temp\llama-cp-home</code> にする）。<strong>付けないと 1 往復に数分かかる</strong></td></tr>
+<tr><td class="nowrap"><code>-UseTemplates</code></td><td>差し替えたテンプレートがあるモデルはそれを使う</td></tr>
+<tr><td class="nowrap"><code>-ExtraArgs</code></td><td>llama-server に足す引数。<code>"--reasoning off"</code> で思考を切る</td></tr>
+<tr><td class="nowrap"><code>-TimeoutSec</code></td><td>1 問を待つ秒数（既定 600）</td></tr>
+<tr><td class="nowrap"><code>-Tests</code></td><td><code>read</code>・<code>write</code> のどちらかだけにする（既定は両方）</td></tr>
+</tbody>
+</table>
+</div>
+<h2>結果の見方</h2>
+<ul>
+	<li>画面に 1 問ごとに <code>読み: ok 13.4 秒 ターン 2 合格 True</code> の形で出る</li>
+	<li>まとめは <code>logs\test-cc-tools\&lt;日時&gt;-norules-results.jsonl</code>（1 モデル 1 行）。1 問ごとの生の出力は <code>…-raw.json</code></li>
+	<li><strong>ターン 1 で合格 False</strong> は、ツールを呼ばずに答えを作ったということ。<strong>ファイルなし</strong>は、作ったと答えても実際にはできていないということ</li>
+</ul>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="ch04" id="ch04">
+<h1>ほかのエージェントの試験を流す</h1>
+<p>Pi・OpenCode・Aider・Codex CLI を、同じ 2 問で試す。各エージェントの設定は <code>W:\temp\llama-cp-agent-home\</code> に書き、いつもの設定には触れない。</p>
+<pre><code class="language-batch">tools\50_run\test-agents.cmd -Agent pi -Only "Nemotron,Qwen3-4B-Thinking" -UseTemplates -ExtraArgs "--reasoning off"
+tools\50_run\test-agents.cmd -Agent opencode -Only "Nemotron" -UseTemplates -ExtraArgs "--reasoning off"
+tools\50_run\test-agents.cmd -Agent aider -Only "Nemotron" -UseTemplates -ExtraArgs "--reasoning off"
+tools\50_run\test-agents.cmd -Agent codex -Only "gpt-oss-20b" -UseTemplates -ExtraArgs "--reasoning off"</code></pre>
+<p>結果は <code>logs\test-agents\&lt;日時&gt;-&lt;エージェント&gt;-results.jsonl</code>。質問はコマンド行に載せるため英語にしてある。</p>
+<div class="callout callout-warning">
+<strong>Codex は安全装置を外して動かす。</strong>
+Windows では <code>-s workspace-write</code> だとファイルの読み書きが止められるため、スクリプトは <code>--dangerously-bypass-approvals-and-sandbox</code> を付けている。
+モデルは作業用コピーの外にも手を出せる。
+</div>
+</section>
+
+<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">共通の注意</h2>
+<ul>
+	<li><strong>試験は 1 つずつ流す</strong>。どれもポート 8080 を使い、Windows では 2 つのサーバが同じポートを取れてしまうため、結果が混ざる</li>
+	<li><strong>始める前に llama-server が残っていないか確かめる</strong>。残っていれば止める
+<pre><code class="language-powershell">Get-Process llama-server
+Stop-Process -Name llama-server</code></pre></li>
+	<li>RAM を多く使う（20GB 級のモデルでは 16 GB 前後）。ブラウザなどを閉じておくと安定する</li>
+	<li>温度とクロックは <code>tools\80_ops\watch-thermal.cmd</code> で 30 秒ごとに <code>logs\thermal\</code> へ記録できる</li>
+</ul>
+
+</div>
+
+<footer>
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+</footer>
+
+</body>
+</html>
