@@ -219,7 +219,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 		<h1>Speculative Decoding 調査</h1>
 		<div class="lead">
 			小さなドラフトモデルで先読みして生成を速める手法が、VRAM 4GB の本PCで成立するかを検討する<br>
-			📅 作成: 2026-08-25 / 更新: 2026-08-25
+			📅 作成: 2026-08-25 / 更新: 2026-09-30
 		</div>
 	</div>
 </div>
@@ -243,7 +243,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 <p>
 <a href="../10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>の実測（第10章）で、Qwen3-4B は 56.5 tok/s に到達した。
 これはGPUのメモリ帯域が決める上限に近い。<strong>帯域を増やさずに、さらに速くする手段はあるか</strong>——
-その問いに対する候補が Speculative Decoding である。本書はその成立可能性を検討する。実行はまだしていない。
+その問いに対する候補が Speculative Decoding である。本書はその成立可能性を検討し、実測した。
 </p>
 
 <!-- ============ 1 ============ -->
@@ -274,23 +274,21 @@ mlx-dspark は Apple Silicon 専用、DFlash 2 は SGLang（NVIDIA の大容量G
 そこだけを取り出して本PCに適用できないかを調べたのが本書である。
 </p>
 
-<h2>結論（現時点の見立て）</h2>
+<h2>結論（実測）</h2>
 <div class="tablewrap">
 <table>
-<thead><tr><th class="nowrap">論点</th><th>見立て</th></tr></thead>
+<thead><tr><th class="nowrap">論点</th><th>結果</th></tr></thead>
 <tbody>
-<tr><td class="nowrap">VRAMに収まるか</td><td><span class="badge b-warn">ぎりぎり</span>Qwen3-4B ＋ 0.6B ドラフトで約 2.8 GB。空き 3.21 GB に対して余裕は 0.4 GB 程度</td></tr>
-<tr><td class="nowrap">速くなるか</td><td><span class="badge b-warn">疑わしい</span>本PCは既に帯域を使い切っており、この手法が最も効く条件から外れている</td></tr>
-<tr><td class="nowrap">やる価値</td><td><span class="badge b-ok">ある</span>ドラフトモデルの取得は数百MBで済み、失敗しても損失が小さい</td></tr>
+<tr><td class="nowrap">VRAMに収まるか</td><td><span class="badge b-warn">ぎりぎり</span>Qwen3-4B ＋ 0.6B ドラフトで 3925 MiB（4096 MiB 中）。KV を q8_0 にすると 3515 MiB</td></tr>
+<tr><td class="nowrap">速くなるか</td><td><span class="badge b-ng">遅くなる</span>単体の 57 tok/s に対し、どの構成も 29〜47 tok/s</td></tr>
+<tr><td class="nowrap">判断</td><td><span class="badge b-ng">見送る</span>第5章の判断基準の「56 tok/s 未満」に当たる</td></tr>
 </tbody>
 </table>
 </div>
-<div class="callout callout-important">
-<strong>期待値は高くない。</strong>
+<p>
 記事の 2.45 倍・3.43 倍という数字は、大きなモデルを潤沢なメモリで動かす環境のものである。
-本PCの条件はほぼ正反対で、同じ倍率は望めない。<strong>効果ゼロか、むしろ遅くなる可能性も相応にある</strong>。
-それでも試す理由は、コストが小さく、外れた場合も「なぜ効かないか」が第10章の帯域律速の裏付けになるため。
-</div>
+本PCの本命は 2.32 GiB と軽く、ドラフトの実行時間を取り返せなかった（第5章の結果）。
+</p>
 </section>
 
 <!-- ============ 2 ============ -->
@@ -383,9 +381,10 @@ Qwen3-4B なら 2.32 GiB を毎回読む。計算そのものは軽く、<strong
 <thead><tr><th class="nowrap">オプション</th><th>意味</th></tr></thead>
 <tbody>
 <tr><td class="nowrap"><code>-md</code> / <code>--model-draft</code></td><td>ドラフトモデルの GGUF を指定する</td></tr>
+<tr><td class="nowrap"><code>--spec-type draft-simple</code></td><td>ドラフトモデルで先読みする。<strong>b10612 では既定が <code>none</code> で、<code>-md</code> だけではドラフトを読み込んでも使わない</strong></td></tr>
 <tr><td class="nowrap"><code>-ngld</code> / <code>--n-gpu-layers-draft</code></td><td>ドラフトモデルをGPUに載せる層数。ここを削ると本命に回せる</td></tr>
-<tr><td class="nowrap"><code>--draft-max</code></td><td>一度に先読みするトークン数の上限。大きいほど当たった時の利得が大きく、外れた時の無駄も大きい</td></tr>
-<tr><td class="nowrap"><code>--draft-min</code></td><td>先読みの下限</td></tr>
+<tr><td class="nowrap"><code>--spec-draft-n-max</code></td><td>一度に先読みするトークン数の上限（既定 3）。大きいほど当たった時の利得が大きく、外れた時の無駄も大きい。b10612 では <code>--draft-max</code> は廃止された</td></tr>
+<tr><td class="nowrap"><code>--spec-draft-n-min</code></td><td>先読みの下限。<code>--draft-min</code> は廃止された</td></tr>
 <tr><td class="nowrap"><code>--draft-p-min</code></td><td>ドラフトの確信度がこの値を下回ったら先読みを打ち切る</td></tr>
 </tbody>
 </table>
@@ -397,7 +396,8 @@ Qwen3-4B なら 2.32 GiB を毎回読む。計算そのものは軽く、<strong
   -md "C:\AI_Models\qwen\Qwen3-0.6B-GGUF\Qwen3-0.6B-Q4_K_M.gguf" ^
   -ngl 99 ^
   -ngld 99 ^
-  --draft-max 4 ^
+  --spec-type draft-simple ^
+  --spec-draft-n-max 4 ^
   -c 4096 ^
   --host 127.0.0.1 --port 8080</code></pre>
 
@@ -551,19 +551,38 @@ Speculative Decoding は「本命モデルの読み出しが重い」ほど得�
 </table>
 </div>
 
-<h2>この調査で分かっていないこと</h2>
+<h2>結果 <span class="badge b-ng">見送る</span></h2>
+<p>
+RAM 32GB・画面表示は内蔵GPU の構成で測った（2026-09-30）。ドラフトは unsloth/Qwen3-0.6B-GGUF の Q4_K_M（396,705,472 B）。
+<code>-c 4096 -np 1 -ngl 99 -ngld 99 --spec-type draft-simple</code> で立て、2 つの問を温度 0・<code>seed 1</code> で 256 トークンずつ出させた。
+1 回目で温め、2 回目を記録した。測ったのは <code>tools\50_run\bench-spec.cmd</code>。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">No</th><th>構成</th><th class="nowrap">文章 tok/s</th><th class="nowrap">受理率</th><th class="nowrap">コード tok/s</th><th class="nowrap">受理率</th><th class="nowrap">VRAM</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td class="nowrap">Qwen3-4B 単体（対照）</td><td class="num"><strong>57.15</strong></td><td class="num">—</td><td class="num"><strong>57.00</strong></td><td class="num">—</td><td class="num">3129 MiB</td></tr>
+<tr><td class="num">2</td><td class="nowrap">＋ドラフト n-max 2</td><td class="num">42.34</td><td class="num">52%</td><td class="num">47.29</td><td class="num">67%</td><td class="num">3925 MiB</td></tr>
+<tr><td class="num">3</td><td class="nowrap">＋ドラフト n-max 4</td><td class="num">36.31</td><td class="num">39%</td><td class="num">43.55</td><td class="num">52%</td><td class="num">3925 MiB</td></tr>
+<tr><td class="num">4</td><td class="nowrap">＋ドラフト n-max 8</td><td class="num">29.32</td><td class="num">20%</td><td class="num">44.99</td><td class="num">38%</td><td class="num">3925 MiB</td></tr>
+<tr><td class="num">5</td><td class="nowrap">4 ＋KV q8_0</td><td class="num">33.75</td><td class="num">23%</td><td class="num">47.27</td><td class="num">38%</td><td class="num">3515 MiB</td></tr>
+</tbody>
+</table>
+</div>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">受理率は、ドラフトが出したトークンのうち本命が採った割合（<code>timings.draft_n_accepted</code> ÷ <code>draft_n</code>）。</p>
 <ul>
-	<li><span class="badge b-none">未確認</span>Qwen3-0.6B の GGUF が実際に配布されているか。無ければ別系列で組み直す必要がある</li>
-	<li><span class="badge b-none">未確認</span>ドラフトモデルの正確なファイルサイズ。第4章の 410 MiB は概算</li>
-	<li><span class="badge b-none">未確認</span>本PCのビルド（b10612）で <code>-md</code> 系オプションがどう提供されているか。オプション名は版により変わる</li>
-	<li><span class="badge b-none">未実施</span><strong>検証そのもの。本書は事前検討のみで、実行はしていない</strong></li>
+	<li><strong>どの構成も単体より遅い</strong>。最も良い No2 のコードでも 47 tok/s で、単体の 57 tok/s に届かない</li>
+	<li><strong>先読みを増やすほど受理率が下がる</strong>。文章は n-max 8 で 20% しか当たらず、外れた先読みの分だけ遅くなった</li>
+	<li>コードは文章より当たりやすい（同じ n-max で受理率が 13〜18 ポイント高い）が、それでも取り返せない</li>
+	<li><strong>出力は単体と一致しなかった</strong>（温度 0・同じ seed）。仕組み上は一致するはずだが、まとめて検証するときの計算順の違いで結果がずれたと考えられる（未確認）</li>
+	<li>VRAM は No2〜4 で 3925 MiB と上限の手前まで使う。第4章の見積り（約 3086 MiB）より 800 MiB ほど多い</li>
 </ul>
 
-<div class="callout">
-<strong>実行前に、まずオプションの存在確認から始める。</strong>
-<code>llama-server.exe --help</code> で <code>--model-draft</code> 系が実際に何という名前で用意されているかを確かめる。
-ここが空振りなら、ドラフトモデルの取得は不要になる。
-</div>
+<h2>この調査で分かっていないこと</h2>
+<ul>
+	<li><span class="badge b-none">未確認</span>20GB 級の MoE（gpt-oss-20b 等）を本命にした場合。本命の読み出しが重いほど効く手法なので、4B とは結果が変わりうる。ただしドラフトを載せる VRAM が残らない</li>
+	<li><span class="badge b-none">未確認</span>出力が単体と一致しない理由</li>
+</ul>
 </section>
 
 <h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">参考資料</h2>
@@ -582,9 +601,9 @@ Speculative Decoding は「本命モデルの読み出しが重い」ほど得�
 </ul>
 
 <div class="callout callout-important" style="border-left-color:var(--navy1, #12224d);">
-<strong>第4章の見積りは推定値を含む。</strong>
-ドラフトモデルのサイズ（約 410 MiB）と KV キャッシュ（約 300 MiB）は
-パラメータ数からの概算で、実測していない。本命モデルの 2376 MiB のみ計画書 第10章の実測値。
+<strong>第4章の見積りは実測前の推定値である。</strong>
+ドラフトモデルのファイルは 378 MiB（396,705,472 B）で、見積りの約 410 MiB に近かった。
+一方、同居させたときの VRAM は 3925 MiB で、見積りの合計（約 3086 MiB）を大きく超えた（第5章の結果）。
 </div>
 
 </div>

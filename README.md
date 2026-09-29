@@ -17,7 +17,7 @@ RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで llama.cpp を動�
 
 ## 2. 調査
 
-- [Speculative Decoding 調査](notes/01_research/r260825-01-投機的デコーディング.md) — 小さなドラフトモデルで先読みして生成を速める手法が、VRAM 4GB で成立するかの事前検討
+- [Speculative Decoding 調査](notes/01_research/r260825-01-投機的デコーディング.md) — 小さなドラフトモデルで先読みして生成を速める手法が、VRAM 4GB で成立するかの検討と実測
 - [ハードウェア選定の判断材料](notes/01_research/r260825-02-ハードウェア選定の判断材料.md) — VRAM 4GB の制約をどのハードウェアで解決できるか。HP ZGX・DGX Spark・Mac Studio・RTX 30 / 50 系の容量・帯域・価格の比較
 - [ローカルLLM で AI エージェントを使う — 試験結果](notes/01_research/r260929-01-AIエージェントの試験結果.md) — llama-server に繋いだ Claude Code・Pi・OpenCode・Aider・Codex CLI で、20GB 以下のモデルがファイルを読み書きできるかを試した結果と、どのモデル・エージェントを使うか
 - [AI エージェント試験の経緯と全実行の記録](notes/01_research/r260930-01-エージェント試験の経緯と全実行の記録.md) — 上の試験の試し方、途中で起きたことと対処、最初の試験（共通ルールあり）の結果、流したすべての試験

@@ -220,16 +220,16 @@ footer{
 <p>関連: <a href="../10_plan/p260825-01-階層型エージェント構成案.html">階層型エージェント構成案</a></p>
 </details>
 
-<details class="md-flat" open>
-<summary><span class="badge b-none">未</span><span class="no">i260927-02</span>Speculative Decoding の検証</summary>
+<details class="md-flat">
+<summary><span class="badge b-ok">済</span><span class="no">i260927-02</span>Speculative Decoding の検証</summary>
 <p>
 小さなドラフトモデルで先読みして生成を速める手法。本命とドラフトを同居させると VRAM の余裕は約 200 MiB と見積もっており、
 帯域を使い切っている本PCでは効果が出ない可能性もある。
 </p>
 <ul>
-	<li><span class="badge b-none">未</span>使用中のビルドの <code>llama-server --help</code> で、ドラフトモデル指定のオプション名を確かめる</li>
-	<li><span class="badge b-none">未</span>本命と同系列のドラフトモデル（Qwen3-0.6B の GGUF）を取得する</li>
-	<li><span class="badge b-none">未</span>調査の検証計画にある5構成を測り、結果を調査に反映する</li>
+	<li><span class="badge b-ok">済</span>使用中のビルドの <code>llama-server --help</code> で、ドラフトモデル指定のオプション名を確かめる（<code>-md</code> のほかに <code>--spec-type draft-simple</code> が要る。<code>--draft-max</code> は <code>--spec-draft-n-max</code> に替わった）</li>
+	<li><span class="badge b-ok">済</span>本命と同系列のドラフトモデル（Qwen3-0.6B の GGUF）を取得する（unsloth の Q4_K_M・397 MB）</li>
+	<li><span class="badge b-ok">済</span>調査の検証計画にある5構成を測り、結果を調査に反映する（どの構成も単体の 57 tok/s より遅く 29〜47 tok/s。見送る。<code>tools\50_run\bench-spec.cmd</code>）</li>
 </ul>
 <p>関連: <a href="../01_research/r260825-01-投機的デコーディング.html">Speculative Decoding 調査</a></p>
 </details>
