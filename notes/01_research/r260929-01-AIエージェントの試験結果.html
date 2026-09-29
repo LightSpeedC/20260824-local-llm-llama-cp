@@ -278,7 +278,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 <thead><tr><th class="nowrap">エージェント</th><th class="nowrap">評価</th><th>根拠</th></tr></thead>
 <tbody>
 <tr><td class="nowrap">Claude Code（ルールなし）</td><td class="nowrap"><span class="badge b-ok">推奨</span></td><td>20 本すべてで試したのはこれだけで、15 本が 15 分以内に合格した。設定は <code>cc1.cmd</code> に入っている</td></tr>
-<tr><td class="nowrap">Pi</td><td class="nowrap"><span class="badge b-warn">次点</span></td><td>最初に送る量が 1,000 トークン未満とされる（記事による）。同じモデルで比べると、Qwen3-4B-Thinking は Claude Code の読み 291 秒・書き 1199 秒に対し 145 秒・88 秒。Nemotron は Claude Code では不可、Pi では 18 秒。ただし試したのは 3 本だけ（第 5 章）</td></tr>
+<tr><td class="nowrap">Pi</td><td class="nowrap"><span class="badge b-ok">速さ重視</span></td><td>合格した問は、どれも Claude Code より速い。gemma-4-E4B は読み 13 秒・書き 13 秒、gpt-oss-20b は 30 秒・21 秒で、Claude Code の 2〜3 倍速い。Nemotron は Claude Code では不可、Pi では 18 秒。ただし gemma-4-E2B の読みは 3 回中 1 回しか答えなかった（第 3 章）。試したのは 6 本だけ</td></tr>
 <tr><td class="nowrap">OpenCode</td><td class="nowrap"><span class="badge b-warn">遅い</span></td><td>Nemotron は合格したが、読みに 431 秒かかった</td></tr>
 <tr><td class="nowrap">Codex CLI</td><td class="nowrap"><span class="badge b-ng">勧めない</span></td><td>合格は gpt-oss-20b だけ。Windows では安全装置を外さないとファイルを読み書きできない</td></tr>
 <tr><td class="nowrap">Aider</td><td class="nowrap"><span class="badge b-ng">勧めない</span></td><td>ファイルを先に渡して使う道具で、読みの問が成り立たない。試験中にプロジェクトの README.html を上書きした</td></tr>
@@ -356,6 +356,25 @@ Claude Code（ルールなし）で通らなかった 3 本を、別のエージ
 	<li>合うエージェントはモデルによって違う。同じモデルでも Pi と OpenCode で結果が逆になった</li>
 </ul>
 
+<h2>速いモデルを Pi で</h2>
+<p>
+第 1 章で選んだ速い 3 本を、Pi でも試した（2026-09-30）。サーバの設定は第 2 章と同じ。E2B は結果が揺れたので 3 回流した。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="nowrap">Pi 読み</th><th class="nowrap">Pi 書き</th><th class="nowrap">Claude Code 読み</th><th class="nowrap">Claude Code 書き</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">gemma-4-E2B-it</td><td class="nowrap"><span class="badge b-warn">3 回中 1 回</span> 4 秒</td><td class="nowrap"><span class="badge b-ok">3 秒</span></td><td class="num">13 秒</td><td class="num">10 秒</td></tr>
+<tr><td class="nowrap">gemma-4-E4B-it</td><td class="nowrap"><span class="badge b-ok">13 秒</span></td><td class="nowrap"><span class="badge b-ok">13 秒</span></td><td class="num">38 秒</td><td class="num">26 秒</td></tr>
+<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap"><span class="badge b-ok">30 秒</span></td><td class="nowrap"><span class="badge b-ok">21 秒</span></td><td class="num">84 秒</td><td class="num">40 秒</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>E4B と gpt-oss-20b は、Pi のほうが 2〜3 倍速い</strong></li>
+	<li>E2B の読みは、不合格の 2 回とも答えが空だった。ファイルの中身を受け取った直後に 1 トークンで生成を終え、答えを書かない。書きは 3 回ともファイルができた</li>
+</ul>
+
 <h2>Codex CLI（ルールなし）</h2>
 <p>
 <code>CODEX_HOME</code> を空のフォルダに向け、利用者の設定と <code>AGENTS.md</code> を読ませずに試した（2026-09-30）。
@@ -401,7 +420,8 @@ Codex はファイルの読み書きに PowerShell のコマンドを使う。<c
 <section class="ch05" id="ch05">
 <h1>未確認のこと</h1>
 <ul>
-	<li><strong>Pi は、Claude Code で通らなかった 3 本でしか試していない</strong>。gemma-4-E2B・E4B と gpt-oss-20b を Pi で試すまで、Claude Code より良いとは言えない（<a href="../40_issues/issues.html">課題</a> i260930-01）</li>
+	<li><strong>Pi で試したのは 6 本だけ</strong>。20GB 級の MoE や、Claude Code で遅かったモデルを Pi で動かしたときの速さは測っていない</li>
+	<li>Pi で gemma-4-E2B が答えを書かずに終わる理由は調べていない。Codex CLI でも、E2B の読みは「これから読む」と答えたところで終わった</li>
 	<li><strong>試験は 1 ファイルを読む・1 行書くだけ</strong>。複数のファイルにまたがる編集や、コードを書く作業での品質は評価していない</li>
 	<li><strong>20GB 級の MoE の生成速度（tok/s）は測っていない</strong>。Qwen3-30B-A3B は課題 i260927-05 で測る</li>
 	<li>Nemotron が Claude Code でだけ読み書きしない理由は調べていない。Pi・OpenCode では通る</li>

@@ -57,14 +57,14 @@ Claude Code は共通ルールを読ませず思考を切れば、20GB 以下の
 
 関連: [AI エージェント比較の検証計画](../10_plan/p260929-01-AIエージェント比較の検証計画.md)／[ローカルLLM で AI エージェントを使う — 試験結果](../01_research/r260929-01-AIエージェントの試験結果.md)
 
-### **未** i260930-01 Pi を速いモデルで試す
+### ✅ **済** i260930-01 Pi を速いモデルで試す
 
 Pi は、Claude Code（ルールなし）で通らなかった 3 本でしか試していない。そのうち 2 本では Claude Code より良い結果だった。 Claude Code で速かったモデルを Pi でも試し、どちらを使うかを決める。
 
-- **未** gemma-4-E2B・gemma-4-E4B・gpt-oss-20b を Pi で試す（`tools\50_run\test-agents.cmd -Agent pi`）
-- **未** Claude Code の結果と比べ、試験結果の結論（どのエージェントを使うか）を見直す
+- ✅ **済** gemma-4-E2B・gemma-4-E4B・gpt-oss-20b を Pi で試す（`tools\50_run\test-agents.cmd -Agent pi`。E4B と gpt-oss-20b は Claude Code の 2〜3 倍速く合格。E2B の読みは 3 回中 1 回だけ答えた）
+- ✅ **済** Claude Code の結果と比べ、試験結果の結論（どのエージェントを使うか）を見直す（Claude Code は推奨のまま、Pi を速さ重視に）
 
-関連: [ローカルLLM で AI エージェントを使う — 試験結果](../01_research/r260929-01-AIエージェントの試験結果.md)（第 5 章）
+関連: [ローカルLLM で AI エージェントを使う — 試験結果](../01_research/r260929-01-AIエージェントの試験結果.md)（第 3 章）
 
 ## 2. 運用
 
