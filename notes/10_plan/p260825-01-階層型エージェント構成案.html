@@ -422,7 +422,7 @@ Qwen3-4B を <code>--parallel 4</code> で立て、独立したタスクを同�
 	<li><span class="badge b-ok">利点</span><strong>「複数のサブエージェント」が唯一実現する形</strong></li>
 	<li><span class="badge b-warn">欠点</span>1スロット 2048 トークン。タスクを相当細かく割る必要がある</li>
 	<li><span class="badge b-warn">欠点</span>全サブエージェントが同一モデル。役割ごとにモデルを変えられない</li>
-	<li><span class="badge b-ok">実測</span>並列時の合計スループット。4 本同時で 2.3 倍、8 本同時で 2.7 倍（第6章 Phase 1 の結果）</li>
+	<li><span class="badge b-ok">実測</span>並列時の合計スループット。4 本同時で 2.3 倍、8 本同時で 2.7 倍。1,200 トークンのプロンプトを付けると 4 本で 1.9 倍（第6章 Phase 1 の結果）</li>
 </ul>
 
 <h2>案4 — ハイブリッド</h2>
@@ -677,7 +677,28 @@ RAM 32GB・画面表示は内蔵GPU の構成で、Qwen3-4B を <code>-c 8192 -n
 	<li><strong>並列 1 の基準は API 経由で 57 tok/s</strong>。第10章の 39.5 tok/s は RAM 16GB・画面表示を NVIDIA 側でしていたときの値</li>
 	<li><strong>VRAM は並列数で増えない</strong>。<code>-c 8192</code> がスロット数で割られ（ログでは 4 本で <code>n_ctx_slot = 2048</code>、8 本で 1024）、KV キャッシュの総量は同じため。第2章の想定どおり</li>
 	<li>このビルドの <code>-np</code> の既定は <code>-1</code>（自動）。構成を固定するには明示する</li>
-	<li><strong>プロンプトは短い文 1 行で測った</strong>。長い資料を渡したときは読み込み（pp）が同時に走るため、倍率が変わる可能性がある（未確認）</li>
+	<li><strong>プロンプトは短い文 1 行で測った</strong>。長いプロンプトの結果は次の表</li>
+</ul>
+
+<h3>長いプロンプトでの結果 <span class="badge b-warn">1.9倍</span></h3>
+<p>
+1 本あたり 1,213 トークンのプロンプト（<code>-PromptSentences 60</code>）を付けて、同じ条件で測った。サブにコードを渡す使い方に近い。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">並列数</th><th class="nowrap">合計 tok/s</th><th class="nowrap">倍率</th><th class="nowrap">1 本あたり tok/s</th><th class="nowrap">4 本が終わるまで</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td class="num">46.9〜47.0</td><td class="num">1.00</td><td class="num">53</td><td class="num">—</td></tr>
+<tr><td class="num">2</td><td class="num">73.7</td><td class="num">1.57</td><td class="num">44〜45</td><td class="num">—</td></tr>
+<tr><td class="num">4</td><td class="num">90.0〜90.3</td><td class="num"><strong>1.92</strong></td><td class="num">25〜29</td><td class="num">11.4 秒</td></tr>
+</tbody>
+</table>
+</div>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">1・4 は 2 回測った範囲。合計 tok/s は、出力トークンの合計を、プロンプトの読み込みも含めた経過時間で割ったもの。</p>
+<ul>
+	<li><strong>プロンプトが長いと倍率が下がり、4 本で 1.92 倍と基準の 2 倍をわずかに下回る</strong>。読み込みも同時に走るため</li>
+	<li>並列を採るかは、サブに渡す量が決まってから判断する。短い指示だけなら 2.3 倍、1,200 トークン級なら 1.9 倍になる</li>
+	<li><strong>2,000 トークンのプロンプトは 4 並列では渡せない</strong>。1 スロットが 2048 トークンのため、出力が途中で打ち切られた（1 本 2,014 トークンで試し、4 本の出力が合計 136 トークンで終わった）</li>
 </ul>
 
 <h2>Phase 2 — 単一タスクの往復</h2>
@@ -767,7 +788,7 @@ notes/10_plan/p260825-01-階層型エージェント構成案.html  … 本書</
 </ul>
 
 <div class="callout callout-tip">
-<strong>Phase 1 は肯定された（4 本同時で 2.3 倍）。</strong>
+<strong>Phase 1 は、短い指示なら肯定された（4 本同時で 2.3 倍）。1,200 トークン級のプロンプトでは 1.9 倍で、基準の境目になる。</strong>
 ただし適用する作業が無ければ、Phase 2 以降の実装は保留でよい。
 </div>
 </section>

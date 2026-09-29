@@ -293,15 +293,15 @@ Claude Code で速かったモデルを Pi でも試し、どちらを使うか�
 <p>関連: <a href="../10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>（第10章の「32GB での再測定」）</p>
 </details>
 
-<details class="md-flat" open>
-<summary><span class="badge b-none">未</span><span class="no">i260930-03</span>長いプロンプトで並列スロットの倍率を測る</summary>
+<details class="md-flat">
+<summary><span class="badge b-ok">済</span><span class="no">i260930-03</span>長いプロンプトで並列スロットの倍率を測る</summary>
 <p>
 並列スロットは 4 本同時で 2.3 倍になったが、プロンプトは短い文 1 行で測った。
 長い資料を渡すと読み込み（pp）が同時に走るため、倍率が変わる可能性がある。
 </p>
 <ul>
-	<li><span class="badge b-none">未</span>1 本あたり 1,000〜1,500 トークンのプロンプトで、<code>--parallel 1 / 2 / 4</code> の合計 tok/s と所要時間を測る（<code>tools\50_run\bench-parallel.cmd</code> にプロンプトを渡す引数を足す）</li>
-	<li><span class="badge b-none">未</span>結果を構成案の Phase 1 に追記し、判断が変わるかを見る</li>
+	<li><span class="badge b-ok">済</span>1 本あたり 1,000〜1,500 トークンのプロンプトで、<code>--parallel 1 / 2 / 4</code> の合計 tok/s と所要時間を測る（<code>tools\50_run\bench-parallel.cmd</code> にプロンプトを渡す引数を足す。1,213 トークンで 47 → 74 → 90 tok/s）</li>
+	<li><span class="badge b-ok">済</span>結果を構成案の Phase 1 に追記し、判断が変わるかを見る（4 本で 1.92 倍と基準の 2 倍の境目。サブに渡す量が決まってから判断する）</li>
 </ul>
 <p>関連: <a href="../10_plan/p260825-01-階層型エージェント構成案.html">階層型エージェント構成案</a>（第6章 Phase 1）</p>
 </details>
