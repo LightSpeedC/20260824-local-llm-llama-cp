@@ -1,0 +1,486 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code のツール利用テスト</title>
+<style>
+:root{
+	--navy1:#12224d;
+	--navy2:#2f5fbf;
+	--ink:#1c2330;
+	--ink-soft:#4a5568;
+	--line:#d9dfe8;
+	--code-bg:#f4f6fa;
+	--link:#1a4fa0;
+	--accent:var(--navy1, #12224d);
+	--accent2:var(--navy2, #2f5fbf);
+	--soft:#f2f5fb;
+}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(224,78%,25%);--accent2:hsl(224,58%,55%);--soft:hsl(224,28%,95%);}
+.ch03{--accent:hsl(168,78%,25%);--accent2:hsl(168,58%,55%);--soft:hsl(168,28%,95%);}
+.ch04{--accent:hsl(112,78%,25%);--accent2:hsl(112,58%,55%);--soft:hsl(112,28%,95%);}
+.ch05{--accent:hsl(56,78%,25%);--accent2:hsl(56,58%,55%);--soft:hsl(56,28%,95%);}
+.ch06{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+
+*{box-sizing:border-box;}
+body{
+	margin:0;
+	background:#fff;
+	color:var(--ink, #1c2330);
+	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+	font-size:15.5px;
+	line-height:1.85;
+}
+.titlebar{
+	background:linear-gradient(135deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	padding:34px 30px 30px;
+}
+.titlebar .inner{max-width:1600px;margin:0 auto;}
+.titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
+.titlebar .lead{font-size:0.88em;color:#cfe0ff;}
+.titlebar .date{font-size:0.88em;color:#cfe0ff;margin-top:4px;}
+.titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+
+.wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
+
+section{
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:4px 26px 26px;
+	margin:34px 0;
+}
+section h1{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	font-size:1.45em;
+	padding:14px 20px;
+	margin:26px 0 20px;
+	border-radius:8px;
+	box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+h2{
+	font-size:1.15em;
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(90deg,var(--soft, #f2f5fb),#fff);
+	padding:6px 12px;
+	margin:30px 0 12px;
+	color:var(--accent, #12224d);
+}
+h3{
+	font-size:1.02em;
+	display:inline-block;
+	border-bottom:2px dotted var(--accent2, #2f5fbf);
+	padding-bottom:3px;
+	margin:20px 0 8px;
+	color:var(--ink, #1c2330);
+}
+p{margin:8px 0;}
+ul,ol{margin:8px 0;padding-left:1.5em;}
+li{margin:4px 0;}
+
+code{
+	background:var(--code-bg, #f4f6fa);
+	border:1px solid var(--line, #d9dfe8);
+	color:#17335f;
+	border-radius:4px;
+	padding:1px 5px;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+}
+pre{
+	background:var(--code-bg, #f4f6fa);
+	color:var(--ink, #1c2330);
+	border:1px solid var(--line, #d9dfe8);
+	border-left:5px solid var(--accent2, #2f5fbf);
+	border-radius:0 8px 8px 0;
+	padding:13px 16px;
+	overflow-x:auto;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+	line-height:1.6;
+}
+pre code{background:none;border:none;padding:0;color:inherit;}
+
+.tablewrap{overflow-x:auto;margin:12px 0;}
+table{
+	border-collapse:collapse;
+	width:100%;
+	border-radius:8px;
+	overflow:hidden;
+	box-shadow:0 2px 7px rgba(0,0,0,0.09);
+	font-size:0.95em;
+}
+th{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-align:left;
+	padding:9px 12px;
+}
+th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line, #d9dfe8);vertical-align:top;}
+tr:nth-child(even) td{background:#fafbfe;}
+.nowrap{white-space:nowrap;}
+.num{text-align:right;white-space:nowrap;}
+
+.badge{
+	display:inline-block;
+	color:#fff;
+	font-size:0.8em;
+	font-weight:600;
+	border-radius:5px;
+	padding:2px 9px;
+	margin-right:7px;
+	white-space:nowrap;
+}
+.b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
+.b-ng{background:linear-gradient(100deg,#a51f22,#e05a5c);}
+.b-none{background:linear-gradient(100deg,#5a6472,#97a1ae);}
+.b-warn{background:linear-gradient(100deg,#b8620a,#f0a548);}
+
+.callout{
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border-radius:0 8px 8px 0;
+	padding:12px 16px;
+	margin:16px 0;
+}
+.callout strong{color:var(--accent, #12224d);}
+
+.toc{
+	background:linear-gradient(180deg,#f2f5fb,#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:6px 26px 22px;
+	margin:34px 0;
+}
+.toc ol{
+	list-style:none;
+	display:flex;
+	flex-wrap:wrap;
+	gap:8px;
+	padding:0;
+	margin:12px 0 0;
+	counter-reset:toc;
+}
+.toc li{counter-increment:toc;margin:0;}
+.toc a{
+	display:-webkit-box;
+	-webkit-line-clamp:2;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:normal;
+	width:310px;
+	max-width:100%;
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-decoration:none;
+	border-radius:7px;
+	padding:8px 12px;
+	font-size:0.92em;
+	line-height:1.4;
+}
+.toc a::before{content:counter(toc) ". ";font-weight:700;}
+
+svg{max-width:100%;height:auto;display:block;margin:16px 0;}
+
+.homelink{margin:20px 0 0;}
+a.home{
+	display:inline-block;
+	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	border-radius:6px;
+	padding:4px 11px;
+	line-height:1;
+	text-decoration:none;
+}
+a.home svg{vertical-align:-2px;}
+a{background:none;color:var(--link, #1a4fa0);}
+footer{
+	max-width:1600px;
+	margin:0 auto;
+	padding:18px 30px 30px;
+	border-top:1px solid var(--line, #d9dfe8);
+	color:var(--ink-soft, #4a5568);
+	font-size:0.9em;
+	margin-top:40px;
+	margin-bottom:40px;
+}
+footer a{color:var(--navy2, #2f5fbf);}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+	<div class="inner">
+		<h1>Claude Code のツール利用テスト</h1>
+		<div class="lead">llama-server に繋いだ Claude Code で、手持ちモデルがファイルを読み書きできるかを試す</div>
+		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-09-29</div>
+	</div>
+</div>
+
+<div class="wrap">
+
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+
+<div class="toc">
+	<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">目次</h2>
+	<ol>
+		<li class="ch01"><a href="#ch01">結論</a></li>
+		<li class="ch02"><a href="#ch02">使える設定</a></li>
+		<li class="ch03"><a href="#ch03">試験の方法と経緯</a></li>
+		<li class="ch04"><a href="#ch04">最初の試験の結果（ルールあり）</a></li>
+		<li class="ch05"><a href="#ch05">ルールなし・思考なしの結果</a></li>
+		<li class="ch06"><a href="#ch06">Pi・OpenCode・Aider で試した結果</a></li>
+	</ol>
+</div>
+
+<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">この文書の位置づけ</h2>
+<p>
+<a href="../10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>の Step 5 で、Claude Code を llama-server に繋いで応答が返ることは確かめた。
+本書は、その先の<strong>ツール（Read・Write）を実際に使えるか</strong>を、手持ちの 13 本とダウンロードした 20GB 以下の 6 本などで試した記録である。
+環境は RAM 32GB・VRAM 4GB（画面表示は内蔵GPU）。
+</p>
+
+<!-- ============ 1 ============ -->
+<section class="ch01" id="ch01">
+<h1>結論</h1>
+<p>
+<strong>共通ルールを読ませなければ、Claude Code はこのPCでも使える。</strong>
+最初の試験（ルールあり）では読み・書きの両方に合格したモデルが 1 本も無かったが、
+ルールを読ませず、思考を切った設定では <strong>21 本中 15 本</strong>が 15 分以内に両方に合格した（1 時間まで待てば 16 本）。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>変えたこと</th><th>効果</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">共通ルールを読ませない（空のホーム）</td><td>最初に送る量が約 60,000 → 17,000〜23,600 トークン。1 往復が数分から数十秒になり、ツールを呼ぶようになった</td></tr>
+<tr><td class="nowrap">思考を切る（<code>--reasoning off</code>）</td><td>思考を長く出して時間切れになるのを防ぐ</td></tr>
+<tr><td class="nowrap">チャットテンプレートの差し替え</td><td>途中の system で 500 エラーになる 4 本（Ministral 2 本・Bonsai・Qwen3.5-9B）が通るようになった</td></tr>
+<tr><td class="nowrap">ホームと作業フォルダをプロジェクトの外に置く</td><td>Qwen 系がプロジェクトのパスを推測して外に書きにいくのを防ぐ（第 3 章）</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>速く使えるモデル</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="nowrap">サイズ</th><th class="nowrap">読み</th><th class="nowrap">書き</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">gemma-4-E2B-it</td><td class="num">3.19 GB</td><td class="num">13 秒</td><td class="num">10 秒</td></tr>
+<tr><td class="nowrap">gemma-4-E4B-it</td><td class="num">4.97 GB</td><td class="num">38 秒</td><td class="num">26 秒</td></tr>
+<tr><td class="nowrap">Ministral-3-3B-Instruct-2512（テンプレート差し替え）</td><td class="num">2.00 GB</td><td class="num">28 秒</td><td class="num">54 秒</td></tr>
+<tr><td class="nowrap">gpt-oss-20b</td><td class="num">11.28 GB</td><td class="num">84 秒</td><td class="num">40 秒</td></tr>
+</tbody>
+</table>
+</div>
+<p>全モデルの結果は第 5 章。Claude Code で通らなかったモデルも、Pi・OpenCode なら通るものがある（第 6 章）。</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="ch02" id="ch02">
+<h1>使える設定</h1>
+<p>gemma-4-E2B-it を例にする。ほかのモデルも <code>-m</code> と <code>--alias</code> を替えるだけでよい（差し替えたテンプレートがあるモデルは <code>--chat-template-file</code> を足す）。</p>
+
+<h3>llama-server</h3>
+<pre><code class="language-batch">"bin\llama.cpp\llama-server.exe" ^
+  -m "C:\AI_Models\Gemma\gemma-4-E2B-it-GGUF\gemma-4-E2B-it-Q4_K_M.gguf" ^
+  -c 65536 -np 1 -ngl 99 ^
+  -nkvo -ctk q8_0 -ctv q8_0 -fa on ^
+  --reasoning off ^
+  --alias gemma-4-E2B-it-Q4_K_M ^
+  --host 127.0.0.1 --port 8080</code></pre>
+<p>3.2 GB を超えるモデルは <code>-ngl</code> を渡さず、llama-server の自動配置に任せた。テンプレートは <code>tools/50_run/templates/</code> にある。</p>
+
+<h3>Claude Code</h3>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">環境変数</th><th>値</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><code>ANTHROPIC_BASE_URL</code></td><td><code>http://127.0.0.1:8080</code></td></tr>
+<tr><td class="nowrap"><code>ANTHROPIC_AUTH_TOKEN</code></td><td>任意の文字列（llama-server は確かめない）</td></tr>
+<tr><td class="nowrap"><code>ANTHROPIC_MODEL</code>・<code>ANTHROPIC_SMALL_FAST_MODEL</code></td><td>サーバの <code>--alias</code> と同じ値</td></tr>
+<tr><td class="nowrap"><code>CLAUDE_CODE_MAX_CONTEXT_TOKENS</code></td><td>サーバの <code>-c</code> と同じ値</td></tr>
+<tr><td class="nowrap"><code>API_TIMEOUT_MS</code></td><td>1 回の要求を待つ長さ（試験では 600000〜900000）</td></tr>
+<tr><td class="nowrap"><code>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC</code></td><td><code>1</code></td></tr>
+<tr><td class="nowrap"><code>USERPROFILE</code>・<code>HOME</code></td><td><strong>プロジェクトの外にある空のフォルダ</strong>。共通ルール・メモリ・フックを読ませない</td></tr>
+<tr><td class="nowrap"><code>CLAUDE_CODE_ATTRIBUTION_HEADER</code></td><td><code>0</code>（プロジェクトの <code>.claude/settings.json</code> に書く）</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout callout-warning">
+<strong>空のホームをプロジェクトの中に置かない。</strong>
+Claude Code は指示文にメモリの置き場（ホームの下）を書き込むため、そこからモデルがプロジェクトの場所を推測し、作業フォルダの外に読み書きしにいく。
+試験では、ホームを <code>W:/temp/llama-cp-home</code>、作業フォルダを <code>W:/temp/llama-cp-sandbox</code> に置いて防いだ。
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
+<h1>試験の方法と経緯</h1>
+
+<h2>スクリプト</h2>
+<ul>
+	<li><code>tools/50_run/test-cc.ps1</code> — 1 モデルを起動し、Claude Code に 1 問投げる。所要時間・ターン数・回答を <code>logs/test-cc/</code> に残す</li>
+	<li><code>tools/50_run/test-cc-tools.ps1</code> — 10GB 未満のモデルを小さい順に 1 本ずつ起動し、読みと書きの 2 問を試す。結果は <code>logs/test-cc-tools/</code> に JSON Lines で残す</li>
+</ul>
+<p>どちらも環境変数（<code>ANTHROPIC_BASE_URL</code> ほか、root の <code>cc1.cmd</code> と同じもの）で接続先を切り替え、<code>claude -p</code> を非対話で走らせる。</p>
+
+<h3>サーバの設定（全モデル共通）</h3>
+<pre><code class="language-text">-c 65536 -np 1 -nkvo -ctk q8_0 -ctv q8_0 -fa on
+3.2GB 以下は -ngl 99、それより大きいものは -ngl を渡さず自動配置</code></pre>
+
+<h3>合否の決め方</h3>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">問</th><th>質問</th><th>合格</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">読み</td><td>README.html を Read ツールで読み、最初の h1 要素の文字列だけを答える</td><td>回答に「ローカルLLM 実行環境」が入っている（読まないと分からない）</td></tr>
+<tr><td class="nowrap">書き</td><td>Write ツールで <code>tmp/</code> にファイルを作り、決めた 1 行を書く</td><td>そのファイルが実際にでき、中身が一致する</td></tr>
+</tbody>
+</table>
+</div>
+<p>1 問の待ち時間は 10 分。超えたものはタイムアウトとして記録した。</p>
+
+<h2>経緯</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">回</th><th>起きたこと</th><th>対処</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td>最初の要求を読み込んでいる途中（43,008 トークン・80 秒）で、Claude Code がメモリ不足としてコマンドを止めた</td><td>プロジェクトの <code>.claude/settings.json</code> の <code>env</code> に <code>CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP=1</code> を入れ、セッションを開き直した</td></tr>
+<tr><td class="num">2</td><td>168 秒で応答が返ったが、答えが README と違い、出力も文字化けしていた</td><td>出力を <code>--output-format json</code> でファイルに受け、UTF-8 として読むようにした</td></tr>
+<tr><td class="num">3</td><td>206 秒で返ったが、質問そのものが化けていた（コマンド行に載せると CP932 になる）</td><td>質問を UTF-8 のファイルにし、標準入力から渡すようにした</td></tr>
+<tr><td class="num">4</td><td>質問は正しく届いた。171 秒で返ったが、ターン数 1 でツールを呼ばずに答えを作っていた（Qwen3-4B-Instruct）</td><td>モデルを替える</td></tr>
+<tr><td class="num">5</td><td>gpt-oss-20b（<code>--n-cpu-moe 18</code>）は 25 分でタイムアウト。やり取りは続いていたが、深いコンテキストで生成が 2.8 tok/s まで落ちた（短い文脈では 19 tok/s）</td><td>10GB 未満の全モデルで試す（第 4 章）</td></tr>
+<tr><td class="num">6</td><td>13 本とも読み・書きの両方には通らない。4 本はチャットテンプレートが途中の system を例外にして 500 エラー</td><td>テンプレートを取り出し、途中の system を通すように直した</td></tr>
+<tr><td class="num">7</td><td>最初に送る 60,000 トークンのうち、共通ルールだけで 41,320 トークンあった（gpt-oss-20b のトークナイザで計数）</td><td><code>USERPROFILE</code>・<code>HOME</code> を空のフォルダに向け、ルールを読ませない</td></tr>
+<tr><td class="num">8</td><td>ルールなしで多くが合格。思考を出すモデルは長く考えて時間切れになる</td><td><code>--reasoning off</code> を足す（第 5 章）</td></tr>
+<tr><td class="num">9</td><td>エージェントの試験で、Aider がプロジェクトの README.html を 2 行に上書きした</td><td>git から戻し、試験は作業用のコピーの中で動かすようにした</td></tr>
+<tr><td class="num">10</td><td>作業用のコピーをリポジトリの中に置くと、Qwen 系がリポジトリの root を推測して本物に読み書きしにいった（Claude Code が作業フォルダの外として拒否）</td><td>作業用のコピーをリポジトリの外（<code>W:/temp</code>）へ</td></tr>
+<tr><td class="num">11</td><td>それでもプロジェクトのパスへ書きにいった。指示文に書かれるメモリの置き場が、プロジェクトの中の空のホームだったため</td><td>空のホームも外へ移した。以後は本物を狙う呼び出しが無くなった</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout callout-caution">
+<strong>試験ではエージェントを本物のファイルの上で動かさない。</strong>
+Aider は渡されていないファイルを「作り直してよい」と受け取ることがあり、<code>--yes-always</code> を付けると確認なしで上書きする。
+コードは git から戻せても、コミット前の変更は戻らない。
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="ch04" id="ch04">
+<h1>最初の試験の結果（ルールあり）</h1>
+<p>2026-09-28 22:28 から流した 1 回分。秒数は <code>claude -p</code> が終わるまでの時間。</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="nowrap">サイズ</th><th class="nowrap">読み</th><th class="nowrap">書き</th><th>何が起きたか</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Ministral-3-3B-Instruct-2512</td><td class="num">2.00 GB</td><td class="nowrap"><span class="badge b-ng">不可</span></td><td class="nowrap"><span class="badge b-ng">不可</span></td><td>サーバが 500 を返す。チャットテンプレートの実行でエラー</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Instruct-2507</td><td class="num">2.33 GB</td><td class="nowrap"><span class="badge b-ng">不可</span></td><td class="nowrap"><span class="badge b-warn">書けた</span></td><td>読み: 188 秒・1 ターン、読まずに作成日の行を答えた。書き: ファイルは正しくできたが 10 分でタイムアウト</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507</td><td class="num">2.33 GB</td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td>どちらも 10 分で返らない。ファイルもできない</td></tr>
+<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B</td><td class="num">2.64 GB</td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td>同上</td></tr>
+<tr><td class="nowrap">gemma-4-E2B-it</td><td class="num">3.19 GB</td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td class="nowrap"><span class="badge b-ok">合格</span></td><td>書き: 480 秒・3 ターンで終わり、ファイルも一致。ただし最後の回答は質問と関係のない要約だった</td></tr>
+<tr><td class="nowrap">Bonsai-27B（Q1_0）</td><td class="num">3.54 GB</td><td class="nowrap"><span class="badge b-ng">不可</span></td><td class="nowrap"><span class="badge b-ng">不可</span></td><td>サーバが 500 を返す。チャットテンプレートの実行でエラー</td></tr>
+<tr><td class="nowrap">gemma-4-E4B-it</td><td class="num">4.97 GB</td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td class="nowrap"><span class="badge b-warn">書けた</span></td><td>書き: ファイルは正しくできたが 10 分でタイムアウト</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B</td><td class="num">5.24 GB</td><td class="nowrap"><span class="badge b-ng">不可</span></td><td class="nowrap"><span class="badge b-ng">不可</span></td><td>サーバが 500 を返す。チャットテンプレートの実行でエラー</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash</td><td class="num">5.74 GB</td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td>どちらも 10 分で返らない</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-QAT</td><td class="num">6.50 GB</td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td>同上。ファイルもできない</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it</td><td class="num">6.87 GB</td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td class="nowrap"><span class="badge b-warn">書けた</span></td><td>書き: ファイルは正しくできたが 10 分でタイムアウト</td></tr>
+<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512</td><td class="num">7.67 GB</td><td class="nowrap"><span class="badge b-ng">不可</span></td><td class="nowrap"><span class="badge b-ng">不可</span></td><td>サーバが 500 を返す。チャットテンプレートの実行でエラー</td></tr>
+<tr><td class="nowrap">Qwen2.5-Coder-14B-Instruct</td><td class="num">8.37 GB</td><td class="nowrap"><span class="badge b-ng">不可</span></td><td class="nowrap"><span class="badge b-ng">不可</span></td><td>400。モデルの上限 32768 に対し、要求が約 60,000 トークンで入らない</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>分かったこと</h2>
+<ul>
+	<li><strong>「応答が返る」と「ツールを使える」は別</strong>。Qwen3-4B-Instruct の読みは 1 ターンで終わっており、ファイルを読まずにもっともらしい答えを作った。ターン数と、答えが本物かの両方を見ないと判別できない</li>
+	<li><strong>チャットテンプレートで落ちるモデルが 4 本ある</strong>（Ministral 2 本・Bonsai・Qwen3.5-9B）。モデル側の問題か、llama-server のテンプレート処理の問題かは切り分けていない</li>
+	<li><strong>時間切れのうち 3 本は、実際にはツールを使えていた</strong>。ファイルができた後に何をしていたかは記録していない</li>
+</ul>
+
+<div class="callout callout-important">
+<strong>時間切れは「使えない」ではない。</strong>
+10 分を超えたものは今回の条件で打ち切っただけで、待てば終わるかどうかは確かめていない。
+テンプレートのエラーも、テンプレートを差し替えれば通る可能性がある。
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="ch05" id="ch05">
+<h1>ルールなし・思考なしの結果</h1>
+<p>
+2026-09-29 に流した。共通ルールを読ませず（空のホーム）、<code>--reasoning off</code>、差し替えたテンプレートがあるモデルはそれを使った。1 問の待ち時間は 10〜15 分。
+最初に送った量はどのモデルも 17,000〜23,600 トークン。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="nowrap">サイズ</th><th class="nowrap">読み</th><th class="nowrap">書き</th><th>備考</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">gemma-4-E2B-it</td><td class="num">3.19 GB</td><td class="nowrap"><span class="badge b-ok">13 秒</span></td><td class="nowrap"><span class="badge b-ok">10 秒</span></td><td></td></tr>
+<tr><td class="nowrap">gemma-4-E4B-it</td><td class="num">4.97 GB</td><td class="nowrap"><span class="badge b-ok">38 秒</span></td><td class="nowrap"><span class="badge b-ok">26 秒</span></td><td></td></tr>
+<tr><td class="nowrap">Ministral-3-3B-Instruct-2512</td><td class="num">2.00 GB</td><td class="nowrap"><span class="badge b-ok">28 秒</span></td><td class="nowrap"><span class="badge b-ok">54 秒</span></td><td>テンプレート差し替え。思考を切る前の回</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Instruct-2507</td><td class="num">2.33 GB</td><td class="nowrap"><span class="badge b-ok">53 秒</span></td><td class="nowrap"><span class="badge b-ok">66 秒</span></td><td>思考を切る前の回</td></tr>
+<tr><td class="nowrap">gpt-oss-20b</td><td class="num">11.28 GB</td><td class="nowrap"><span class="badge b-ok">84 秒</span></td><td class="nowrap"><span class="badge b-ok">40 秒</span></td><td></td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-QAT</td><td class="num">6.50 GB</td><td class="nowrap"><span class="badge b-ok">104 秒</span></td><td class="nowrap"><span class="badge b-ok">84 秒</span></td><td></td></tr>
+<tr><td class="nowrap">gemma-4-12B-it</td><td class="num">6.87 GB</td><td class="nowrap"><span class="badge b-ok">113 秒</span></td><td class="nowrap"><span class="badge b-ok">86 秒</span></td><td></td></tr>
+<tr><td class="nowrap">gemma-4-26B-A4B-it</td><td class="num">15.84 GB</td><td class="nowrap"><span class="badge b-ok">127 秒</span></td><td class="nowrap"><span class="badge b-ok">59 秒</span></td><td>ダウンロード</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507</td><td class="num">16.48 GB</td><td class="nowrap"><span class="badge b-ok">140 秒</span></td><td class="nowrap"><span class="badge b-ok">73 秒</span></td><td>ダウンロード。ホームを外に移してから合格</td></tr>
+<tr><td class="nowrap">Bonsai-27B（Q1_0）</td><td class="num">3.54 GB</td><td class="nowrap"><span class="badge b-ok">141 秒</span></td><td class="nowrap"><span class="badge b-ok">121 秒</span></td><td>テンプレート差し替え</td></tr>
+<tr><td class="nowrap">Qwen3.6-35B-A3B（UD-Q3_K_XL）</td><td class="num">15.69 GB</td><td class="nowrap"><span class="badge b-ok">164 秒</span></td><td class="nowrap"><span class="badge b-ok">123 秒</span></td><td>ダウンロード。ホームを外に移してから合格</td></tr>
+<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct</td><td class="num">16.45 GB</td><td class="nowrap"><span class="badge b-ok">166 秒</span></td><td class="nowrap"><span class="badge b-ok">64 秒</span></td><td>ダウンロード。ホームを外に移してから合格</td></tr>
+<tr><td class="nowrap">GLM-4.7-Flash</td><td class="num">16.32 GB</td><td class="nowrap"><span class="badge b-ok">203 秒</span></td><td class="nowrap"><span class="badge b-ok">60 秒</span></td><td>ダウンロード</td></tr>
+<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512</td><td class="num">7.67 GB</td><td class="nowrap"><span class="badge b-ok">226 秒</span></td><td class="nowrap"><span class="badge b-ok">331 秒</span></td><td>テンプレート差し替え</td></tr>
+<tr><td class="nowrap">Devstral-Small-2507（24B）</td><td class="num">13.55 GB</td><td class="nowrap"><span class="badge b-ok">246 秒</span></td><td class="nowrap"><span class="badge b-ok">320 秒</span></td><td>ダウンロード</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B</td><td class="num">5.24 GB</td><td class="nowrap"><span class="badge b-warn">78 秒</span></td><td class="nowrap"><span class="badge b-ok">49 秒</span></td><td>テンプレート差し替え。読めているが、答えを「ローカル LLM 実行環境」と空白を足して書き写す（2 回とも）</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507</td><td class="num">2.33 GB</td><td class="nowrap"><span class="badge b-ok">291 秒</span></td><td class="nowrap"><span class="badge b-warn">1199 秒</span></td><td>思考を切れない版。書きは 10 分で時間切れ、1 時間の枠で約 20 分かけて合格</td></tr>
+<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B</td><td class="num">2.64 GB</td><td class="nowrap"><span class="badge b-ng">不可</span></td><td class="nowrap"><span class="badge b-ng">不可</span></td><td>1 時間の枠でも、読まずに「準備はできています」と答えるだけ。Pi・OpenCode では通る（第 6 章）</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash</td><td class="num">5.74 GB</td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td class="nowrap"><span class="badge b-none">時間切れ</span></td><td>1 時間の枠でも返らない。OpenCode・Aider で書きだけ通る（第 6 章）</td></tr>
+<tr><td class="nowrap">Qwen2.5-Coder-14B-Instruct</td><td class="num">8.37 GB</td><td class="nowrap"><span class="badge b-ng">不可</span></td><td class="nowrap"><span class="badge b-ng">不可</span></td><td>道具の呼び出しを <code>&lt;tool_call&gt;</code> で囲まず JSON の文章として出すため、llama-server が呼び出しと読み取れない。Qwen3 のテンプレートに差し替えても同じ</td></tr>
+</tbody>
+</table>
+</div>
+<p>
+秒数は <code>claude -p</code> が終わるまでの時間。10〜15 分で時間切れになった問は、1 時間の枠で試し直した（Nemotron・GLM-4.6V・Qwen3-4B-Thinking の書き）。
+読み・書きの両方に合格したのは 16 本（Qwen3-4B-Thinking は時間をかければ合格）。
+</p>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="ch06" id="ch06">
+<h1>Pi・OpenCode・Aider で試した結果</h1>
+<p>
+Claude Code（ルールなし）で時間切れになった 3 本を、別のエージェントで試した。サーバの設定は第 5 章と同じ。
+質問はコマンド行に載せるため英語にした。スクリプトは <code>tools/50_run/test-agents.ps1</code>。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="nowrap">Pi</th><th class="nowrap">OpenCode</th><th class="nowrap">Aider</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B</td><td><span class="badge b-ok">両方合格</span>読み 18 秒・書き 19 秒</td><td><span class="badge b-ok">両方合格</span>読み 431 秒・書き 58 秒</td><td><span class="badge b-warn">書きのみ</span>書き 11 秒</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash</td><td><span class="badge b-ng">不可</span>読みは時間切れ、書きは作ったと答えたがファイルなし</td><td><span class="badge b-warn">書きのみ</span>書き 152 秒</td><td><span class="badge b-warn">書きのみ</span>書き 16 秒</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507</td><td><span class="badge b-ok">両方合格</span>読み 145 秒・書き 88 秒</td><td><span class="badge b-none">時間切れ</span></td><td><span class="badge b-warn">書きのみ</span>書き 311 秒</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>Pi がいちばん速い</strong>。Nemotron は Claude Code で時間切れだったが、Pi では 18 秒で答えた</li>
+	<li><strong>Aider はファイルを先に渡して使う道具</strong>。ファイルを渡さずに「読め」と頼むと、読めないと答えるか、中身を作り上げる。書きは 3 本とも通った（送る量は約 650 トークン）</li>
+	<li>合うエージェントはモデルによって違う。同じモデルでも Pi と OpenCode で結果が逆になった</li>
+</ul>
+</section>
+
+</div>
+
+<footer>
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+</footer>
+
+</body>
+</html>

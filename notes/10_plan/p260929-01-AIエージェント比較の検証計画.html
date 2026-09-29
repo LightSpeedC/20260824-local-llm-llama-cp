@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI エージェント比較の検証計画</title>
+<style>
+:root{
+	--navy1:#12224d;
+	--navy2:#2f5fbf;
+	--ink:#1c2330;
+	--ink-soft:#4a5568;
+	--line:#d9dfe8;
+	--code-bg:#f4f6fa;
+	--link:#1a4fa0;
+	--accent:var(--navy1, #12224d);
+	--accent2:var(--navy2, #2f5fbf);
+	--soft:#f2f5fb;
+}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(140,78%,25%);--accent2:hsl(140,58%,55%);--soft:hsl(140,28%,95%);}
+.ch03{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+
+*{box-sizing:border-box;}
+body{
+	margin:0;
+	background:#fff;
+	color:var(--ink, #1c2330);
+	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+	font-size:15.5px;
+	line-height:1.85;
+}
+.titlebar{
+	background:linear-gradient(135deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	padding:34px 30px 30px;
+}
+.titlebar .inner{max-width:1600px;margin:0 auto;}
+.titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
+.titlebar .lead{font-size:0.88em;color:#cfe0ff;}
+.titlebar .date{font-size:0.88em;color:#cfe0ff;margin-top:4px;}
+.titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+
+.wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
+
+section{
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:4px 26px 26px;
+	margin:34px 0;
+}
+section h1{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	font-size:1.45em;
+	padding:14px 20px;
+	margin:26px 0 20px;
+	border-radius:8px;
+	box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+h2{
+	font-size:1.15em;
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(90deg,var(--soft, #f2f5fb),#fff);
+	padding:6px 12px;
+	margin:30px 0 12px;
+	color:var(--accent, #12224d);
+}
+h3{
+	font-size:1.02em;
+	display:inline-block;
+	border-bottom:2px dotted var(--accent2, #2f5fbf);
+	padding-bottom:3px;
+	margin:20px 0 8px;
+	color:var(--ink, #1c2330);
+}
+p{margin:8px 0;}
+ul,ol{margin:8px 0;padding-left:1.5em;}
+li{margin:4px 0;}
+
+code{
+	background:var(--code-bg, #f4f6fa);
+	border:1px solid var(--line, #d9dfe8);
+	color:#17335f;
+	border-radius:4px;
+	padding:1px 5px;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+}
+pre{
+	background:var(--code-bg, #f4f6fa);
+	color:var(--ink, #1c2330);
+	border:1px solid var(--line, #d9dfe8);
+	border-left:5px solid var(--accent2, #2f5fbf);
+	border-radius:0 8px 8px 0;
+	padding:13px 16px;
+	overflow-x:auto;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+	line-height:1.6;
+}
+pre code{background:none;border:none;padding:0;color:inherit;}
+
+.tablewrap{overflow-x:auto;margin:12px 0;}
+table{
+	border-collapse:collapse;
+	width:100%;
+	border-radius:8px;
+	overflow:hidden;
+	box-shadow:0 2px 7px rgba(0,0,0,0.09);
+	font-size:0.95em;
+}
+th{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-align:left;
+	padding:9px 12px;
+}
+th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line, #d9dfe8);vertical-align:top;}
+tr:nth-child(even) td{background:#fafbfe;}
+.nowrap{white-space:nowrap;}
+.num{text-align:right;white-space:nowrap;}
+
+.badge{
+	display:inline-block;
+	color:#fff;
+	font-size:0.8em;
+	font-weight:600;
+	border-radius:5px;
+	padding:2px 9px;
+	margin-right:7px;
+	white-space:nowrap;
+}
+.b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
+.b-ng{background:linear-gradient(100deg,#a51f22,#e05a5c);}
+.b-none{background:linear-gradient(100deg,#5a6472,#97a1ae);}
+.b-warn{background:linear-gradient(100deg,#b8620a,#f0a548);}
+
+.callout{
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border-radius:0 8px 8px 0;
+	padding:12px 16px;
+	margin:16px 0;
+}
+.callout strong{color:var(--accent, #12224d);}
+
+.toc{
+	background:linear-gradient(180deg,#f2f5fb,#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:6px 26px 22px;
+	margin:34px 0;
+}
+.toc ol{
+	list-style:none;
+	display:flex;
+	flex-wrap:wrap;
+	gap:8px;
+	padding:0;
+	margin:12px 0 0;
+	counter-reset:toc;
+}
+.toc li{counter-increment:toc;margin:0;}
+.toc a{
+	display:-webkit-box;
+	-webkit-line-clamp:2;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:normal;
+	width:310px;
+	max-width:100%;
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-decoration:none;
+	border-radius:7px;
+	padding:8px 12px;
+	font-size:0.92em;
+	line-height:1.4;
+}
+.toc a::before{content:counter(toc) ". ";font-weight:700;}
+
+svg{max-width:100%;height:auto;display:block;margin:16px 0;}
+
+.homelink{margin:20px 0 0;}
+a.home{
+	display:inline-block;
+	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	border-radius:6px;
+	padding:4px 11px;
+	line-height:1;
+	text-decoration:none;
+}
+a.home svg{vertical-align:-2px;}
+a{background:none;color:var(--link, #1a4fa0);}
+footer{
+	max-width:1600px;
+	margin:0 auto;
+	padding:18px 30px 30px;
+	border-top:1px solid var(--line, #d9dfe8);
+	color:var(--ink-soft, #4a5568);
+	font-size:0.9em;
+	margin-top:40px;
+	margin-bottom:40px;
+}
+footer a{color:var(--navy2, #2f5fbf);}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+	<div class="inner">
+		<h1>AI エージェント比較の検証計画</h1>
+		<div class="lead">Claude Code（ルールなし）・Pi・OpenCode・Codex CLI（ルールなし）・Aider を、同じ試験で llama-server に繋いで比べる</div>
+		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-09-29</div>
+	</div>
+</div>
+
+<div class="wrap">
+
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+
+<div class="toc">
+	<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">目次</h2>
+	<ol>
+		<li class="ch01"><a href="#ch01">目的</a></li>
+		<li class="ch02"><a href="#ch02">進め方</a></li>
+		<li class="ch03"><a href="#ch03">導入するもの</a></li>
+	</ol>
+</div>
+
+<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">この文書の位置づけ</h2>
+<p>事前調査は <a href="../01_research/p260929-01-ClaudeCode以外のエージェント調査.html">Claude Code 以外の AI エージェント調査</a>。</p>
+
+<!-- ============ 1 ============ -->
+<section class="ch01" id="ch01">
+<h1>目的</h1>
+<p>
+Claude Code がこのPCで遅いのは、最初に送る量（約 60,000 トークン）が大きいためである。
+そのうち<strong>共通ルールだけで 41,320 トークン</strong>ある（2026-09-29、gpt-oss-20b のトークナイザで実測）。
+ルールを読ませない状態と、送る量が小さいエージェントで、どこまで使えるようになるかを確かめる。
+</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="ch02" id="ch02">
+<h1>進め方</h1>
+<p>Claude Code の試験（手順 2・3・4・1）がすべて終わってから始める。順番は次のとおり。</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">順</th><th>エージェント</th><th>ルールを読ませない方法</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td class="nowrap">Claude Code（ルールなし）</td><td><code>USERPROFILE</code>・<code>HOME</code> を <code>tmp/</code> の空のホームに向けて起動する。利用者の <code>CLAUDE.md</code>・メモリ・フックが読まれない</td></tr>
+<tr><td class="num">2</td><td class="nowrap">Pi</td><td>もともと共通ルールを読まない。同じ空のホームに設定を置く</td></tr>
+<tr><td class="num">3</td><td class="nowrap">OpenCode</td><td>同上</td></tr>
+<tr><td class="num">4</td><td class="nowrap">Codex CLI（ルールなし）</td><td>空のホームに <code>.codex/config.toml</code> を置く。<code>AGENTS.md</code> は読むため、試験用の作業フォルダで動かす</td></tr>
+<tr><td class="num">5</td><td class="nowrap">Aider</td><td>もともと共通ルールを読まない</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>試験は Claude Code と同じ</strong>。README の h1 を読む／決めた 1 行を書く。1 問 15 分、時間切れは後で 1 時間で試し直す</li>
+	<li><strong>モデルは、Claude Code の試験で書きに合格したものを使う</strong>（gemma-4-E2B・Qwen3-4B-Instruct・Ministral-3B など。最終的な選定は試験の結果を見て決める）</li>
+	<li>最初に送った量（トークン数）を、llama-server のログから読んで記録する</li>
+</ul>
+<div class="callout callout-important">
+<strong>空のホームにしても、プロジェクトの <code>AGENTS.md</code> とローカルルールは残る。</strong>
+Codex CLI は <code>AGENTS.md</code> を読むので、そのぶんは送る量に入る。比べるときは、読まれたものを記録に残す。
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
+<h1>導入するもの</h1>
+<div class="tablewrap">
+<table>
+<thead><tr><th>エージェント</th><th>入れ方</th><th>備考</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Pi</td><td><code>npm install -g --ignore-scripts @earendil-works/pi-coding-agent</code></td><td>Node.js 22.19 以上（手元は 26.8）</td></tr>
+<tr><td class="nowrap">OpenCode</td><td><code>npm install -g opencode-ai</code></td><td></td></tr>
+<tr><td class="nowrap">Codex CLI</td><td><code>npm install -g @openai/codex</code></td><td>llama-server が Responses API に応じるかを先に確かめる</td></tr>
+<tr><td class="nowrap">Aider</td><td>uv を入れ、<code>uv tool install --python python3.12 aider-chat@latest</code></td><td><span class="badge b-warn">要判断</span>uv と Python 3.12 が入る。共通ルールの「Python は使用しない」は AI エージェントのコマンド実行の話で、ツールとして入れるのは別と扱う</td></tr>
+</tbody>
+</table>
+</div>
+<p>どれもグローバルに入れる。ダウンロードを伴うため、入れる前に利用者の許可を取る。</p>
+</section>
+
+<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">参考資料</h2>
+<ul>
+	<li><a href="https://www.npmjs.com/package/@earendil-works/pi-coding-agent">@earendil-works/pi-coding-agent - npm</a></li>
+	<li><a href="https://www.npmjs.com/package/opencode-ai">opencode-ai - npm</a></li>
+	<li><a href="https://www.npmjs.com/package/@openai/codex">@openai/codex - npm</a></li>
+	<li><a href="https://aider.chat/docs/install.html">Installation | aider</a></li>
+</ul>
+
+</div>
+
+<footer>
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+</footer>
+
+</body>
+</html>
