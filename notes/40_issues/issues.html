@@ -280,6 +280,45 @@ Claude Code で速かったモデルを Pi でも試し、どちらを使うか�
 <p>関連: <a href="../01_research/r260929-01-AIエージェントの試験結果.html">ローカルLLM で AI エージェントを使う — 試験結果</a>（第 3 章）</p>
 </details>
 
+<details class="md-flat">
+<summary><span class="badge b-ok">済</span><span class="no">i260930-02</span>Qwen3-30B-A3B を長いコンテキストで使うときの配置を決める</summary>
+<p>
+<code>-ncmoe 40</code> で 16.6 tok/s 出たが、測ったのはプロンプトを入れない tg64 で、KV キャッシュはほぼ空だった。
+39 以下では VRAM があふれて 7〜14 tok/s に落ちるため、コンテキストを使うと 40 でもあふれる可能性がある。
+</p>
+<ul>
+	<li><span class="badge b-ok">済</span>実際に使うコンテキスト（例: 16384・65536）と KV の型（q8_0・<code>-nkvo</code>）で、<code>-ncmoe</code> を振って生成速度と VRAM を測る（深さ 16384・KV q8_0 で 40 は 0.35 tok/s、44 は 12.9 tok/s。<code>-nkvo</code> は 16384 で 4.4、65536 で 1.3 tok/s）</li>
+	<li><span class="badge b-ok">済</span>結果を実行計画の「結論と方針（RAM 32GB）」の設定に反映する（16384 までは <code>--n-cpu-moe 44</code>、65536 は使えない）</li>
+</ul>
+<p>関連: <a href="../10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>（第10章の「32GB での再測定」）</p>
+</details>
+
+<details class="md-flat" open>
+<summary><span class="badge b-none">未</span><span class="no">i260930-03</span>長いプロンプトで並列スロットの倍率を測る</summary>
+<p>
+並列スロットは 4 本同時で 2.3 倍になったが、プロンプトは短い文 1 行で測った。
+長い資料を渡すと読み込み（pp）が同時に走るため、倍率が変わる可能性がある。
+</p>
+<ul>
+	<li><span class="badge b-none">未</span>1 本あたり 1,000〜1,500 トークンのプロンプトで、<code>--parallel 1 / 2 / 4</code> の合計 tok/s と所要時間を測る（<code>tools\50_run\bench-parallel.cmd</code> にプロンプトを渡す引数を足す）</li>
+	<li><span class="badge b-none">未</span>結果を構成案の Phase 1 に追記し、判断が変わるかを見る</li>
+</ul>
+<p>関連: <a href="../10_plan/p260825-01-階層型エージェント構成案.html">階層型エージェント構成案</a>（第6章 Phase 1）</p>
+</details>
+
+<details class="md-flat" open>
+<summary><span class="badge b-none">未</span><span class="no">i260930-04</span>Speculative Decoding で出力が単体と一致しない理由を調べる</summary>
+<p>
+温度 0・同じ seed でも、ドラフトありの 4 構成はすべて単体と違う出力になった。仕組み上は一致するはずで、
+まとめて検証するときの計算順の違いと推測しているが、確かめていない。採用は見送ったため急がない。
+</p>
+<ul>
+	<li><span class="badge b-none">未</span>どこから出力がずれるかを見る（先頭から何トークン目か）</li>
+	<li><span class="badge b-none">未</span>単体でも <code>-ub</code>・<code>-b</code> を変えると出力が変わるかを見て、計算順の違いで説明できるかを確かめる</li>
+</ul>
+<p>関連: <a href="../01_research/r260825-01-投機的デコーディング.html">Speculative Decoding 調査</a>（第5章の結果）</p>
+</details>
+
 </section>
 
 <section class="ch02" id="ch02">

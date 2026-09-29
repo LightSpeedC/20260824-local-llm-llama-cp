@@ -1967,6 +1967,11 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたあとで、RAM
 <tr><td class="nowrap">Qwen3-30B-A3B（UD-Q4_K_XL）</td><td class="nowrap">-ncmoe 39</td><td class="num">—</td><td class="num">13.54</td><td class="num">—</td></tr>
 <tr><td class="nowrap">Qwen3-30B-A3B（UD-Q4_K_XL）</td><td class="nowrap">-ncmoe 38</td><td class="num">—</td><td class="num">7.10</td><td class="num">—</td></tr>
 <tr><td class="nowrap">Qwen3-30B-A3B（UD-Q4_K_XL）</td><td class="nowrap">-ncmoe 36</td><td class="num">—</td><td class="num">9.84</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B ＋KV q8_0 ＠深さ 16384</td><td class="nowrap">-ncmoe 40</td><td class="num">—</td><td class="num">0.35</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B ＋KV q8_0 ＠深さ 16384</td><td class="nowrap">-ncmoe 44</td><td class="num">—</td><td class="num"><strong>12.92</strong></td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B ＋KV q8_0 ＠深さ 16384</td><td class="nowrap">-ncmoe 48</td><td class="num">—</td><td class="num">12.99</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B ＋KV q8_0（RAM 側）＠深さ 16384</td><td class="nowrap">-ncmoe 40 -nkvo</td><td class="num">—</td><td class="num">4.37</td><td class="num">—</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B ＋KV q8_0（RAM 側）＠深さ 65536</td><td class="nowrap">-ncmoe 40 -nkvo</td><td class="num">—</td><td class="num">1.27</td><td class="num">—</td></tr>
 <tr><td class="nowrap">Qwen3-4B ＋KV q8_0 ＠深さ 8192</td><td class="nowrap">-ngl 99</td><td class="num">—</td><td class="num">37.06</td><td class="num">—</td></tr>
 <tr><td class="nowrap">Qwen3-4B ＋KV q8_0 ＠深さ 16384</td><td class="nowrap">-ngl 99</td><td class="num">止まったまま20分以上</td><td class="num"><strong>26.96</strong></td><td class="num">—</td></tr>
 </tbody>
@@ -1986,7 +1991,8 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたあとで、RAM
 		画面表示を内蔵GPU に任せて空いた分で、KV キャッシュが VRAM に収まった</li>
 	<li><strong>gpt-oss-20b は第9章の合格ライン（15 tok/s）を超えた</strong>。上の測定では「用途限定」としていたが、対話にも使える速さになった</li>
 	<li><strong>Qwen3-30B-A3B（16.5 GB）も合格ラインを超えた</strong>。<code>-ncmoe 40</code> で 16.6 tok/s（2 回測って 16.54・16.60）。39 以下は VRAM があふれて値が揺れ、7〜14 tok/s に落ちる。
-		測ったのはプロンプトを入れない tg64 なので、長いコンテキストを使うときは KV キャッシュの分だけ <code>-ncmoe</code> を増やす必要があるはず（未確認）</li>
+		文脈を 16384 トークン入れると、40 では VRAM があふれて 0.35 tok/s に落ちる。KV キャッシュの分だけ <code>-ncmoe</code> を 44 に上げれば 12.9 tok/s（48 でも 13.0 でほぼ同じ）</li>
+	<li><strong>Qwen3-30B-A3B を 65536 トークンで使うのは無理</strong>。KV を RAM に置く（<code>-nkvo</code>）と VRAM はあふれないが、注意の計算を CPU がするため深さ 16384 で 4.4 tok/s、65536 で 1.3 tok/s。cc1 と同じ使い方（65536・<code>-nkvo</code>）には向かない</li>
 </ul>
 
 <h2>結論と方針（RAM 32GB）</h2>
@@ -2002,7 +2008,7 @@ RAM を 32GB に増設し、画面表示を内蔵GPU に任せたあとで、RAM
 <tr><td class="nowrap"><span class="badge b-ok">長い入力</span></td><td class="nowrap">Qwen3-4B-Instruct-2507<br><code>-ngl 99 -c 16384 -ctk q8_0 -ctv q8_0 -fa on</code></td><td class="nowrap">27 tok/s<br>（深さ 16384）</td><td>8192 に収まらない資料を渡すとき。KV を q8_0 にした分、8192 のときより遅い</td></tr>
 <tr><td class="nowrap"><span class="badge b-ok">知識を問う時</span></td><td class="nowrap"><strong>gemma-4-E4B-it</strong><br><code>-ngl 99</code>／<code>max_tokens</code> は 1500 以上</td><td class="nowrap">47 tok/s</td><td>変更なし。生成は 16GB のときとほぼ同じ</td></tr>
 <tr><td class="nowrap"><span class="badge b-ok">対話に使える</span></td><td class="nowrap"><strong>gpt-oss-20b</strong><br><code>-ngl 99 --n-cpu-moe 18</code></td><td class="nowrap">19 tok/s</td><td>20B級の知識が要る場面。合格ライン（15 tok/s）を超えたので「用途限定」から上げる。<strong>回答の品質はまだ評価していない</strong></td></tr>
-<tr><td class="nowrap"><span class="badge b-ok">対話に使える</span></td><td class="nowrap"><strong>Qwen3-30B-A3B-Instruct-2507</strong>（UD-Q4_K_XL）<br><code>-ngl 99 --n-cpu-moe 40</code></td><td class="nowrap">17 tok/s</td><td>gpt-oss-20b と同じ枠の候補。<strong>回答の品質はまだ評価していない</strong></td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">対話に使える</span></td><td class="nowrap"><strong>Qwen3-30B-A3B-Instruct-2507</strong>（UD-Q4_K_XL）<br><code>-ngl 99 --n-cpu-moe 40</code></td><td class="nowrap">17 tok/s<br>（深さ 0）</td><td>gpt-oss-20b と同じ枠の候補。文脈を 16384 まで使うなら <code>--n-cpu-moe 44 -ctk q8_0 -ctv q8_0 -fa on</code> で 13 tok/s。65536 は 1.3 tok/s で使えない。<strong>回答の品質はまだ評価していない</strong></td></tr>
 <tr><td class="nowrap"><span class="badge b-warn">用途限定</span></td><td class="nowrap">Qwen3.5-9B<br><code>-ngl 24 -ctk q8_0 -ctv q8_0 -fa on</code></td><td class="nowrap">15 tok/s</td><td>合格ラインの手前。同じ速さで gpt-oss-20b が使えるため、優先しない</td></tr>
 </tbody>
 </table>
