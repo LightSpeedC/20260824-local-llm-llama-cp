@@ -1,5 +1,5 @@
 ﻿# 初期プログラミングの問（sum）の判定。test-agents.ps1・test-cc-tools.ps1 から読み込む（p260930-02）
-# ① sum.js ができたか ② node sum の出力が 55 だけか ③ 答えに 55 があるか ④ ソース ⑤ 作業ログに node sum の実行があるか
+# ① sum.js ができたか ② node sum の出力に 55 があるか ③ 答えに 55 があるか ④ ソース ⑤ 作業ログに node sum の実行があるか
 
 $SumPrompt = '1から10までの合計を表示するnode.jsプログラムをsum.jsに書く。node sumで実行する'
 $EchoText = '日本語の確認です。合計は五十五。'
@@ -27,7 +27,8 @@ function Test-SumResult([string]$work, [string]$answer, [string]$toolLog, [strin
 		$errTask = $p.StandardError.ReadToEndAsync()
 		if (-not $p.WaitForExit(20000)) { $p.Kill(); $r.run_out = '（20 秒で終わらない）' }
 		else { $r.run_out = ($outTask.Result + $errTask.Result).Trim() }
-		$r.run_pass = ($outTask.Result.Trim() -eq '55')
+		# 「1から10までの合計: 55」のような表示も正しい。55 という数が単独で出ていれば合格にする
+		$r.run_pass = ($outTask.Result -match '(?<!\d)55(?!\d)')
 	}
 	$r.report_pass = ($answer -match '(?<!\d)55(?!\d)')
 	# ⑤ 道具の呼び出し（JSON の command）か、Aider の「Running」行に node sum があるか

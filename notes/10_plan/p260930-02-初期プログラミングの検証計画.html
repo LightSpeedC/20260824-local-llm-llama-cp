@@ -301,7 +301,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 <thead><tr><th class="nowrap">段</th><th>見ること</th><th>合格の条件</th></tr></thead>
 <tbody>
 <tr><td class="nowrap">① 作成</td><td><code>sum.js</code> ができたか</td><td>ファイルがある</td></tr>
-<tr><td class="nowrap">② 動作</td><td>試験スクリプト自身が <code>node sum</code> を実行する</td><td>標準出力が <code>55</code> だけ（前後の空白は除く）</td></tr>
+<tr><td class="nowrap">② 動作</td><td>試験スクリプト自身が <code>node sum</code> を実行する</td><td>標準出力に <code>55</code> という数がある（ほかの数字とつながっていない）。「1から10までの合計: 55」のような表示も正しいものとする</td></tr>
 <tr><td class="nowrap">③ 報告</td><td>エージェントの答え</td><td><code>55</code> を含む</td></tr>
 <tr><td class="nowrap">④ 中身</td><td><code>sum.js</code> のソース</td><td>ログに残して目で見る。<code>console.log(55)</code> のような決め打ちでないか</td></tr>
 <tr><td class="nowrap">⑤ 実行の跡</td><td>エージェントの作業ログ</td><td>道具の呼び出しに <code>node sum</code> がある</td></tr>
@@ -345,7 +345,7 @@ sum の問では <code>--allowedTools "Bash(node:*)"</code> を足し、<code>no
 <div class="callout callout-warning">
 <strong>簡易サンドボックスは、作業フォルダを分けるだけで、外への書き込みは止めない。</strong>
 エージェントがコピーの外のパスを推測して書きにいけば届く。
-読み書きの試験では、ホームがプロジェクトの中にあった回に、プロジェクトの本物のファイルへ読み書きしにいった（試験結果の第 4 章）。
+読み書きの試験では、ホームがプロジェクトの中にあった回に、プロジェクトの本物のファイルへ読み書きしにいった（試験結果の第 5 章）。
 </div>
 
 <h2>流し方</h2>
