@@ -217,7 +217,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<div class="inner">
 		<h1>AI エージェント試験の経緯と全実行の記録</h1>
 		<div class="lead">ローカルLLM で AI エージェントを使う試験の、試し方・途中で起きたこと・流したすべての試験</div>
-		<div class="date">📅 作成: 2026-09-30 / 更新: 2026-09-30</div>
+		<div class="date">📅 作成: 2026-09-30 / 更新: 2026-10-01</div>
 	</div>
 </div>
 
@@ -443,6 +443,100 @@ Aider は渡されていないファイルを「作り直してよい」と受�
 <tr><td class="nowrap">09/30 06:59</td><td class="nowrap">Pi</td><td>思考なし・テンプレート</td><td class="nowrap">gpt-oss-20b-MXFP4</td><td class="nowrap"><span class="badge b-ok">合格</span> 30 秒</td><td class="nowrap"><span class="badge b-ok">合格</span> 21 秒</td><td class="nowrap">10分</td><td>有効</td></tr>
 <tr><td class="nowrap">09/30 07:01</td><td class="nowrap">Pi</td><td>思考なし・テンプレート</td><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td class="nowrap"><span class="badge b-ok">合格</span> 4 秒</td><td class="nowrap"><span class="badge b-ok">合格</span> 3 秒</td><td class="nowrap">10分</td><td>有効</td></tr>
 <tr><td class="nowrap">09/30 07:02</td><td class="nowrap">Pi</td><td>思考なし・テンプレート</td><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td class="nowrap"><span class="badge b-ng">不合格</span> 3 秒</td><td class="nowrap"><span class="badge b-ok">合格</span> 3 秒</td><td class="nowrap">10分</td><td>有効（読みは答えが空）</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>初期プログラミング（sum）の全実行</h2>
+<p>
+2026-09-30 22:54 から 10-01 01:42 までに、日本語で「プログラムを書いて実行する」問を流した回を、1 組 1 行で残す（77 行）。
+問と判定は<a href="../10_plan/p260930-02-初期プログラミングの検証計画.html">初期プログラミングの検証計画</a>、まとめは<a href="r260929-01-AIエージェントの試験結果.html#ch04">試験結果の第 4 章</a>にある。
+「開始」はその回の試験スクリプトを流し始めた時刻で、モデルごとの時刻ではない。1 問の上限はどれも 10 分。
+</p>
+<p>
+無効の 1 行は、試験の中の Claude Code に PowerShell の道具が加わっていた回（許していない道具で <code>node</code> を呼び、止められ続けた）。直して流し直した。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">開始</th><th class="nowrap">ツール</th><th class="nowrap">モデル</th><th>結果</th><th class="nowrap">所要</th><th>有効性</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">09/30 22:54</td><td class="nowrap">Claude Code</td><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>63 秒</td><td class="num">63 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 22:56</td><td class="nowrap">Pi</td><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>21 秒</td><td class="num">21 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 22:57</td><td class="nowrap">OpenCode</td><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>26 秒</td><td class="num">26 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 22:58</td><td class="nowrap">Aider</td><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">19 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>7 秒</td><td class="num">7 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">11 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">6 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td><span class="badge b-ok">合格</span>54 秒</td><td class="num">54 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">gpt-oss-20b-MXFP4</td><td><span class="badge b-ok">合格</span>32 秒（跡なし）</td><td class="num">32 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td><span class="badge b-ok">合格</span>46 秒</td><td class="num">46 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>49 秒</td><td class="num">49 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>39 秒</td><td class="num">39 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>44 秒（跡なし）</td><td class="num">44 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td class="num">40 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>24 秒</td><td class="num">24 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">Bonsai-27B-Q1_0</td><td><span class="badge b-ok">合格</span>57 秒</td><td class="num">57 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td><span class="badge b-ok">合格</span>35 秒</td><td class="num">35 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td><span class="badge b-ok">合格</span>111 秒（跡なし）</td><td class="num">111 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td class="num">94 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td><span class="badge b-ok">合格</span>18 秒</td><td class="num">18 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">110 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:00</td><td class="nowrap">Pi</td><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td class="num">19 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>11 秒</td><td class="num">11 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">28 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td><span class="badge b-ok">合格</span>33 秒</td><td class="num">33 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td><span class="badge b-ok">合格</span>97 秒</td><td class="num">97 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">gpt-oss-20b-MXFP4</td><td><span class="badge b-ok">合格</span>84 秒（跡なし）</td><td class="num">84 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td class="num">117 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>97 秒</td><td class="num">97 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>91 秒</td><td class="num">91 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">84 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td class="num">81 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td><span class="badge b-ng">不合格</span>実行したが結果を答えない</td><td class="num">97 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">Bonsai-27B-Q1_0</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td class="num">101 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td><span class="badge b-ok">合格</span>102 秒</td><td class="num">102 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td class="num">112 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>175 秒</td><td class="num">175 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td class="num">307 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが 55 が出ない</td><td class="num">529 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:18</td><td class="nowrap">OpenCode</td><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td class="num">51 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">19 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">7 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">9 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">21 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">gpt-oss-20b-MXFP4</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">21 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">69 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">36 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">30 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>22 秒（跡なし）</td><td class="num">22 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">20 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">16 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">Bonsai-27B-Q1_0</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">21 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">24 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">24 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">29 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">11 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td><span class="badge b-ok">合格</span>40 秒（跡なし）</td><td class="num">40 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">09/30 23:59</td><td class="nowrap">Aider</td><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td class="num">31 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:11</td><td class="nowrap">Claude Code</td><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>32 秒</td><td class="num">32 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:11</td><td class="nowrap">Claude Code</td><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td><span class="badge b-ok">合格</span>77 秒</td><td class="num">77 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:11</td><td class="nowrap">Claude Code</td><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td><span class="badge b-ng">不合格</span>実行を止められ続けて 10 ターンで打ち切り</td><td class="num">357 秒</td><td>無効：PowerShell の道具が加わっていた。流し直した</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td><span class="badge b-ok">合格</span>119 秒</td><td class="num">119 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td><span class="badge b-ok">合格</span>102 秒</td><td class="num">102 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">gpt-oss-20b-MXFP4</td><td><span class="badge b-ok">合格</span>80 秒（跡なし）</td><td class="num">80 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td><span class="badge b-ok">合格</span>118 秒</td><td class="num">118 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>113 秒</td><td class="num">113 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>143 秒</td><td class="num">143 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>158 秒（跡なし）</td><td class="num">158 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>170 秒</td><td class="num">170 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>173 秒</td><td class="num">173 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">Bonsai-27B-Q1_0</td><td><span class="badge b-ok">合格</span>445 秒</td><td class="num">445 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td><span class="badge b-ok">合格</span>227 秒</td><td class="num">227 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td><span class="badge b-ok">合格</span>504 秒（跡なし）</td><td class="num">504 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>577 秒</td><td class="num">577 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td><span class="badge b-none">時間切れ</span></td><td class="num">600 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td><span class="badge b-none">時間切れ</span></td><td class="num">600 秒</td><td>有効</td></tr>
+<tr><td class="nowrap">10/01 00:20</td><td class="nowrap">Claude Code</td><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td><span class="badge b-none">時間切れ</span></td><td class="num">600 秒</td><td>有効</td></tr>
 </tbody>
 </table>
 </div>

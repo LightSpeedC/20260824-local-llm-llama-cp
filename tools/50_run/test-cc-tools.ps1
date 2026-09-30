@@ -66,11 +66,15 @@ function Invoke-Claude([string]$prompt, [string]$tag, [switch]$Trace, [string]$C
 	[IO.File]::WriteAllText($pf, $prompt, $utf8)
 	$sw = [Diagnostics.Stopwatch]::StartNew()
 	# 質問は標準入力、出力はファイルで受ける（コマンド行やパイプを通すと CP932 に化ける）
-	$saved = @{ USERPROFILE = $env:USERPROFILE; HOME = $env:HOME }
+	$saved = @{ USERPROFILE = $env:USERPROFILE; HOME = $env:HOME; PS = $env:CLAUDE_CODE_USE_POWERSHELL_TOOL }
 	if ($NoRules) { $env:USERPROFILE = $noRulesHome; $env:HOME = $noRulesHome }
+	# 呼び出し元の Claude Code から PowerShell の道具を有効にする変数を引き継がない。
+	# 利用者は settings.json で有効にしており、空のホームで動く cc1 には PowerShell の道具が無い。試験もそれに揃える
+	# （引き継ぐと、許していない PowerShell の道具で node を呼んで止められ続けた。p260930-02）
+	$env:CLAUDE_CODE_USE_POWERSHELL_TOOL = $null
 	$fmt = if ($Trace) { 'stream-json --verbose' } else { 'json' }
 	$cc = Start-Process -FilePath 'cmd.exe' -ArgumentList "/d /c claude -p --max-turns $MaxTurns --permission-mode acceptEdits $ClaudeArgs --output-format $fmt < `"$pf`" > `"$out`" 2> `"$err`"" -WorkingDirectory $work -PassThru -WindowStyle Hidden
-	$env:USERPROFILE = $saved.USERPROFILE; $env:HOME = $saved.HOME
+	$env:USERPROFILE = $saved.USERPROFILE; $env:HOME = $saved.HOME; $env:CLAUDE_CODE_USE_POWERSHELL_TOOL = $saved.PS
 	$done = $cc.WaitForExit($TimeoutSec * 1000)
 	$sw.Stop()
 	if (-not $done) { taskkill /PID $cc.Id /T /F | Out-Null }

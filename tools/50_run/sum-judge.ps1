@@ -31,8 +31,14 @@ function Test-SumResult([string]$work, [string]$answer, [string]$toolLog, [strin
 		$r.run_pass = ($outTask.Result -match '(?<!\d)55(?!\d)')
 	}
 	$r.report_pass = ($answer -match '(?<!\d)55(?!\d)')
-	# ⑤ 道具の呼び出し（JSON の command）か、Aider の「Running」行に node sum があるか
-	$r.log_ran = ($toolLog -match '"command"\s*:\s*"[^"]*node\s+sum' -or $toolLog -match '(?m)^\s*Running\s+node\s+sum')
+	$r.log_ran = Test-SumTrace $toolLog
 	$r.pass = ($r.file -eq 'あり' -and $r.run_pass -and $r.report_pass)
 	return $r
+}
+
+# ⑤ 道具の呼び出し（JSON の command）か、Aider の「Running」行に node で sum を実行した跡があるか
+# パス付き（node /w/temp/llama-cp-sandbox/sum.js・node W:\\temp\\…\\sum.js）も拾う
+function Test-SumTrace([string]$toolLog) {
+	$cmd = 'node\s+[^"\s]*?sum(\.js)?(?![\w.])'
+	return ($toolLog -match ('"command"\s*:\s*"[^"]*' + $cmd) -or $toolLog -match ('(?m)^\s*Running\s+' + $cmd))
 }

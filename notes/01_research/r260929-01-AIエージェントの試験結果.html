@@ -220,7 +220,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<div class="inner">
 		<h1>ローカルLLM で AI エージェントを使う — 試験結果</h1>
 		<div class="lead">llama-server に繋いだ Claude Code・Pi・OpenCode・Aider・Codex CLI で、20GB 以下のモデルがファイルを読み書きできるかを試した結果と、どれを使うか</div>
-		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-09-30</div>
+		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-10-01</div>
 	</div>
 </div>
 
@@ -279,11 +279,11 @@ footer a{color:var(--navy2, #2f5fbf);}
 <table>
 <thead><tr><th class="nowrap">エージェント</th><th class="nowrap">評価</th><th>根拠</th></tr></thead>
 <tbody>
-<tr><td class="nowrap">Claude Code（ルールなし）</td><td class="nowrap"><span class="badge b-ok">推奨</span></td><td>20 本すべてで試したのはこれだけで、15 本が 15 分以内に合格した。設定は <code>cc1.cmd</code> に入っている</td></tr>
-<tr><td class="nowrap">Pi</td><td class="nowrap"><span class="badge b-ok">速さ重視</span></td><td>合格した問は、どれも Claude Code より速い。gemma-4-E4B は読み 13 秒・書き 13 秒、gpt-oss-20b は 30 秒・21 秒で、Claude Code の 2〜3 倍速い。Nemotron は Claude Code では不可、Pi では 18 秒。ただし gemma-4-E2B の読みは 3 回中 1 回しか答えなかった（第 3 章）。試したのは 6 本だけ</td></tr>
-<tr><td class="nowrap">OpenCode</td><td class="nowrap"><span class="badge b-warn">遅い</span></td><td>Nemotron は合格したが、読みに 431 秒かかった</td></tr>
+<tr><td class="nowrap">Claude Code（ルールなし）</td><td class="nowrap"><span class="badge b-ok">推奨</span></td><td>20 本すべてで試したのはこれだけで、15 本が 15 分以内に合格した。日本語で「プログラムを書いて実行する」問でも、19 本中 16 本が合格していちばん多い（第 4 章）。設定は <code>cc1.cmd</code> に入っている</td></tr>
+<tr><td class="nowrap">Pi</td><td class="nowrap"><span class="badge b-ok">速さ重視</span></td><td>合格した問は、どれも Claude Code より速い。gemma-4-E4B は読み 13 秒・書き 13 秒、gpt-oss-20b は 30 秒・21 秒で、Claude Code の 2〜3 倍速い。Nemotron は Claude Code では不可、Pi では 18 秒。ただし gemma-4-E2B の読みは 3 回中 1 回しか答えなかった（第 3 章）。プログラムを書いて実行する問は 19 本中 14 本が合格し、合格はどれも 2 分以内（第 4 章）</td></tr>
+<tr><td class="nowrap">OpenCode</td><td class="nowrap"><span class="badge b-warn">遅い</span></td><td>Nemotron は合格したが、読みに 431 秒かかった。プログラムを書いて実行する問は 19 本中 9 本（第 4 章）</td></tr>
 <tr><td class="nowrap">Codex CLI</td><td class="nowrap"><span class="badge b-ng">勧めない</span></td><td>合格は gpt-oss-20b だけ。Windows では安全装置を外さないとファイルを読み書きできない</td></tr>
-<tr><td class="nowrap">Aider</td><td class="nowrap"><span class="badge b-ng">勧めない</span></td><td>ファイルを先に渡して使う道具で、読みの問が成り立たない。試験中にプロジェクトの README.html を上書きした</td></tr>
+<tr><td class="nowrap">Aider</td><td class="nowrap"><span class="badge b-ng">勧めない</span></td><td>ファイルを先に渡して使う道具で、読みの問が成り立たない。試験中にプロジェクトの README.html を上書きした。プログラムは 19 本とも書けたが、自分では実行しない（第 4 章）</td></tr>
 </tbody>
 </table>
 </div>
@@ -402,7 +402,7 @@ Codex はファイルの読み書きに PowerShell のコマンドを使う。<c
 <section class="ch04" id="ch04">
 <h1>日本語でプログラムを書かせた結果</h1>
 <p>
-書きの試験に 10 分以内で合格した 19 本を、4 つのエージェントで試した（2026-09-30〜）。問は日本語のまま渡した。
+書きの試験に 10 分以内で合格した 19 本を、4 つのエージェントで試した（2026-09-30〜10-01）。問は日本語のまま渡した。
 </p>
 <pre><code class="language-text">1から10までの合計を表示するnode.jsプログラムをsum.jsに書く。node sumで実行する</code></pre>
 <p>
@@ -415,30 +415,58 @@ Codex はファイルの読み書きに PowerShell のコマンドを使う。<c
 <thead><tr><th>モデル</th><th class="nowrap">Claude Code</th><th class="nowrap">Pi</th><th class="nowrap">OpenCode</th><th class="nowrap">Aider</th></tr></thead>
 <tbody>
 <!-- AUTO:sum-rows -->
-<tr><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td>—</td><td><span class="badge b-ok">合格</span>7 秒</td><td><span class="badge b-ok">合格</span>11 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>32 秒</td><td><span class="badge b-ok">合格</span>7 秒</td><td><span class="badge b-ok">合格</span>11 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
 <tr><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>63 秒</td><td><span class="badge b-ok">合格</span>21 秒</td><td><span class="badge b-ok">合格</span>26 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td>—</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td>—</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ok">合格</span>33 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td>—</td><td><span class="badge b-ok">合格</span>54 秒</td><td><span class="badge b-ok">合格</span>97 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">gpt-oss-20b-MXFP4</td><td>—</td><td><span class="badge b-ok">合格</span>32 秒（跡なし）</td><td><span class="badge b-ok">合格</span>84 秒（跡なし）</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td>—</td><td><span class="badge b-ok">合格</span>46 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td>—</td><td><span class="badge b-ok">合格</span>49 秒</td><td><span class="badge b-ok">合格</span>97 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td>—</td><td><span class="badge b-ok">合格</span>39 秒</td><td><span class="badge b-ok">合格</span>91 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td>—</td><td><span class="badge b-ok">合格</span>44 秒（跡なし）</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ok">合格</span>22 秒（跡なし）</td></tr>
-<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td>—</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td>—</td><td><span class="badge b-ok">合格</span>24 秒</td><td><span class="badge b-ng">不合格</span>実行したが結果を答えない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Bonsai-27B-Q1_0</td><td>—</td><td><span class="badge b-ok">合格</span>57 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td>—</td><td><span class="badge b-ok">合格</span>35 秒</td><td><span class="badge b-ok">合格</span>102 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td>—</td><td><span class="badge b-ok">合格</span>111 秒（跡なし）</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td>—</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ok">合格</span>175 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td>—</td><td><span class="badge b-ok">合格</span>18 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td>—</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ng">不合格</span>書いたが 55 が出ない</td><td><span class="badge b-ok">合格</span>40 秒（跡なし）</td></tr>
-<tr><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td>—</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td><span class="badge b-ok">合格</span>77 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td><span class="badge b-ok">合格</span>119 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ok">合格</span>33 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td><span class="badge b-ok">合格</span>102 秒</td><td><span class="badge b-ok">合格</span>54 秒</td><td><span class="badge b-ok">合格</span>97 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">gpt-oss-20b-MXFP4</td><td><span class="badge b-ok">合格</span>80 秒（跡なし）</td><td><span class="badge b-ok">合格</span>32 秒（跡なし）</td><td><span class="badge b-ok">合格</span>84 秒（跡なし）</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td><span class="badge b-ok">合格</span>118 秒</td><td><span class="badge b-ok">合格</span>46 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>113 秒</td><td><span class="badge b-ok">合格</span>49 秒</td><td><span class="badge b-ok">合格</span>97 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>143 秒</td><td><span class="badge b-ok">合格</span>39 秒</td><td><span class="badge b-ok">合格</span>91 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>158 秒（跡なし）</td><td><span class="badge b-ok">合格</span>44 秒（跡なし）</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ok">合格</span>22 秒（跡なし）</td></tr>
+<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>170 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>173 秒</td><td><span class="badge b-ok">合格</span>24 秒</td><td><span class="badge b-ng">不合格</span>実行したが結果を答えない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Bonsai-27B-Q1_0</td><td><span class="badge b-ok">合格</span>445 秒</td><td><span class="badge b-ok">合格</span>57 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td><span class="badge b-ok">合格</span>227 秒</td><td><span class="badge b-ok">合格</span>35 秒</td><td><span class="badge b-ok">合格</span>102 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td><span class="badge b-ok">合格</span>504 秒（跡なし）</td><td><span class="badge b-ok">合格</span>111 秒（跡なし）</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>577 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ok">合格</span>175 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td><span class="badge b-none">時間切れ</span></td><td><span class="badge b-ok">合格</span>18 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td><span class="badge b-none">時間切れ</span></td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ng">不合格</span>書いたが 55 が出ない</td><td><span class="badge b-ok">合格</span>40 秒（跡なし）</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td><span class="badge b-none">時間切れ</span></td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
 <!-- /AUTO:sum-rows -->
 </tbody>
 </table>
 </div>
-<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">「—」はまだ流していない組み合わせ。「書いたが実行・報告なし」は、正しい <code>sum.js</code> を書いたが、自分では実行せず、答えにも 55 が無かったもの。「実行したが結果を答えない」は、<code>node sum</code> を実行して 55 を得たのに、答えには書かなかったもの（例: 「Done. sum.js:1-8」とだけ答えた）。</p>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">1 組 1 回ずつ流した結果。表は <code>tools\50_run\sum-table.ps1</code> で結果のファイルから作った。「書いたが実行・報告なし」は、正しい <code>sum.js</code> を書いたが、自分では実行せず、答えにも 55 が無かったもの。「実行したが結果を答えない」は、<code>node sum</code> を実行して 55 を得たのに、答えには書かなかったもの。「時間切れ」は 10 分で終わらなかったもの。</p>
+
+<h2>エージェントごとの合格数</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">エージェント</th><th class="num">合格</th><th class="num">うち実行の跡あり</th><th>落ち方</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Claude Code（ルールなし）</td><td class="num"><strong>16 / 19</strong></td><td class="num">13</td><td>落ちた 3 本は時間切れ。合格の多くは 1〜3 分かかる</td></tr>
+<tr><td class="nowrap">Pi</td><td class="num">14 / 19</td><td class="num">11</td><td>合格はどれも 2 分以内で、多くは 1 分以内。書いただけで止まるか、<code>sum.js</code> を作らない</td></tr>
+<tr><td class="nowrap">OpenCode</td><td class="num">9 / 19</td><td class="num">8</td><td><code>sum.js</code> を作らないものが多い</td></tr>
+<tr><td class="nowrap">Aider</td><td class="num">2 / 19</td><td class="num">0</td><td>19 本とも正しい <code>sum.js</code> を書いたが、自分では実行しない</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>3 つのエージェント（Claude Code・Pi・OpenCode）すべてで、実行して合格したのは 6 本</strong>: gemma-4-E2B・E4B・12B（Q4_K_M）・26B-A4B、Qwen3.5-9B、Qwen3.6-35B-A3B</li>
+	<li><strong>速さで選ぶなら Pi</strong>。gemma-4-E2B は 7 秒、E4B は 21 秒で、同じモデルの Claude Code の 3〜5 倍速い</li>
+	<li><strong>通る本数で選ぶなら Claude Code</strong>。Pi・OpenCode で落ちた Ministral-3-3B・Qwen3-Coder-30B・Devstral も通った</li>
+	<li><strong>gpt-oss-20b・Qwen3-30B-A3B・Ministral-3-14B は、どのエージェントでも実行せずに 55 と答えた</strong>。プログラムは正しいが、「実行する」の指示には従っていない</li>
+	<li><strong>Aider はこの問に向かない</strong>。Aider はモデルの答えに書かれたコマンドだけを実行する作りで、どのモデルもコマンドを書かなかった</li>
+	<li>OpenCode の GLM-4.7-Flash は <code>node sum</code> を実行して 55 を得たのに、答えは「Done. sum.js:1-8」だけだった</li>
+	<li>Qwen3.6-35B-A3B は Claude Code で、はじめ <code>sum.js</code> を作業フォルダではなくホームの下（メモリの置き場）に書こうとして止められた。第 5 章の「ホームの場所からプロジェクトを推測する」と同じ動き</li>
+</ul>
+<div class="callout callout-warning">
+<strong>Claude Code にコマンドを実行させるときは、呼び出し元の環境変数に注意する。</strong>
+試験では最初、このセッションの <code>CLAUDE_CODE_USE_POWERSHELL_TOOL</code> を引き継いでいたため、Claude Code に PowerShell の道具が加わった。
+<code>--allowedTools "Bash(node:*)"</code> で許したのは Bash の道具だけなので、PowerShell の道具で <code>node</code> を呼んだ Qwen3-4B-Instruct は 10 回とも止められた。
+この変数を渡さないように直して流し直した（<code>cc1.cmd</code> は空のホームで動くので、もともと PowerShell の道具は無い）。
+</div>
 </section>
 
 <!-- ============ 5 ============ -->
@@ -467,7 +495,8 @@ Codex はファイルの読み書きに PowerShell のコマンドを使う。<c
 <ul>
 	<li><strong>Pi で試したのは 6 本だけ</strong>。20GB 級の MoE や、Claude Code で遅かったモデルを Pi で動かしたときの速さは測っていない</li>
 	<li>Pi で gemma-4-E2B が答えを書かずに終わる理由は調べていない。Codex CLI でも、E2B の読みは「これから読む」と答えたところで終わった</li>
-	<li><strong>試験は 1 ファイルを読む・1 行書くだけ</strong>。複数のファイルにまたがる編集や、コードを書く作業での品質は評価していない</li>
+	<li><strong>試験は 1 ファイルを読む・1 行書く・10 行ほどのプログラムを書いて実行するだけ</strong>。複数のファイルにまたがる編集や、大きなコードを書く作業での品質は評価していない</li>
+	<li>プログラムの問（第 4 章）は 1 組 1 回ずつで、同じ組でも結果が揺れるかは確かめていない。読みの問では、gemma-4-E2B が Pi で 3 回中 1 回しか答えなかった</li>
 	<li><strong>20GB 級の MoE の生成速度は、Qwen3-30B-A3B のほかは測っていない</strong></li>
 	<li>Nemotron が Claude Code でだけ読み書きしない理由は調べていない。Pi・OpenCode では通る</li>
 	<li>チャットテンプレートで 500 エラーになった 4 本が、モデル側の問題か、llama-server のテンプレート処理の問題かは切り分けていない</li>
