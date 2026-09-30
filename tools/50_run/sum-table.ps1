@@ -36,6 +36,7 @@ function Format-Cell($r) {
 	}
 	$why = if ($r.file -ne 'あり') { 'sum.js を作らない' }
 		elseif (-not $run) { '書いたが 55 が出ない' }
+		elseif ($r.log_ran) { '実行したが結果を答えない' }
 		else { '書いたが実行・報告なし' }
 	return "<span class=`"badge b-ng`">不合格</span>$why"
 }
