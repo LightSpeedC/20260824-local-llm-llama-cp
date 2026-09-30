@@ -319,6 +319,21 @@ Claude Code で速かったモデルを Pi でも試し、どちらを使うか�
 <p>関連: <a href="../01_research/r260825-01-投機的デコーディング.html">Speculative Decoding 調査</a>（第5章の結果）</p>
 </details>
 
+<details class="md-flat" open>
+<summary><span class="badge b-warn">着手</span><span class="no">i260930-05</span>日本語で初期プログラミングができるか試す</summary>
+<p>
+「1から10までの合計を表示するnode.jsプログラムをsum.jsに書く。node sumで実行する」を日本語のまま渡し、
+書きの試験に 10 分以内で合格した 19 本を Claude Code・Pi・OpenCode・Aider で総当たりに試す。
+</p>
+<ul>
+	<li><span class="badge b-ok">済</span>試験スクリプト 2 本の <code>-Tests</code> に <code>sum</code>・<code>echo</code> を足し、日本語が化けるとしたコメントを直す（判定は <code>tools\50_run\sum-judge.ps1</code>）</li>
+	<li><span class="badge b-ok">済</span>確認用の 1 問（Pi・OpenCode・Aider に日本語が化けずに届くか）を流す（E4B で 4 エージェントとも化けずに往復した。sum も Claude Code・Pi・OpenCode は合格、Aider は書けたが実行も報告もしなかった）</li>
+	<li><span class="badge b-none">未</span>本番の 76 回を流す</li>
+	<li><span class="badge b-none">未</span>結果を試験結果と全実行の記録に反映する</li>
+</ul>
+<p>関連: <a href="../10_plan/p260930-02-初期プログラミングの検証計画.html">初期プログラミングの検証計画</a></p>
+</details>
+
 </section>
 
 <section class="ch02" id="ch02">

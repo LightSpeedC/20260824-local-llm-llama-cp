@@ -7,11 +7,14 @@
 	[int]$Port = 8080,
 	[switch]$UseTemplates,
 	[string]$ExtraArgs = '',
-	[ValidateSet('responses', 'chat')][string]$CodexWireApi = 'responses'
+	[ValidateSet('responses', 'chat')][string]$CodexWireApi = 'responses',
+	# read・write・sum（初期プログラミング）・echo（日本語が届くかの確認）をカンマ区切りで
+	[string]$Tests = 'read,write'
 )
 # Claude Code 以外のエージェント（Pi・OpenCode・Aider）を llama-server に繋ぎ、読み・書きができるかを試す
 # 試験の中身は test-cc-tools.ps1 と同じ。結果は logs/test-agents/ に 1 モデル 1 行の JSON Lines で追記する
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'sum-judge.ps1')
 $root = (Resolve-Path "$PSScriptRoot/../..").Path
 $exe = Join-Path $root 'bin/llama.cpp/llama-server.exe'
 $logDir = Join-Path $root 'logs/test-agents'
@@ -40,14 +43,16 @@ $models = foreach ($k in $keys) { $all | Where-Object { $_.BaseName -like "*$k*"
 $models = $models | Select-Object -Unique
 if (-not $models) { throw 'モデルが見つかりません' }
 
-function Invoke-Agent([string]$prompt, [string]$name, [string]$tag) {
+function Invoke-Agent([string]$prompt, [string]$name, [string]$tag, [switch]$Trace) {
 	$out = Join-Path $logDir "$tag-out.txt"
 	$err = Join-Path $logDir "$tag-err.txt"
-	# 質問は ASCII に限る。コマンド行に日本語を載せると CP932 に化けるため
+	# コマンド行の日本語は化けずに届く（cmd.exe → npm の起動口 → node で確かめた。p260930-02）。化けるのは出力を CP932 として読んだとき
 	$p = $prompt.Replace('"', "'")
+	# -Trace: 道具の呼び出しを残す。Pi はセッションのファイル、OpenCode は JSON の出来事で受ける
+	$piSession = Join-Path $logDir "$tag-pi-session"
 	$cmdLine = switch ($Agent) {
-		'pi' { "pi -p --no-session --provider llamacpp --model `"$name`" `"$p`"" }
-		'opencode' { "opencode run -m `"llamacpp/$name`" `"$p`"" }
+		'pi' { if ($Trace) { "pi -p --session-dir `"$piSession`" --provider llamacpp --model `"$name`" `"$p`"" } else { "pi -p --no-session --provider llamacpp --model `"$name`" `"$p`"" } }
+		'opencode' { if ($Trace) { "opencode run --format json -m `"llamacpp/$name`" `"$p`"" } else { "opencode run -m `"llamacpp/$name`" `"$p`"" } }
 		# Windows では -s workspace-write だと Codex のシェル実行（ファイルの読み書きに使う）が policy で止まるため、安全装置を外す。
 		# 作業フォルダは W:/temp の下のコピーなので、外に出なければ本物には届かない（出ない保証はない）
 		'codex' { "codex exec --skip-git-repo-check --ephemeral --dangerously-bypass-approvals-and-sandbox -m `"$name`" `"$p`"" }
@@ -59,7 +64,20 @@ function Invoke-Agent([string]$prompt, [string]$name, [string]$tag) {
 	$sw.Stop()
 	if (-not $done) { taskkill /PID $cc.Id /T /F | Out-Null }
 	$text = if (Test-Path $out) { [IO.File]::ReadAllText($out, [Text.Encoding]::UTF8) } else { '' }
-	return [ordered]@{ status = $(if ($done) { 'ok' } else { 'timeout' }); sec = [Math]::Round($sw.Elapsed.TotalSeconds, 1); result = $text.Trim() }
+	$toolLog = $text
+	if ($Trace -and $Agent -eq 'pi' -and (Test-Path $piSession)) {
+		$toolLog = (Get-ChildItem $piSession -Recurse -Filter *.jsonl | ForEach-Object { [IO.File]::ReadAllText($_.FullName, [Text.Encoding]::UTF8) }) -join "`n"
+	}
+	if ($Trace -and $Agent -eq 'opencode') {
+		# JSON の出来事から、答えの文だけを拾う
+		$parts = foreach ($line in ($text -split "`n")) {
+			if (-not $line.TrimStart().StartsWith('{')) { continue }
+			try { $j = $line | ConvertFrom-Json } catch { continue }
+			if ($j.type -eq 'text' -and $j.part.text) { $j.part.text }
+		}
+		if ($parts) { $text = $parts -join "`n" }
+	}
+	return [ordered]@{ status = $(if ($done) { 'ok' } else { 'timeout' }); sec = [Math]::Round($sw.Elapsed.TotalSeconds, 1); result = $text.Trim(); toolLog = $toolLog }
 }
 
 $readExpect = 'ローカルLLM 実行環境'
@@ -71,7 +89,7 @@ foreach ($m in $models) {
 	$tplArg = if ($UseTemplates -and (Test-Path $tpl)) { "--chat-template-file `"$tpl`"" } else { '' }
 	$argList = "-m `"$($m.FullName)`" -c $Ctx -np 1 $ngl -nkvo -ctk q8_0 -ctv q8_0 -fa on $tplArg $ExtraArgs --alias $name --host 127.0.0.1 --port $Port"
 	Write-Host "=== $Agent / $name"
-	$rec = [ordered]@{ agent = $Agent; model = $name; server = $argList; load = ''; read = $null; write = $null }
+	$rec = [ordered]@{ agent = $Agent; model = $name; server = $argList; load = ''; read = $null; write = $null; echo = $null; sum = $null }
 
 	# エージェントごとの接続設定を空のホームに書く
 	switch ($Agent) {
@@ -116,23 +134,50 @@ foreach ($m in $models) {
 		if (-not $ready) { $rec.load = 'サーバが起動しない'; continue }
 		$rec.load = 'ok'
 
-		Reset-Sandbox
-		$r = Invoke-Agent 'Read the file README.html and answer with only the text of its first h1 element.' $name "$tag-read"
-		$r.pass = ($r.status -eq 'ok' -and $r.result -like "*$readExpect*")
-		$rec.read = $r
-		Write-Host "  読み: $($r.status) $($r.sec) 秒 合格 $($r.pass)"
+		if ($Tests -match 'read') {
+			Reset-Sandbox
+			$r = Invoke-Agent 'Read the file README.html and answer with only the text of its first h1 element.' $name "$tag-read"
+			$r.Remove('toolLog')
+			$r.pass = ($r.status -eq 'ok' -and $r.result -like "*$readExpect*")
+			$rec.read = $r
+			Write-Host "  読み: $($r.status) $($r.sec) 秒 合格 $($r.pass)"
+		}
 
-		Reset-Sandbox
-		$wf = Join-Path $work "tmp/cc-write-$Agent-$name.txt"
-		if (Test-Path $wf) { Remove-Item -LiteralPath $wf }
-		$token = "written-by-$Agent-$name-$runStamp"
-		$r = Invoke-Agent "Create the file tmp/cc-write-$Agent-$name.txt whose content is exactly this single line: $token" $name "$tag-write"
-		$got = if (Test-Path $wf) { ([IO.File]::ReadAllText($wf, [Text.Encoding]::UTF8)).Trim() } else { '' }
-		$r.pass = ($got -eq $token)
-		$r.file = $(if (Test-Path $wf) { 'あり' } else { 'なし' })
-		$rec.write = $r
-		Write-Host "  書き: $($r.status) $($r.sec) 秒 合格 $($r.pass)"
-		if (Test-Path $wf) { Remove-Item -LiteralPath $wf }
+		if ($Tests -match 'write') {
+			Reset-Sandbox
+			$wf = Join-Path $work "tmp/cc-write-$Agent-$name.txt"
+			if (Test-Path $wf) { Remove-Item -LiteralPath $wf }
+			$token = "written-by-$Agent-$name-$runStamp"
+			$r = Invoke-Agent "Create the file tmp/cc-write-$Agent-$name.txt whose content is exactly this single line: $token" $name "$tag-write"
+			$r.Remove('toolLog')
+			$got = if (Test-Path $wf) { ([IO.File]::ReadAllText($wf, [Text.Encoding]::UTF8)).Trim() } else { '' }
+			$r.pass = ($got -eq $token)
+			$r.file = $(if (Test-Path $wf) { 'あり' } else { 'なし' })
+			$rec.write = $r
+			Write-Host "  書き: $($r.status) $($r.sec) 秒 合格 $($r.pass)"
+			if (Test-Path $wf) { Remove-Item -LiteralPath $wf }
+		}
+
+		# 日本語が化けずに届き、化けずに返るか
+		if ($Tests -match 'echo') {
+			Reset-Sandbox
+			$r = Invoke-Agent $EchoPrompt $name "$tag-echo" -Trace
+			$r.Remove('toolLog')
+			$r.pass = ($r.status -eq 'ok' -and $r.result.Contains($EchoText))
+			$rec.echo = $r
+			Write-Host "  日本語: $($r.status) $($r.sec) 秒 合格 $($r.pass)  答え: $($r.result.Substring(0, [Math]::Min(60, $r.result.Length)))"
+		}
+
+		# 初期プログラミング（p260930-02）
+		if ($Tests -match 'sum') {
+			Reset-Sandbox
+			$r = Invoke-Agent $SumPrompt $name "$tag-sum" -Trace
+			$j = Test-SumResult $work $r.result $r.toolLog (Join-Path $logDir "$tag-sum")
+			$r.Remove('toolLog')
+			foreach ($k in $j.Keys) { $r[$k] = $j[$k] }
+			$rec.sum = $r
+			Write-Host "  sum: $($r.status) $($r.sec) 秒 合格 $($r.pass)（作成 $($r.file)・実行 $($r.run_pass)・報告 $($r.report_pass)・ログ $($r.log_ran)）"
+		}
 	} finally {
 		if (-not $srv.HasExited) { taskkill /PID $srv.Id /T /F | Out-Null }
 		Start-Sleep -Seconds 3

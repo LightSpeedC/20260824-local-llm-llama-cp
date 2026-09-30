@@ -13,6 +13,8 @@
 # 10GB 以下の手持ちモデルを 1 本ずつ llama-server で起動し、Claude Code からファイルの読み・書きができるかを試す
 # 結果は logs/test-cc-tools/ に 1 モデル 1 行の JSON Lines で追記する
 $ErrorActionPreference = 'Stop'
+# -Tests には read・write のほか、sum（初期プログラミング）・echo（日本語が届くかの確認）も渡せる
+. (Join-Path $PSScriptRoot 'sum-judge.ps1')
 $root = (Resolve-Path "$PSScriptRoot/../..").Path
 $exe = Join-Path $root 'bin/llama.cpp/llama-server.exe'
 $logDir = Join-Path $root 'logs/test-cc-tools'
@@ -54,7 +56,9 @@ if ($NoRules) {
 	$resultFile = $resultFile.Replace('-results.jsonl', '-norules-results.jsonl')
 }
 
-function Invoke-Claude([string]$prompt, [string]$tag) {
+# -Trace: 道具の呼び出しも残す（stream-json）。最後の行は同じ result なので、答えの取り出し方は変わらない
+# -ExtraArgs: sum では node の実行だけを許す（acceptEdits はファイルの編集しか許さない）
+function Invoke-Claude([string]$prompt, [string]$tag, [switch]$Trace, [string]$ClaudeArgs = '', [int]$MaxTurns = 6) {
 	if ($NoRules) { $tag = "$tag-norules" }
 	$pf = Join-Path $logDir "$tag-prompt.txt"
 	$out = Join-Path $logDir "$tag-raw.json"
@@ -64,14 +68,16 @@ function Invoke-Claude([string]$prompt, [string]$tag) {
 	# 質問は標準入力、出力はファイルで受ける（コマンド行やパイプを通すと CP932 に化ける）
 	$saved = @{ USERPROFILE = $env:USERPROFILE; HOME = $env:HOME }
 	if ($NoRules) { $env:USERPROFILE = $noRulesHome; $env:HOME = $noRulesHome }
-	$cc = Start-Process -FilePath 'cmd.exe' -ArgumentList "/d /c claude -p --max-turns 6 --permission-mode acceptEdits --output-format json < `"$pf`" > `"$out`" 2> `"$err`"" -WorkingDirectory $work -PassThru -WindowStyle Hidden
+	$fmt = if ($Trace) { 'stream-json --verbose' } else { 'json' }
+	$cc = Start-Process -FilePath 'cmd.exe' -ArgumentList "/d /c claude -p --max-turns $MaxTurns --permission-mode acceptEdits $ClaudeArgs --output-format $fmt < `"$pf`" > `"$out`" 2> `"$err`"" -WorkingDirectory $work -PassThru -WindowStyle Hidden
 	$env:USERPROFILE = $saved.USERPROFILE; $env:HOME = $saved.HOME
 	$done = $cc.WaitForExit($TimeoutSec * 1000)
 	$sw.Stop()
 	if (-not $done) { taskkill /PID $cc.Id /T /F | Out-Null }
-	$r = [ordered]@{ status = $(if ($done) { 'ok' } else { 'timeout' }); sec = [Math]::Round($sw.Elapsed.TotalSeconds, 1); turns = $null; is_error = $null; result = '' }
+	$r = [ordered]@{ status = $(if ($done) { 'ok' } else { 'timeout' }); sec = [Math]::Round($sw.Elapsed.TotalSeconds, 1); turns = $null; is_error = $null; result = ''; toolLog = '' }
+	if (Test-Path $out) { $r.toolLog = [IO.File]::ReadAllText($out, [Text.Encoding]::UTF8) }
 	if ($done -and (Test-Path $out)) {
-		$line = [IO.File]::ReadAllText($out, [Text.Encoding]::UTF8) -split "`n" | Where-Object { $_.TrimStart().StartsWith('{') } | Select-Object -Last 1
+		$line = $r.toolLog -split "`n" | Where-Object { $_.TrimStart().StartsWith('{') } | Select-Object -Last 1
 		try {
 			$j = $line | ConvertFrom-Json
 			$r.turns = $j.num_turns; $r.is_error = $j.is_error; $r.result = "$($j.result)"; $r.input_tokens = $j.usage.input_tokens
@@ -92,7 +98,7 @@ foreach ($m in $models) {
 	$tplArg = if ($UseTemplates -and (Test-Path $tpl)) { "--chat-template-file `"$tpl`"" } else { '' }
 	$argList = "-m `"$($m.FullName)`" -c $Ctx -np 1 $ngl -nkvo -ctk q8_0 -ctv q8_0 -fa on $tplArg $ExtraArgs --alias $name --host 127.0.0.1 --port $Port"
 	Write-Host "=== $name（$sizeGB GB）"
-	$rec = [ordered]@{ model = $name; sizeGB = $sizeGB; server = $argList; load = ''; read = $null; write = $null }
+	$rec = [ordered]@{ model = $name; sizeGB = $sizeGB; server = $argList; load = ''; read = $null; write = $null; echo = $null; sum = $null }
 	$srvLog = Join-Path $logDir "$tag-server.log"
 	$srv = Start-Process -FilePath $exe -ArgumentList $argList -PassThru -WindowStyle Hidden -RedirectStandardError $srvLog -RedirectStandardOutput "$srvLog.out"
 	try {
@@ -120,24 +126,47 @@ foreach ($m in $models) {
 		if ($Tests -match 'read') {
 		Reset-Sandbox
 		$r = Invoke-Claude "README.html を Read ツールで読み、最初の h1 要素の文字列だけを答えてください。" "$tag-read"
+		$r.Remove('toolLog')
 		$r.pass = ($r.status -eq 'ok' -and $r.result -like "*$readExpect*")
 		$rec.read = $r
 		Write-Host "  読み: $($r.status) $($r.sec) 秒 ターン $($r.turns) 合格 $($r.pass)"
 		}
-		if ($Tests -notmatch 'write') { continue }
-
 		# 書き: 決めた中身のファイルが実際にできたかで判定する
+		if ($Tests -match 'write') {
 		Reset-Sandbox
 		$wf = Join-Path $work "tmp/cc-write-$name.txt"
 		if (Test-Path $wf) { Remove-Item -LiteralPath $wf }
 		$token = "written-by-$name-$runStamp"
 		$r = Invoke-Claude "Write ツールで tmp/cc-write-$name.txt というファイルを作り、中身を次の1行だけにしてください: $token" "$tag-write"
+		$r.Remove('toolLog')
 		$got = if (Test-Path $wf) { ([IO.File]::ReadAllText($wf, [Text.Encoding]::UTF8)).Trim() } else { '' }
 		$r.pass = ($got -eq $token)
 		$r.file = $(if (Test-Path $wf) { 'あり' } else { 'なし' })
 		$rec.write = $r
 		Write-Host "  書き: $($r.status) $($r.sec) 秒 ターン $($r.turns) 合格 $($r.pass)"
 		if (Test-Path $wf) { Remove-Item -LiteralPath $wf }
+		}
+
+		# 日本語が化けずに返るか
+		if ($Tests -match 'echo') {
+			Reset-Sandbox
+			$r = Invoke-Claude $EchoPrompt "$tag-echo"
+			$r.Remove('toolLog')
+			$r.pass = ($r.status -eq 'ok' -and $r.result.Contains($EchoText))
+			$rec.echo = $r
+			Write-Host "  日本語: $($r.status) $($r.sec) 秒 合格 $($r.pass)"
+		}
+
+		# 初期プログラミング（p260930-02）。node の実行だけを許す
+		if ($Tests -match 'sum') {
+			Reset-Sandbox
+			$r = Invoke-Claude $SumPrompt "$tag-sum" -Trace -ClaudeArgs '--allowedTools "Bash(node:*)"' -MaxTurns 10
+			$j = Test-SumResult $work $r.result $r.toolLog (Join-Path $logDir "$tag-sum")
+			$r.Remove('toolLog')
+			foreach ($k in $j.Keys) { $r[$k] = $j[$k] }
+			$rec.sum = $r
+			Write-Host "  sum: $($r.status) $($r.sec) 秒 ターン $($r.turns) 合格 $($r.pass)（作成 $($r.file)・実行 $($r.run_pass)・報告 $($r.report_pass)・ログ $($r.log_ran)）"
+		}
 	} finally {
 		if (-not $srv.HasExited) { taskkill /PID $srv.Id /T /F | Out-Null }
 		Start-Sleep -Seconds 3

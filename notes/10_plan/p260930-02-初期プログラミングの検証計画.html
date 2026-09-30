@@ -1,0 +1,389 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>初期プログラミングの検証計画</title>
+<style>
+:root{
+	--navy1:#12224d;
+	--navy2:#2f5fbf;
+	--ink:#1c2330;
+	--ink-soft:#4a5568;
+	--line:#d9dfe8;
+	--code-bg:#f4f6fa;
+	--link:#1a4fa0;
+	--accent:var(--navy1, #12224d);
+	--accent2:var(--navy2, #2f5fbf);
+	--soft:#f2f5fb;
+}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(210,78%,25%);--accent2:hsl(210,58%,55%);--soft:hsl(210,28%,95%);}
+.ch03{--accent:hsl(140,78%,25%);--accent2:hsl(140,58%,55%);--soft:hsl(140,28%,95%);}
+.ch04{--accent:hsl(70,78%,25%);--accent2:hsl(70,58%,55%);--soft:hsl(70,28%,95%);}
+.ch05{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+
+*{box-sizing:border-box;}
+body{
+	margin:0;
+	background:#fff;
+	color:var(--ink, #1c2330);
+	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+	font-size:15.5px;
+	line-height:1.85;
+}
+.titlebar{
+	background:linear-gradient(135deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	padding:34px 30px 30px;
+}
+.titlebar .inner{max-width:1600px;margin:0 auto;}
+.titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
+.titlebar .lead{font-size:0.88em;color:#cfe0ff;}
+.titlebar .date{font-size:0.88em;color:#cfe0ff;margin-top:4px;}
+.titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+
+.wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
+
+section{
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:4px 26px 26px;
+	margin:34px 0;
+}
+section h1{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	font-size:1.45em;
+	padding:14px 20px;
+	margin:26px 0 20px;
+	border-radius:8px;
+	box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+h2{
+	font-size:1.15em;
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(90deg,var(--soft, #f2f5fb),#fff);
+	padding:6px 12px;
+	margin:30px 0 12px;
+	color:var(--accent, #12224d);
+}
+h3{
+	font-size:1.02em;
+	display:inline-block;
+	border-bottom:2px dotted var(--accent2, #2f5fbf);
+	padding-bottom:3px;
+	margin:20px 0 8px;
+	color:var(--ink, #1c2330);
+}
+p{margin:8px 0;}
+ul,ol{margin:8px 0;padding-left:1.5em;}
+li{margin:4px 0;}
+
+code{
+	background:var(--code-bg, #f4f6fa);
+	border:1px solid var(--line, #d9dfe8);
+	color:#17335f;
+	border-radius:4px;
+	padding:1px 5px;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+}
+pre{
+	background:var(--code-bg, #f4f6fa);
+	color:var(--ink, #1c2330);
+	border:1px solid var(--line, #d9dfe8);
+	border-left:5px solid var(--accent2, #2f5fbf);
+	border-radius:0 8px 8px 0;
+	padding:13px 16px;
+	overflow-x:auto;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+	line-height:1.6;
+}
+pre code{background:none;border:none;padding:0;color:inherit;}
+
+.tablewrap{overflow-x:auto;margin:12px 0;}
+table{
+	border-collapse:collapse;
+	width:100%;
+	border-radius:8px;
+	overflow:hidden;
+	box-shadow:0 2px 7px rgba(0,0,0,0.09);
+	font-size:0.95em;
+}
+th{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-align:left;
+	padding:9px 12px;
+}
+th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line, #d9dfe8);vertical-align:top;}
+tr:nth-child(even) td{background:#fafbfe;}
+.nowrap{white-space:nowrap;}
+.num{text-align:right;white-space:nowrap;}
+
+.badge{
+	display:inline-block;
+	color:#fff;
+	font-size:0.8em;
+	font-weight:600;
+	border-radius:5px;
+	padding:2px 9px;
+	margin-right:7px;
+	white-space:nowrap;
+}
+.b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
+.b-ng{background:linear-gradient(100deg,#a51f22,#e05a5c);}
+.b-none{background:linear-gradient(100deg,#5a6472,#97a1ae);}
+.b-warn{background:linear-gradient(100deg,#b8620a,#f0a548);}
+
+.callout{
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border-radius:0 8px 8px 0;
+	padding:12px 16px;
+	margin:16px 0;
+}
+.callout strong{color:var(--accent, #12224d);}
+
+.toc{
+	background:linear-gradient(180deg,#f2f5fb,#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:6px 26px 22px;
+	margin:34px 0;
+}
+.toc ol{
+	list-style:none;
+	display:flex;
+	flex-wrap:wrap;
+	gap:8px;
+	padding:0;
+	margin:12px 0 0;
+	counter-reset:toc;
+}
+.toc li{counter-increment:toc;margin:0;}
+.toc a{
+	display:-webkit-box;
+	-webkit-line-clamp:2;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:normal;
+	width:310px;
+	max-width:100%;
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-decoration:none;
+	border-radius:7px;
+	padding:8px 12px;
+	font-size:0.92em;
+	font-weight:700;
+	line-height:1.4;
+}
+.toc a::before{content:counter(toc) ". ";font-weight:700;}
+
+.homelink{margin:20px 0 0;}
+a.home{
+	display:inline-block;
+	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	border-radius:6px;
+	padding:4px 11px;
+	line-height:1;
+	text-decoration:none;
+}
+a.home svg{vertical-align:-2px;}
+a{background:none;color:var(--link, #1a4fa0);}
+footer{
+	max-width:1600px;
+	margin:0 auto;
+	padding:18px 30px 30px;
+	border-top:1px solid var(--line, #d9dfe8);
+	color:var(--ink-soft, #4a5568);
+	font-size:0.9em;
+	margin-top:40px;
+	margin-bottom:40px;
+}
+footer a{color:var(--navy2, #2f5fbf);}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+	<div class="inner">
+		<h1>初期プログラミングの検証計画</h1>
+		<div class="lead">日本語で「プログラムを書いて実行する」を頼み、書きの試験に合格した 19 本のモデルを 4 つのエージェントで総当たりに試す</div>
+		<div class="date">📅 作成: 2026-09-30 / 更新: 2026-09-30</div>
+	</div>
+</div>
+
+<div class="wrap">
+
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+
+<div class="toc">
+	<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">目次</h2>
+	<ol>
+		<li class="ch01"><a href="#ch01">目的と対象</a></li>
+		<li class="ch02"><a href="#ch02">問と判定</a></li>
+		<li class="ch03"><a href="#ch03">簡易サンドボックスと流し方</a></li>
+		<li class="ch04"><a href="#ch04">作業の手順</a></li>
+		<li class="ch05"><a href="#ch05">未確認のこと</a></li>
+	</ol>
+</div>
+
+<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">この文書の位置づけ</h2>
+<p>
+読み・書きの試験の結果は<a href="../01_research/r260929-01-AIエージェントの試験結果.html">ローカルLLM で AI エージェントを使う — 試験結果</a>、
+全実行の記録は<a href="../01_research/r260930-01-エージェント試験の経緯と全実行の記録.html">エージェント試験の経緯と全実行の記録</a>にある。
+本書はその次の段として、プログラムを書いて実行するところまでを試す。
+</p>
+
+<!-- ============ 1 ============ -->
+<section class="ch01" id="ch01">
+<h1>目的と対象</h1>
+<p>
+ファイルを 1 行書けたモデルとエージェントが、<strong>日本語の指示で、プログラムを書く → 実行する → 結果を答える</strong>ところまでできるかを確かめる。
+</p>
+
+<h2>対象モデル</h2>
+<p>
+読み・書きの試験で、<strong>どれかのエージェントで書きに 10 分以内で合格した 19 本</strong>に限る。
+10 分で書けなかったモデルは、このPCでは使えないものとして外す。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">区分</th><th>モデル</th><th class="num">本数</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Claude Code で合格</td><td>gemma-4-E2B・gemma-4-E4B・Ministral-3-3B・Qwen3-4B-Instruct-2507・gpt-oss-20b・Qwen3.5-9B・gemma-4-12B-QAT・gemma-4-12B・gemma-4-26B-A4B・Qwen3-30B-A3B・Qwen3-Coder-30B-A3B・GLM-4.7-Flash・Bonsai-27B・Qwen3.6-35B-A3B・Devstral-Small-2507・Ministral-3-14B-Reasoning</td><td class="num">16</td></tr>
+<tr><td class="nowrap">ほかのエージェントで合格</td><td>NVIDIA-Nemotron-3-Nano-4B（Pi 18 秒・OpenCode 58 秒・Aider 11 秒）・Qwen3-4B-Thinking-2507（Pi 88 秒・Aider 311 秒）・GLM-4.6V-Flash（Aider 16 秒・OpenCode 152 秒）</td><td class="num">3</td></tr>
+</tbody>
+</table>
+</div>
+<p>外れるのは Qwen2.5-Coder-14B（Claude Code で書けず、ほかのエージェントでは合格していない）。</p>
+
+<h2>エージェント</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">エージェント</th><th>扱い</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Claude Code（ルールなし）</td><td>19 本すべて</td></tr>
+<tr><td class="nowrap">Pi</td><td>19 本すべて</td></tr>
+<tr><td class="nowrap">OpenCode</td><td>19 本すべて</td></tr>
+<tr><td class="nowrap">Aider</td><td>19 本すべて</td></tr>
+<tr><td class="nowrap">Codex CLI（ルールなし）</td><td>安全装置を外さないと動かないため、利用者が実行する。gpt-oss-20b と gemma-4-E2B のコマンドだけ用意する</td></tr>
+</tbody>
+</table>
+</div>
+<p>19 本 × 4 エージェントで 76 回。1 問の上限は 10 分で、最長で約 13 時間。多くが数分で終わるとすれば 4〜6 時間の見込み。</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="ch02" id="ch02">
+<h1>問と判定</h1>
+
+<h2>問</h2>
+<p>日本語の原文のまま渡す。</p>
+<pre><code class="language-text">1から10までの合計を表示するnode.jsプログラムをsum.jsに書く。node sumで実行する</code></pre>
+<p>
+コマンド行の日本語は、試験スクリプトと同じ渡し方（Windows PowerShell 5.1 → <code>cmd.exe</code> → npm の cmd の起動口 → node）で、化けずに届くことを確かめてある（2026-09-30）。
+</p>
+
+<h2>判定</h2>
+<p>エージェントが終わったあと、試験スクリプトが作業用のコピーの中で次を確かめる。</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">段</th><th>見ること</th><th>合格の条件</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">① 作成</td><td><code>sum.js</code> ができたか</td><td>ファイルがある</td></tr>
+<tr><td class="nowrap">② 動作</td><td>試験スクリプト自身が <code>node sum</code> を実行する</td><td>標準出力が <code>55</code> だけ（前後の空白は除く）</td></tr>
+<tr><td class="nowrap">③ 報告</td><td>エージェントの答え</td><td><code>55</code> を含む</td></tr>
+<tr><td class="nowrap">④ 中身</td><td><code>sum.js</code> のソース</td><td>ログに残して目で見る。<code>console.log(55)</code> のような決め打ちでないか</td></tr>
+<tr><td class="nowrap">⑤ 実行の跡</td><td>エージェントの作業ログ</td><td>道具の呼び出しに <code>node sum</code> がある</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>①②③がそろって合格</strong>。①②だけなら「書けたが報告なし」、③だけなら「実行せずに答えた疑い」として分けて記録する</li>
+	<li>⑤は、エージェントが自分で <code>node</code> を実行したかを見るためのもの。合否には入れず、③で <code>55</code> と答えたのが実行した結果か、暗算かを分けるのに使う</li>
+</ul>
+<h3>作業ログの取り方</h3>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">エージェント</th><th>取り方</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Claude Code</td><td><code>--output-format stream-json --verbose</code>。道具の呼び出しが 1 行ずつ出る</td></tr>
+<tr><td class="nowrap">Pi</td><td><code>--no-session</code> の代わりに <code>--session-dir</code> を渡し、セッションのファイルを読む</td></tr>
+<tr><td class="nowrap">OpenCode</td><td><code>--format json</code>。答えの文は JSON の出来事から拾う</td></tr>
+<tr><td class="nowrap">Aider</td><td>画面に出る文字の、コマンドを実行した行（<code>Running</code>）</td></tr>
+</tbody>
+</table>
+</div>
+<div class="callout callout-important">
+<strong>Claude Code には <code>node</code> の実行だけを許す。</strong>
+試験は <code>--permission-mode acceptEdits</code> で動かしており、許されるのはファイルの編集だけで、コマンドの実行は止められる。
+sum の問では <code>--allowedTools "Bash(node:*)"</code> を足し、<code>node</code> で始まるコマンドだけを許す。書く・実行する・答えるで手数が増えるため、<code>--max-turns</code> も 6 から 10 にする。
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
+<h1>簡易サンドボックスと流し方</h1>
+
+<h2>簡易サンドボックス</h2>
+<ul>
+	<li>どのエージェントも、プロジェクトの外にあるコピー（<code>W:/temp/llama-cp-sandbox</code>）の中で動かす</li>
+	<li><strong>1 問ごとにコピーを作り直し</strong>、<code>sum.js</code> が無い状態から始める</li>
+	<li>Claude Code は、これまでどおりホームも <code>W:/temp</code> の下の空のフォルダにする</li>
+	<li>判定の <code>node sum</code> も、試験スクリプトがこのコピーの中で実行する</li>
+</ul>
+<div class="callout callout-warning">
+<strong>簡易サンドボックスは、作業フォルダを分けるだけで、外への書き込みは止めない。</strong>
+エージェントがコピーの外のパスを推測して書きにいけば届く。
+読み書きの試験では、ホームがプロジェクトの中にあった回に、プロジェクトの本物のファイルへ読み書きしにいった（試験結果の第 4 章）。
+</div>
+
+<h2>流し方</h2>
+<ol>
+	<li><strong>確認用の 1 問</strong>。gemma-4-E4B を 4 つのエージェントで動かし、「次の日本語をそのまま繰り返して」と頼んで、化けずに返るかを見る（<code>-Tests echo</code>）。化けたエージェントは、問をファイルに書いて標準入力から渡す形に切り替える</li>
+	<li><strong>本番</strong>。エージェントごとに、19 本のモデルを速いものから順に流す（<code>-Tests sum</code>）。試験スクリプトはモデルごとに llama-server を立て直す。サーバの設定は読み書きの試験と同じ（思考なし・差し替えたテンプレートがあるモデルはそれを使う）</li>
+	<li><strong>Codex</strong>。本番のあと、利用者がコマンドを実行する</li>
+</ol>
+<p>結果は 1 件終わるごとに <code>logs/</code> に書き出し、そのつど報告する（ローカルルール「長い試験・測定の進め方」）。</p>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="ch04" id="ch04">
+<h1>作業の手順</h1>
+<ol>
+	<li><code>tools\50_run\test-agents.ps1</code> と <code>tools\50_run\test-cc-tools.ps1</code> の <code>-Tests</code> に <code>sum</code> と <code>echo</code> を足す。既定は <code>read,write</code>（これまでの読み書き）のまま。判定は <code>tools\50_run\sum-judge.ps1</code> に 1 つだけ書き、両方から読み込む</li>
+	<li><code>test-agents.ps1</code> のコメント「コマンド行に日本語を載せると CP932 に化ける」を、確かめた事実に直す</li>
+	<li>確認用の 1 問を流す</li>
+	<li>本番の 76 回を流す</li>
+	<li>結果を<a href="../01_research/r260929-01-AIエージェントの試験結果.html">試験結果</a>に 1 章として足し、<a href="../01_research/r260930-01-エージェント試験の経緯と全実行の記録.html">全実行の記録</a>に行を足す</li>
+	<li>課題 i260930-05 の状態を進める</li>
+</ol>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="ch05" id="ch05">
+<h1>未確認のこと</h1>
+<ul>
+	<li><span class="badge b-none">未確認</span><strong>OpenCode・Codex に日本語が届くか</strong>。どちらも node ではなくネイティブの exe を起動する。同じ仕組みで届くはずだが、実物では確かめていない（第 3 章の確認用の 1 問で見る）</li>
+	<li><span class="badge b-none">未確認</span><strong>Aider が <code>node sum</code> まで実行するか</strong>。Aider は編集のあとにシェルのコマンドを提案し、<code>--yes-always</code> ならそのまま実行するはず。実行しなければ①②は通っても③で落ちる</li>
+	<li><span class="badge b-none">未確認</span>各エージェントがどのシェルで <code>node</code> を呼ぶか（Git Bash・PowerShell・cmd）。<code>node</code> が PATH にあれば、どれでも動くはず</li>
+</ul>
+</section>
+</div>
+
+<footer>
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+</footer>
+
+</body>
+</html>
