@@ -81,6 +81,8 @@ function Invoke-Agent([string]$prompt, [string]$name, [string]$tag, [switch]$Tra
 }
 
 # いつ・どの版で試したかを結果に残す（版が上がると結果が変わりうる）
+# Windows PowerShell 5.1 は 2>&1 で受けた標準エラーの行をエラーとして扱い、Stop のままだと止まる
+$ErrorActionPreference = 'Continue'
 $agentVersion = switch ($Agent) {
 	'pi' { (pi --version 2>&1 | Select-Object -First 1) }
 	'opencode' { (opencode --version 2>&1 | Select-Object -First 1) }
@@ -89,6 +91,7 @@ $agentVersion = switch ($Agent) {
 }
 $llamaVersion = (& $exe --version 2>&1 | Select-String 'version' | Select-Object -First 1).Line
 $versions = [ordered]@{ agent = "$agentVersion".Trim(); llama = "$llamaVersion".Trim(); node = (node --version) }
+$ErrorActionPreference = 'Stop'
 Write-Host "版: $Agent $($versions.agent) / llama.cpp $($versions.llama) / node $($versions.node)"
 
 $readExpect = 'ローカルLLM 実行環境'
