@@ -340,8 +340,8 @@ Claude Code で速かったモデルを Pi でも試し、どちらを使うか�
 llama.cpp・エージェント・Node.js を最新にして、これまでの試験をやり直す。版が上がると結果が変わりうるため、閉域網へ持っていく前に、持っていく版で結果を取り直す。
 </p>
 <ul>
-	<li><span class="badge b-ok">済</span>llama.cpp を b10612 から b11302（CUDA 12.4 版）にする。前の版は <code>bin\llama.cpp-b10612</code> に残した</li>
-	<li><span class="badge b-ok">済</span>Pi を 0.87.1 → 0.99.2、Codex CLI を 0.158.0 → 0.159.3、OpenCode を 1.18.33 → 1.18.34 にする（Claude Code 2.1.286・Aider 0.86.2 は最新のまま）。llama.cpp は日に何十もビルドが出るため b11302 で止める</li>
+	<li><span class="badge b-ok">済</span>llama.cpp を b10612 から b11320（CUDA 12.4 版）にする。前の版は <code>bin\llama.cpp-b10612</code> に残した</li>
+	<li><span class="badge b-ok">済</span>Pi を 0.87.1 → 0.99.2、Codex CLI を 0.158.0 → 0.159.3、OpenCode を 1.18.33 → 1.18.34 にする（Claude Code 2.1.286・Aider 0.86.2 は最新のまま）。llama.cpp は日に何十もビルドが出るため b11320 で止める</li>
 	<li><span class="badge b-ok">済</span>Node.js を v26.8.1 → v26.10.0 にする（利用者が msi を実行した。インストール先は <code>C:\Tools\nodejs</code>）</li>
 	<li><span class="badge b-ok">済</span>試験スクリプトが結果ファイルに版を書き込むようにする</li>
 	<li><span class="badge b-ok">済</span>画面表示の出力先を確かめる（内蔵 GPU が出していた。VRAM の空きは nvidia-smi で 3962 MiB で、前回の再測定と同じ。llama.cpp の <code>--list-devices</code> は CUDA から見た値で 3287 MiB と出るため、比べるときは同じ測り方にそろえる）</li>
