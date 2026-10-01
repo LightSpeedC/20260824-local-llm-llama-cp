@@ -80,6 +80,17 @@ function Invoke-Agent([string]$prompt, [string]$name, [string]$tag, [switch]$Tra
 	return [ordered]@{ status = $(if ($done) { 'ok' } else { 'timeout' }); sec = [Math]::Round($sw.Elapsed.TotalSeconds, 1); result = $text.Trim(); toolLog = $toolLog }
 }
 
+# いつ・どの版で試したかを結果に残す（版が上がると結果が変わりうる）
+$agentVersion = switch ($Agent) {
+	'pi' { (pi --version 2>&1 | Select-Object -First 1) }
+	'opencode' { (opencode --version 2>&1 | Select-Object -First 1) }
+	'codex' { (codex --version 2>&1 | Select-Object -First 1) }
+	'aider' { (& $aider --version 2>&1 | Select-Object -Last 1) }
+}
+$llamaVersion = (& $exe --version 2>&1 | Select-String 'version' | Select-Object -First 1).Line
+$versions = [ordered]@{ agent = "$agentVersion".Trim(); llama = "$llamaVersion".Trim(); node = (node --version) }
+Write-Host "版: $Agent $($versions.agent) / llama.cpp $($versions.llama) / node $($versions.node)"
+
 $readExpect = 'ローカルLLM 実行環境'
 foreach ($m in $models) {
 	$name = $m.BaseName
@@ -89,7 +100,7 @@ foreach ($m in $models) {
 	$tplArg = if ($UseTemplates -and (Test-Path $tpl)) { "--chat-template-file `"$tpl`"" } else { '' }
 	$argList = "-m `"$($m.FullName)`" -c $Ctx -np 1 $ngl -nkvo -ctk q8_0 -ctv q8_0 -fa on $tplArg $ExtraArgs --alias $name --host 127.0.0.1 --port $Port"
 	Write-Host "=== $Agent / $name"
-	$rec = [ordered]@{ agent = $Agent; model = $name; server = $argList; load = ''; read = $null; write = $null; echo = $null; sum = $null }
+	$rec = [ordered]@{ agent = $Agent; model = $name; versions = $versions; server = $argList; load = ''; read = $null; write = $null; echo = $null; sum = $null }
 
 	# エージェントごとの接続設定を空のホームに書く
 	switch ($Agent) {

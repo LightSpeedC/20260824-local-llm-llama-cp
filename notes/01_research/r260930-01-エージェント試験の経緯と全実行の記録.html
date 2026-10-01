@@ -272,6 +272,27 @@ Claude Code は環境変数（<code>ANTHROPIC_BASE_URL</code> ほか、root の 
 </div>
 <p>1 問の待ち時間は 10〜15 分。超えたものは時間切れとして記録し、あとで 1 時間の枠で試し直した。</p>
 
+<h2>試験した版</h2>
+<p>
+この資料の試験（2026-09-28 21:34 〜 10-01 01:42）は、次の版で行った。
+版はあとから 2026-10-01 に確かめたもので、試験の途中でエージェントが自動で更新されていた可能性は否定できない。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">もの</th><th class="nowrap">版</th><th>備考</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">llama.cpp</td><td class="nowrap">b10612（commit 758443071）</td><td>Windows 向け CUDA 12.4 版の配布バイナリ</td></tr>
+<tr><td class="nowrap">Claude Code</td><td class="nowrap">2.1.286</td><td></td></tr>
+<tr><td class="nowrap">Pi</td><td class="nowrap">0.87.1</td><td></td></tr>
+<tr><td class="nowrap">OpenCode</td><td class="nowrap">1.18.33</td><td></td></tr>
+<tr><td class="nowrap">Codex CLI</td><td class="nowrap">0.158.0</td><td></td></tr>
+<tr><td class="nowrap">Aider</td><td class="nowrap">0.86.2</td><td></td></tr>
+<tr><td class="nowrap">Node.js</td><td class="nowrap">v26.8.1</td><td>Pi・OpenCode・Codex の土台</td></tr>
+</tbody>
+</table>
+</div>
+<p>2026-10-01 以降の試験では、試験スクリプトが結果ファイル（<code>*-results.jsonl</code>）の各行に、エージェント・llama.cpp・Node.js の版を書き込む。</p>
+
 <h2>経緯</h2>
 <div class="tablewrap">
 <table>

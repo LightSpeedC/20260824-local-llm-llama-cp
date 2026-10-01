@@ -334,6 +334,23 @@ Claude Code で速かったモデルを Pi でも試し、どちらを使うか�
 <p>関連: <a href="../10_plan/p260930-02-初期プログラミングの検証計画.html">初期プログラミングの検証計画</a></p>
 </details>
 
+<details class="md-flat" open>
+<summary><span class="badge b-warn">着手</span><span class="no">i261001-01</span>版を上げて試験をやり直す</summary>
+<p>
+llama.cpp・エージェント・Node.js を最新にして、これまでの試験をやり直す。版が上がると結果が変わりうるため、閉域網へ持っていく前に、持っていく版で結果を取り直す。
+</p>
+<ul>
+	<li><span class="badge b-ok">済</span>llama.cpp を b10612 から b11302（CUDA 12.4 版）にする。前の版は <code>bin\llama.cpp-b10612</code> に残した</li>
+	<li><span class="badge b-ok">済</span>Pi を 0.87.1 → 0.99.2、Codex CLI を 0.158.0 → 0.159.3 にする（Claude Code 2.1.286・OpenCode 1.18.33・Aider 0.86.2 は最新のまま）</li>
+	<li><span class="badge b-none">未</span>Node.js を v26.8.1 → v26.10.0 にする（利用者が msi を実行する。インストール先は <code>C:\Tools\nodejs</code>）</li>
+	<li><span class="badge b-ok">済</span>試験スクリプトが結果ファイルに版を書き込むようにする</li>
+	<li><span class="badge b-none">未</span>画面表示の出力先を確かめる（llama.cpp から見た VRAM の空きが 3287 MiB で、前回の再測定の 3962 MiB より少ない）</li>
+	<li><span class="badge b-none">未</span>E4B で 4 エージェントに日本語の確認と sum を流し、壊れていないことを確かめる</li>
+	<li><span class="badge b-none">未</span>sum の 76 通り、読み書きの試験、主な速度（llama-bench）をやり直し、前の版と比べて資料に反映する</li>
+</ul>
+<p>関連: <a href="../01_research/r260930-01-エージェント試験の経緯と全実行の記録.html">試験の経緯と全実行の記録</a>（「試験した版」）</p>
+</details>
+
 </section>
 
 <section class="ch02" id="ch02">

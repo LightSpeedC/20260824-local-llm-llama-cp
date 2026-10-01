@@ -90,6 +90,11 @@ function Invoke-Claude([string]$prompt, [string]$tag, [switch]$Trace, [string]$C
 	return $r
 }
 
+# いつ・どの版で試したかを結果に残す（版が上がると結果が変わりうる）
+$llamaVersion = (& $exe --version 2>&1 | Select-String 'version' | Select-Object -First 1).Line
+$versions = [ordered]@{ agent = "$(claude.exe --version 2>&1 | Select-Object -First 1)".Trim(); llama = "$llamaVersion".Trim(); node = (node --version) }
+Write-Host "版: Claude Code $($versions.agent) / llama.cpp $($versions.llama) / node $($versions.node)"
+
 $readExpect = 'ローカルLLM 実行環境'
 foreach ($m in $models) {
 	$name = $m.BaseName
@@ -102,7 +107,7 @@ foreach ($m in $models) {
 	$tplArg = if ($UseTemplates -and (Test-Path $tpl)) { "--chat-template-file `"$tpl`"" } else { '' }
 	$argList = "-m `"$($m.FullName)`" -c $Ctx -np 1 $ngl -nkvo -ctk q8_0 -ctv q8_0 -fa on $tplArg $ExtraArgs --alias $name --host 127.0.0.1 --port $Port"
 	Write-Host "=== $name（$sizeGB GB）"
-	$rec = [ordered]@{ model = $name; sizeGB = $sizeGB; server = $argList; load = ''; read = $null; write = $null; echo = $null; sum = $null }
+	$rec = [ordered]@{ model = $name; sizeGB = $sizeGB; versions = $versions; server = $argList; load = ''; read = $null; write = $null; echo = $null; sum = $null }
 	$srvLog = Join-Path $logDir "$tag-server.log"
 	$srv = Start-Process -FilePath $exe -ArgumentList $argList -PassThru -WindowStyle Hidden -RedirectStandardError $srvLog -RedirectStandardOutput "$srvLog.out"
 	try {
