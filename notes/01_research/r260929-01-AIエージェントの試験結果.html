@@ -220,7 +220,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<div class="inner">
 		<h1>ローカルLLM で AI エージェントを使う — 試験結果</h1>
 		<div class="lead">llama-server に繋いだ Claude Code・Pi・OpenCode・Aider・Codex CLI で、20GB 以下のモデルがファイルを読み書きできるかを試した結果と、どれを使うか</div>
-		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-10-01</div>
+		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-10-02</div>
 	</div>
 </div>
 
@@ -468,6 +468,71 @@ Codex はファイルの読み書きに PowerShell のコマンドを使う。<c
 <code>--allowedTools "Bash(node:*)"</code> で許したのは Bash の道具だけなので、PowerShell の道具で <code>node</code> を呼んだ Qwen3-4B-Instruct は 10 回とも止められた。
 この変数を渡さないように直して流し直した（<code>cc1.cmd</code> は空のホームで動くので、もともと PowerShell の道具は無い）。
 </div>
+
+<h2>版を上げて 3 回ずつ流した結果</h2>
+<p>
+llama.cpp を b11320 に、エージェントを最新に上げて（版は<a href="r260930-01-エージェント試験の経緯と全実行の記録.html">試験の経緯と全実行の記録</a>の「試験した版」）、同じ問を 1 組 3 回ずつ流した（2026-10-01〜10-02）。
+1 回目の結果が前の版と食い違ったため、揺れか版の違いかを見るためである。
+</p>
+<h3>エージェントに渡した指示文</h3>
+<p>どのエージェントにも、次の 1 文だけを渡した。補足の文や例は付けていない。</p>
+<pre><code class="language-text">1から10までの合計を表示するnode.jsプログラムをsum.jsに書く。node sumで実行する</code></pre>
+<p>渡し方はエージェントごとに次のとおり。作業フォルダは README.html だけを置いた空のフォルダで、1 問ごとに作り直した。</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">エージェント</th><th>コマンド（指示文は <code>&lt;指示文&gt;</code> と略す）</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Claude Code</td><td><code>claude -p --max-turns 10 --permission-mode acceptEdits --allowedTools "Bash(node:*)" --output-format stream-json --verbose</code>（指示文は標準入力で渡す）</td></tr>
+<tr><td class="nowrap">Pi</td><td><code>pi -p --session-dir &lt;ログ&gt; --provider llamacpp --model &lt;モデル&gt; "&lt;指示文&gt;"</code></td></tr>
+<tr><td class="nowrap">OpenCode</td><td><code>opencode run --format json -m "llamacpp/&lt;モデル&gt;" "&lt;指示文&gt;"</code></td></tr>
+<tr><td class="nowrap">Aider</td><td><code>aider --model "openai/&lt;モデル&gt;" --openai-api-base http://127.0.0.1:8080/v1 --no-git --yes-always --message "&lt;指示文&gt;"</code></td></tr>
+</tbody>
+</table>
+</div>
+<h3>3 回の結果</h3>
+<p>
+1 マスに 1 回目・2 回目・3 回目の順に並べた。
+✅ 合格（書いて、<code>node</code> で実行して、55 と答えた）／
+🉑 補欠合格（正しい <code>sum.js</code> を書いて 55 と答えたが、<code>node</code> で実行していない）／
+❌ 不合格（作らない・55 が出ない・実行したが答えない など）／
+⏱ 時間切れ（10 分）。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="nowrap">Claude Code</th><th class="nowrap">Pi</th><th class="nowrap">OpenCode</th><th class="nowrap">Aider</th></tr></thead>
+<tbody>
+<!-- AUTO:sum-sets -->
+<tr><td class="nowrap">gemma-4-E2B</td><td class="nowrap">❌✅🉑</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-E4B</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Ministral-3-3B</td><td class="nowrap">✅❌✅</td><td class="nowrap">❌✅❌</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Instruct</td><td class="nowrap">❌✅🉑</td><td class="nowrap">🉑❌❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅🉑❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">🉑❌❌</td><td class="nowrap">🉑🉑🉑</td><td class="nowrap">🉑❌🉑</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-12B-QAT</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-12B</td><td class="nowrap">❌✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-26B-A4B</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B</td><td class="nowrap">🉑🉑🉑</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌❌</td><td class="nowrap">🉑🉑</td></tr>
+<tr><td class="nowrap">Qwen3-Coder-30B</td><td class="nowrap">🉑🉑✅</td><td class="nowrap">❌✅🉑</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">GLM-4.7-Flash</td><td class="nowrap">✅✅🉑</td><td class="nowrap">🉑✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Bonsai-27B</td><td class="nowrap">✅✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3.6-35B-A3B</td><td class="nowrap">❌✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Ministral-3-14B</td><td class="nowrap">❌❌🉑</td><td class="nowrap">✅✅❌</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Devstral-Small-2507</td><td class="nowrap">🉑⏱✅</td><td class="nowrap">✅❌❌</td><td class="nowrap">✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Nemotron-3-Nano-4B</td><td class="nowrap">⏱⏱⏱</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking</td><td class="nowrap">🉑🉑⏱</td><td class="nowrap">🉑🉑❌</td><td class="nowrap">⏱⏱</td><td class="nowrap">🉑🉑</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash</td><td class="nowrap">❌⏱⏱</td><td class="nowrap">⏱❌❌</td><td class="nowrap">❌❌</td><td class="nowrap">❌❌</td></tr>
+<!-- /AUTO:sum-sets -->
+</tbody>
+</table>
+</div>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">Aider は 2 回まで流した（朝 7 時の期限で 3 回目を流せなかった）。OpenCode の 3 回目は流している途中で、欠けているマスはまだ流していない。</p>
+<ul>
+	<li><strong>3 回とも ✅ だったのは、gemma-4-E4B と gemma-4-26B-A4B（Claude Code・Pi・OpenCode のどれでも）</strong>。Qwen3.5-9B と gemma-4-12B-QAT は Claude Code と Pi で 3 回とも ✅</li>
+	<li><strong>同じモデル・同じエージェントでも、多くの組み合わせで ✅ と ❌ が入れ替わる</strong>。1 回だけの結果では合否を決められない。前の版との 1 回ずつの差（Claude Code 16 → 12 本など）は、この揺れの範囲に入る</li>
+	<li><strong>Pi は揺れが小さい</strong>。19 本中 9 本が 3 回とも ✅ で、どれも 1 分前後で終わる</li>
+	<li><strong>🉑 はモデルの癖として出る</strong>。gpt-oss-20b と Qwen3-30B-A3B は、どのエージェントでも 🉑 が多い。作業ログでは、ファイルを書く道具を 1 回呼んだだけで、<code>node</code> を実行する道具は呼んでいない。1〜10 の合計は暗算でも出るため、答えは合う</li>
+	<li><strong>Aider は揺れずに落ちる</strong>。どのモデルも正しい <code>sum.js</code> を書くが、Aider は自分では実行しない</li>
+</ul>
 </section>
 
 <!-- ============ 5 ============ -->
