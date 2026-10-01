@@ -293,6 +293,23 @@ Claude Code は環境変数（<code>ANTHROPIC_BASE_URL</code> ほか、root の 
 </div>
 <p>2026-10-01 以降の試験では、試験スクリプトが結果ファイル（<code>*-results.jsonl</code>）の各行に、エージェント・llama.cpp・Node.js の版を書き込む。</p>
 
+<h3>再テストで使う版（2026-10-01 に上げた）</h3>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">もの</th><th class="nowrap">試験した版</th><th class="nowrap">上げた版</th><th>備考</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">llama.cpp</td><td class="nowrap">b10612</td><td class="nowrap"><strong>b11302</strong>（commit 05af0d2b1）</td><td>同じ CUDA 12.4 版。前の版は <code>bin\llama.cpp-b10612</code> に残した。ビルドは 1 日に何十も出るため、この版で止める</td></tr>
+<tr><td class="nowrap">Claude Code</td><td class="nowrap">2.1.286</td><td class="nowrap">2.1.286</td><td>最新のまま</td></tr>
+<tr><td class="nowrap">Pi</td><td class="nowrap">0.87.1</td><td class="nowrap"><strong>0.99.2</strong></td><td></td></tr>
+<tr><td class="nowrap">OpenCode</td><td class="nowrap">1.18.33</td><td class="nowrap"><strong>1.18.34</strong></td><td></td></tr>
+<tr><td class="nowrap">Codex CLI</td><td class="nowrap">0.158.0</td><td class="nowrap"><strong>0.159.3</strong></td><td></td></tr>
+<tr><td class="nowrap">Aider</td><td class="nowrap">0.86.2</td><td class="nowrap">0.86.2</td><td>最新のまま</td></tr>
+<tr><td class="nowrap">Node.js</td><td class="nowrap">v26.8.1</td><td class="nowrap"><strong>v26.10.0</strong></td><td></td></tr>
+</tbody>
+</table>
+</div>
+<p>どれも 2026-10-01 22:40 時点の最新（llama.cpp を除く）。Pi・Codex・OpenCode を npm で入れたとき、npm が一部のパッケージのインストール時スクリプト（esbuild など）を止めた。動くかは再テストで確かめる。</p>
+
 <h2>経緯</h2>
 <div class="tablewrap">
 <table>
