@@ -1,0 +1,420 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>閉域網へ持っていく配布物</title>
+<style>
+:root{
+	--navy1:#12224d;
+	--navy2:#2f5fbf;
+	--ink:#1c2330;
+	--ink-soft:#4a5568;
+	--line:#d9dfe8;
+	--code-bg:#f4f6fa;
+	--link:#1a4fa0;
+	--accent:var(--navy1, #12224d);
+	--accent2:var(--navy2, #2f5fbf);
+	--soft:#f2f5fb;
+}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(210,78%,25%);--accent2:hsl(210,58%,55%);--soft:hsl(210,28%,95%);}
+.ch03{--accent:hsl(140,78%,25%);--accent2:hsl(140,58%,55%);--soft:hsl(140,28%,95%);}
+.ch04{--accent:hsl(70,78%,25%);--accent2:hsl(70,58%,55%);--soft:hsl(70,28%,95%);}
+.ch05{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+
+*{box-sizing:border-box;}
+body{
+	margin:0;
+	background:#fff;
+	color:var(--ink, #1c2330);
+	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+	font-size:15.5px;
+	line-height:1.85;
+}
+.titlebar{
+	background:linear-gradient(135deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	padding:34px 30px 30px;
+}
+.titlebar .inner{max-width:1600px;margin:0 auto;}
+.titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
+.titlebar .lead{font-size:0.88em;color:#cfe0ff;}
+.titlebar .date{font-size:0.88em;color:#cfe0ff;margin-top:4px;}
+.titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+
+.wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
+
+section{
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:4px 26px 26px;
+	margin:34px 0;
+}
+section h1{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	font-size:1.45em;
+	padding:14px 20px;
+	margin:26px 0 20px;
+	border-radius:8px;
+	box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+h2{
+	font-size:1.15em;
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(90deg,var(--soft, #f2f5fb),#fff);
+	padding:6px 12px;
+	margin:30px 0 12px;
+	color:var(--accent, #12224d);
+}
+h3{
+	font-size:1.02em;
+	display:inline-block;
+	border-bottom:2px dotted var(--accent2, #2f5fbf);
+	padding-bottom:3px;
+	margin:20px 0 8px;
+	color:var(--ink, #1c2330);
+}
+p{margin:8px 0;}
+ul,ol{margin:8px 0;padding-left:1.5em;}
+li{margin:4px 0;}
+
+code{
+	background:var(--code-bg, #f4f6fa);
+	border:1px solid var(--line, #d9dfe8);
+	color:#17335f;
+	border-radius:4px;
+	padding:1px 5px;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+}
+pre{
+	background:var(--code-bg, #f4f6fa);
+	color:var(--ink, #1c2330);
+	border:1px solid var(--line, #d9dfe8);
+	border-left:5px solid var(--accent2, #2f5fbf);
+	border-radius:0 8px 8px 0;
+	padding:13px 16px;
+	overflow-x:auto;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+	line-height:1.6;
+}
+pre code{background:none;border:none;padding:0;color:inherit;}
+
+.tablewrap{overflow-x:auto;margin:12px 0;}
+table{
+	border-collapse:collapse;
+	width:100%;
+	border-radius:8px;
+	overflow:hidden;
+	box-shadow:0 2px 7px rgba(0,0,0,0.09);
+	font-size:0.95em;
+}
+th{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-align:left;
+	padding:9px 12px;
+}
+th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line, #d9dfe8);vertical-align:top;}
+tr:nth-child(even) td{background:#fafbfe;}
+.nowrap{white-space:nowrap;}
+.num{text-align:right;white-space:nowrap;}
+
+.badge{
+	display:inline-block;
+	color:#fff;
+	font-size:0.8em;
+	font-weight:600;
+	border-radius:5px;
+	padding:2px 9px;
+	margin-right:7px;
+	white-space:nowrap;
+}
+.b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
+.b-ng{background:linear-gradient(100deg,#a51f22,#e05a5c);}
+.b-none{background:linear-gradient(100deg,#5a6472,#97a1ae);}
+.b-warn{background:linear-gradient(100deg,#b8620a,#f0a548);}
+
+.callout{
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border-radius:0 8px 8px 0;
+	padding:12px 16px;
+	margin:16px 0;
+}
+.callout strong{color:var(--accent, #12224d);}
+
+.toc{
+	background:linear-gradient(180deg,#f2f5fb,#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:6px 26px 22px;
+	margin:34px 0;
+}
+.toc ol{
+	list-style:none;
+	display:flex;
+	flex-wrap:wrap;
+	gap:8px;
+	padding:0;
+	margin:12px 0 0;
+	counter-reset:toc;
+}
+.toc li{counter-increment:toc;margin:0;}
+.toc a{
+	display:-webkit-box;
+	-webkit-line-clamp:2;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:normal;
+	width:310px;
+	max-width:100%;
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-decoration:none;
+	border-radius:7px;
+	padding:8px 12px;
+	font-size:0.92em;
+	font-weight:700;
+	line-height:1.4;
+}
+.toc a::before{content:counter(toc) ". ";font-weight:700;}
+
+.homelink{margin:20px 0 0;}
+a.home{
+	display:inline-block;
+	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	border-radius:6px;
+	padding:4px 11px;
+	line-height:1;
+	text-decoration:none;
+}
+a.home svg{vertical-align:-2px;}
+a{background:none;color:var(--link, #1a4fa0);}
+footer{
+	max-width:1600px;
+	margin:0 auto;
+	padding:18px 30px 30px;
+	border-top:1px solid var(--line, #d9dfe8);
+	color:var(--ink-soft, #4a5568);
+	font-size:0.9em;
+	margin-top:40px;
+	margin-bottom:40px;
+}
+footer a{color:var(--navy2, #2f5fbf);}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+	<div class="inner">
+		<h1>閉域網へ持っていく配布物</h1>
+		<div class="lead">ネットに出られない別の PC（Intel の内蔵 GPU）で、ローカル LLM とエージェントを試せるように、モデル以外も含めて 1 つにまとめて運ぶ</div>
+		<div class="date">📅 作成: 2026-10-02 / 更新: 2026-10-02</div>
+	</div>
+</div>
+
+<div class="wrap">
+
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+
+<div class="toc">
+	<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">目次</h2>
+	<ol>
+		<li class="ch01"><a href="#ch01">目的と持っていく先</a></li>
+		<li class="ch02"><a href="#ch02">持っていくもの</a></li>
+		<li class="ch03"><a href="#ch03">どこに置いても動く形にする</a></li>
+		<li class="ch04"><a href="#ch04">エージェントとモデルごとの起動用 cmd</a></li>
+		<li class="ch05"><a href="#ch05">作業の手順と未確認のこと</a></li>
+	</ol>
+</div>
+
+<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">この文書の位置づけ</h2>
+<p>
+どのモデルとエージェントの組み合わせが動くかは<a href="../01_research/r260929-01-AIエージェントの試験結果.html">ローカルLLM で AI エージェントを使う — 試験結果</a>にある。
+本書は、その結果をもとに、閉域網の PC へ持っていく配布物の中身と作り方を決める。
+</p>
+
+<!-- ============ 1 ============ -->
+<section class="ch01" id="ch01">
+<h1>目的と持っていく先</h1>
+<p>
+ネットにつながらない別の PC へ、<strong>ローカル LLM（llama.cpp）・Node.js・エージェント・試験スクリプト・モデル</strong>をまとめて運び、そこで同じ試験を流せるようにする。
+現地では何もダウンロードしない。
+</p>
+
+<h2>持っていく先の PC</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">PC</th><th class="nowrap">CPU</th><th class="nowrap">GPU（ドライバ）</th><th class="num">メモリ</th><th>扱い</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">PC-A</td><td class="nowrap">Core i7-1355U（10 コア）</td><td class="nowrap">Iris Xe（32.0.101.7085）</td><td class="num">32 GB</td><td>本命。メモリを 2 枚にして UHD から Iris Xe の表示に変わった</td></tr>
+<tr><td class="nowrap">PC-B</td><td class="nowrap">Core i7-1355U（10 コア）</td><td class="nowrap">Iris Xe（32.0.101.7085）</td><td class="num">32 GB</td><td>本命。PC-A と同じ構成</td></tr>
+<tr><td class="nowrap">PC-C</td><td class="nowrap">Core i7-1185G7（4 コア）</td><td class="nowrap">Iris Xe（30.0.101.1338、2022 年）</td><td class="num">16 GB</td><td>手を加えずに試す</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>現地で測った速さ（gemma-4-E4B UD-Q3_K_XL、llama-bench）</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">PC</th><th class="nowrap">使う版</th><th class="num">入力の処理（pp512）</th><th class="num">生成（tg64）</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">PC-A</td><td class="nowrap">Vulkan（Intel GPU）</td><td class="num">163 tok/s</td><td class="num">7.5 tok/s</td></tr>
+<tr><td class="nowrap">PC-A</td><td class="nowrap">CPU だけ</td><td class="num">34 tok/s</td><td class="num">8.4 tok/s</td></tr>
+<tr><td class="nowrap">PC-C</td><td class="nowrap">Vulkan（Intel GPU）</td><td class="num">129 tok/s</td><td class="num">2.4 tok/s</td></tr>
+<tr><td class="nowrap">PC-C</td><td class="nowrap">CPU だけ</td><td class="num">68 tok/s</td><td class="num">7.0 tok/s</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>Intel GPU は入力の処理を速くする</strong>（PC-A で約 5 倍）。生成はメインメモリの速さで頭打ちになり、CPU とほぼ同じ</li>
+	<li>PC-C の Intel GPU だけ生成が遅いのは、古いドライバのためとみている（CPU だけなら 7.0 tok/s 出る）</li>
+	<li>指示文が長い Claude Code は Intel GPU、短い Pi は PC-C では CPU だけのほうが速い見込み（ベンチからの見積もりで、試していない）</li>
+</ul>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="ch02" id="ch02">
+<h1>持っていくもの</h1>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">種類</th><th>中身</th><th>作り方</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">llama.cpp</td><td>b11320 の Vulkan 版（Intel GPU）・CPU 版・CUDA 版（NVIDIA がある PC のため）</td><td>GitHub の公式リリースを展開したフォルダをそのままコピーする。exe は同じフォルダの DLL を使うので、フォルダの中身を分けない</td></tr>
+<tr><td class="nowrap">Node.js</td><td>v26.10.0 の <strong>zip 版と msi 版の両方</strong></td><td>zip 版はインストールも管理者の権限も要らない。msi 版は、インストールして使いたい PC のために添える</td></tr>
+<tr><td class="nowrap">エージェント</td><td>Pi・OpenCode・Claude Code（<strong>npm 版と単体の <code>claude.exe</code> の両方</strong>）</td><td>こちらで zip 版 Node.js のフォルダの中に npm でインストールし、そのフォルダごと運ぶ。インストール時に取ってくる OS 用の実行ファイルも中に入った状態で運べる</td></tr>
+<tr><td class="nowrap">モデル</td><td>gemma-4-E4B（Q4_K_M、5.0 GB）・gemma-4-E2B（Q4_K_M、3.2 GB）・Ministral-3-3B（Q4_K_M、2.0 GB）・gemma-4-12B-QAT（Q4_0、6.5 GB）</td><td>差し替え用のテンプレートがあるもの（いまは Ministral-3-3B）は <code>.jinja</code> も一緒に運ぶ</td></tr>
+<tr><td class="nowrap">試験スクリプト</td><td><code>tools/50_run/</code> の sum・読み書き・ベンチの試験</td><td>置き場所を引数と 1 つの設定で変えられるようにしてから運ぶ（第 3 章）</td></tr>
+<tr><td class="nowrap">起動用の cmd</td><td>エージェントとモデルの組み合わせごとの cmd</td><td>第 4 章</td></tr>
+<tr><td class="nowrap">GPU ドライバ</td><td>Intel 第 11〜14 世代向け 32.0.101.7092（<code>gfx_win_101.7092.exe</code>）</td><td>Intel の公式サイトから取得済み。入れるかは現地で決める</td></tr>
+</tbody>
+</table>
+</div>
+<p>持っていかないもの: Aider（試験で、書いたプログラムを自分では実行しなかった）・Codex（試験は利用者が流していた）。</p>
+<div class="callout callout-important">
+<strong>Claude Code は利用条件を確かめてから配る。</strong>
+npm で公開されているが、ライセンスは Anthropic の利用条件に従う。社内の閉域網へ持ち込んで使ってよいかを、配る前に確かめる。
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
+<h1>どこに置いても動く形にする</h1>
+<p>
+配布物は 1 つのフォルダにまとめ、<strong>どのドライブ・どのフォルダに置いても動く</strong>ようにする（<code>Y:\</code> の直下でも、<code>D:\llm\</code> の下でも）。
+スクリプトと cmd は、自分の置き場所（<code>%~dp0</code>・<code>$PSScriptRoot</code>）から相対で全部を探す。
+</p>
+
+<h2>配布物のフォルダ構成</h2>
+<pre><code class="language-text">&lt;配布先&gt;\
+  bin\
+    llama.cpp-b11320-vulkan\
+    llama.cpp-b11320-cpu\
+    llama.cpp-b11320-cuda\
+    node\                  zip 版 Node.js。中に npm で入れたエージェント
+    claude\                単体の claude.exe
+  installers\
+    node-v26.10.0-x64.msi
+    gfx_win_101.7092.exe
+  models\                  .gguf（既定の置き場。設定で別の場所にもできる）
+  templates\               .jinja
+  run\                     起動用の cmd（第 4 章）
+  tools\                   試験スクリプト
+  config.cmd               場所の設定（下の表）
+  work\                    エージェントの作業フォルダ・空のホーム（実行時に作る）
+  logs\                    試験の結果（実行時に作る）</code></pre>
+
+<h2>場所を決め打ちしているところ（直す箇所）</h2>
+<p>
+いまの試験スクリプトで、場所をリテラルで書いているのは次のとおり。
+これを <strong><code>config.cmd</code> の 1 か所</strong>にまとめ、現地で違う場所（例: <code>C:\AI-models</code>）にあるときは、そこだけを書き換えればよい形にする。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">いまの値</th><th>使っているところ</th><th class="nowrap">設定の名前</th><th>配布物での既定</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><code>C:\AI_Models</code></td><td><code>test-agents.ps1</code>・<code>test-cc-tools.ps1</code>・<code>test-aider-followup.ps1</code> の <code>-ModelDir</code></td><td class="nowrap"><code>LLM_MODEL_DIR</code></td><td><code>&lt;配布先&gt;\models</code></td></tr>
+<tr><td class="nowrap"><code>W:/temp/llama-cp-sandbox</code></td><td>エージェントの作業フォルダ（3 本とも）</td><td class="nowrap"><code>LLM_WORK_DIR</code></td><td><code>&lt;配布先&gt;\work</code></td></tr>
+<tr><td class="nowrap"><code>W:/temp/llama-cp-agent-home</code></td><td>Pi・OpenCode の空のホーム（<code>test-agents.ps1</code>）</td><td class="nowrap">（<code>LLM_WORK_DIR</code> の下）</td><td><code>&lt;配布先&gt;\work\agent-home</code></td></tr>
+<tr><td class="nowrap"><code>W:/temp/llama-cp-home</code></td><td>Claude Code の空のホーム（<code>test-cc-tools.ps1</code>）</td><td class="nowrap">（<code>LLM_WORK_DIR</code> の下）</td><td><code>&lt;配布先&gt;\work\cc-home</code></td></tr>
+<tr><td class="nowrap"><code>bin/llama.cpp</code></td><td>llama-server の場所（<code>-LlamaDir</code>）</td><td class="nowrap"><code>LLM_BACKEND</code></td><td>自動（第 4 章）</td></tr>
+<tr><td class="nowrap"><code>tools/50_run/templates</code></td><td>差し替え用のテンプレート</td><td class="nowrap">—</td><td><code>&lt;配布先&gt;\templates</code></td></tr>
+<tr><td class="nowrap">PATH の <code>node</code>・<code>pi</code>・<code>opencode</code>・<code>claude</code></td><td>エージェントの起動</td><td class="nowrap">—</td><td>cmd の中で <code>&lt;配布先&gt;\bin\node</code> を PATH の先頭に足す</td></tr>
+</tbody>
+</table>
+</div>
+<p>引数で渡せば、その回だけ設定より優先する（いまの <code>-ModelDir</code> などと同じ）。</p>
+<div class="callout callout-warning">
+<strong>作業フォルダは配布物の中でも、プロジェクトの git の外に置く。</strong>
+試験では、作業フォルダがリポジトリの中にあると、モデルがリポジトリの root を推測して本物のファイルを読みにいった。配布物は git のリポジトリではないので <code>&lt;配布先&gt;\work</code> でよいが、開発用のこの PC で流すときは今までどおり外に置く。
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="ch04" id="ch04">
+<h1>エージェントとモデルごとの起動用 cmd</h1>
+<p>
+ダブルクリックで、llama-server を立ててエージェントを開けるようにする。<strong>エージェントとモデルの組み合わせごとに 1 本</strong>を <code>run\</code> に置く。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">cmd の名前（例）</th><th>中身</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><code>pi-gemma-4-E4B.cmd</code></td><td>E4B で llama-server を立て、Pi をそれにつないで開く</td></tr>
+<tr><td class="nowrap"><code>claude-gemma-4-E4B.cmd</code></td><td>同じく Claude Code（npm 版）。<code>claude-exe-…</code> は単体の <code>claude.exe</code></td></tr>
+<tr><td class="nowrap"><code>opencode-gemma-4-E4B.cmd</code></td><td>同じく OpenCode</td></tr>
+<tr><td class="nowrap"><code>server-gemma-4-E4B.cmd</code></td><td>llama-server だけを立てる（エージェントを自分で開くとき）</td></tr>
+</tbody>
+</table>
+</div>
+<p>エージェント 3 つ（Claude Code は npm 版と単体版）× モデル 4 本。cmd は手で書かず、モデルとエージェントの一覧から生成する。</p>
+
+<h2>cmd がすること</h2>
+<ol>
+	<li><code>config.cmd</code> を読む（モデルの場所など）</li>
+	<li>llama.cpp の版を選ぶ。<code>LLM_BACKEND</code> が空なら、Vulkan 版の <code>--list-devices</code> に GPU が出れば Vulkan 版、出なければ CPU 版</li>
+	<li>llama-server を立てる。オプションは試験と同じ（<code>-c 65536 -np 1 -fa on -ctk q8_0 -ctv q8_0 --reasoning off</code>、テンプレートがあれば <code>--chat-template-file</code>）</li>
+	<li>エージェントの接続設定を <code>work\</code> の下の空のホームに書き、そのホームでエージェントを開く（利用者のいつもの設定には触れない）</li>
+</ol>
+<p>Intel GPU でのオプションの確かめ（<code>-fa</code>・<code>-ctk q8_0</code> が効くか、<code>-ngl</code>）は、この PC の Iris Xe では試験と同じオプションで動いた。現地でも同じ値から始める。</p>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="ch05" id="ch05">
+<h1>作業の手順と未確認のこと</h1>
+<h2>手順</h2>
+<ol>
+	<li>試験スクリプトの場所を <code>config.cmd</code> の設定と引数で変えられるようにする（第 3 章の表の箇所）</li>
+	<li>zip 版 Node.js を展開し、その中に Pi・OpenCode・Claude Code を npm で入れる。インストール時のスクリプトを止めずに入れ、OS 用の実行ファイルまでそろえる</li>
+	<li>起動用の cmd を生成するスクリプトを書く</li>
+	<li>配布物を組み立てるスクリプトを <code>tools/60_release/</code> に書く。出力先は <code>_releases/</code></li>
+	<li>この PC で、配布物を別のドライブ（例: <code>Y:\</code>）に置き、ネットを切った状態で cmd と試験が動くかを確かめる</li>
+	<li>現地で <code>--list-devices</code>・<code>llama-bench</code>・sum の試験を流す</li>
+</ol>
+
+<h2>未確認のこと</h2>
+<ul>
+	<li><span class="badge b-none">未</span>npm でインストールしたフォルダを、別の PC・別のドライブへ移しても動くか（中に絶対パスを持つものがないか）</li>
+	<li><span class="badge b-none">未</span>Claude Code・OpenCode が、閉域網で更新の確認やログインをしようとして止まらないか</li>
+	<li><span class="badge b-none">未</span>Claude Code を社内の閉域網で使ってよいか（利用条件）</li>
+	<li><span class="badge b-none">未</span>PC-C の Intel GPU で生成が遅いのが、本当にドライバのためか（ドライバを入れるかは現地で決める）</li>
+</ul>
+</section>
+
+</div>
+
+<footer>
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+</footer>
+
+</body>
+</html>
