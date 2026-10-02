@@ -1,7 +1,8 @@
 ﻿param(
 	[Parameter(Mandatory)][ValidateSet('pi', 'opencode', 'aider', 'codex')][string]$Agent,
 	[Parameter(Mandatory)][string]$Only,
-	[string]$ModelDir = 'C:\AI_Models',
+	# 空なら config.cmd の LLM_MODEL_DIR（paths.ps1）
+	[string]$ModelDir = '',
 	[int]$Ctx = 65536,
 	[int]$TimeoutSec = 600,
 	[int]$Port = 8080,
@@ -10,14 +11,18 @@
 	[ValidateSet('responses', 'chat')][string]$CodexWireApi = 'responses',
 	# read・write・sum（初期プログラミング）・echo（日本語が届くかの確認）をカンマ区切りで
 	[string]$Tests = 'read,write',
-	# 使う llama.cpp の bin 下のフォルダ名（Intel GPU は llama.cpp-b11320-vulkan、CPU だけは llama.cpp-b11320-cpu）
-	[string]$LlamaDir = 'llama.cpp'
+	# 使う llama.cpp の bin 下のフォルダ名（Intel GPU は llama.cpp-b11320-vulkan、CPU だけは llama.cpp-b11320-cpu、auto は自動）。空なら config.cmd の LLM_BACKEND
+	[string]$LlamaDir = ''
 )
 # Claude Code 以外のエージェント（Pi・OpenCode・Aider）を llama-server に繋ぎ、読み・書きができるかを試す
 # 試験の中身は test-cc-tools.ps1 と同じ。結果は logs/test-agents/ に 1 モデル 1 行の JSON Lines で追記する
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'sum-judge.ps1')
-$root = (Resolve-Path "$PSScriptRoot/../..").Path
+. (Join-Path $PSScriptRoot 'paths.ps1')
+$root = $LlmRoot
+if (-not $ModelDir) { $ModelDir = $LlmModelDir }
+if (-not $LlamaDir) { $LlamaDir = $LlmBackend }
+$LlamaDir = Resolve-LlmBackend $LlamaDir
 $exe = Join-Path $root "bin/$LlamaDir/llama-server.exe"
 $logDir = Join-Path $root 'logs/test-agents'
 New-Item -ItemType Directory -Force $logDir | Out-Null
@@ -27,8 +32,8 @@ if ($LlamaDir -ne 'llama.cpp') { $resultFile = $resultFile.Replace('-results.jso
 $utf8 = New-Object Text.UTF8Encoding($false)
 # エージェントは作業用のコピーの中で動かす。プロジェクトの本物のファイルを書き換えさせない（Aider が README.html を上書きした）
 # git のリポジトリの外に置く。中に置くと、モデルがリポジトリの root を推測して本物を読みにいく
-# 中身は 1 問ごとに消すので、専用のフォルダにする（W:/temp そのものにしない）
-$work = 'W:/temp/llama-cp-sandbox'
+# 中身は 1 問ごとに消すので、専用のフォルダにする（場所は paths.ps1）
+$work = $LlmSandbox
 function Reset-Sandbox {
 	if (Test-Path $work) { Get-ChildItem -LiteralPath $work -Force | Remove-Item -Recurse -Force }
 	New-Item -ItemType Directory -Force (Join-Path $work 'tmp') | Out-Null
@@ -36,7 +41,7 @@ function Reset-Sandbox {
 }
 # 設定は空のホームに置く。利用者のいつもの設定には触れない
 # プロジェクトの外に置く（中に置くと、そのパスからモデルがプロジェクトの場所を推測することがある）
-$agentHome = "W:/temp/llama-cp-agent-home/$Agent"
+$agentHome = Join-Path $LlmAgentHome $Agent
 New-Item -ItemType Directory -Force $agentHome | Out-Null
 $aider = Join-Path $env:USERPROFILE '.local/bin/aider.exe'
 
@@ -57,7 +62,7 @@ function Invoke-Agent([string]$prompt, [string]$name, [string]$tag, [switch]$Tra
 		'pi' { if ($Trace) { "pi -p --session-dir `"$piSession`" --provider llamacpp --model `"$name`" `"$p`"" } else { "pi -p --no-session --provider llamacpp --model `"$name`" `"$p`"" } }
 		'opencode' { if ($Trace) { "opencode run --format json -m `"llamacpp/$name`" `"$p`"" } else { "opencode run -m `"llamacpp/$name`" `"$p`"" } }
 		# Windows では -s workspace-write だと Codex のシェル実行（ファイルの読み書きに使う）が policy で止まるため、安全装置を外す。
-		# 作業フォルダは W:/temp の下のコピーなので、外に出なければ本物には届かない（出ない保証はない）
+		# 作業フォルダは README.html だけを置いたコピーなので、外に出なければ本物には届かない（出ない保証はない）
 		'codex' { "codex exec --skip-git-repo-check --ephemeral --dangerously-bypass-approvals-and-sandbox -m `"$name`" `"$p`"" }
 		'aider' { "`"$aider`" --model `"openai/$name`" --openai-api-base http://127.0.0.1:$Port/v1 --openai-api-key llamacpp --no-git --yes-always --no-show-model-warnings --no-check-update --no-pretty --message `"$p`"" }
 	}
@@ -201,4 +206,4 @@ foreach ($m in $models) {
 		[IO.File]::AppendAllText($resultFile, (($rec | ConvertTo-Json -Compress -Depth 4) + "`n"), $utf8)
 	}
 }
-Write-Host "結果: logs/test-agents/$runStamp-$Agent-results.jsonl"
+Write-Host "結果: $($resultFile.Replace($root + [IO.Path]::DirectorySeparatorChar, ''))"

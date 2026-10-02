@@ -1,5 +1,6 @@
 ﻿param(
-	[string]$ModelDir = 'C:\AI_Models',
+	# 空なら config.cmd の LLM_MODEL_DIR（paths.ps1）
+	[string]$ModelDir = '',
 	[double]$MaxSizeGB = 10,
 	[int]$Ctx = 65536,
 	[int]$TimeoutSec = 600,
@@ -9,15 +10,19 @@
 	[string]$Tests = 'read,write',
 	[switch]$NoRules,
 	[string]$ExtraArgs = '',
-	# 使う llama.cpp の bin 下のフォルダ名（Intel GPU は llama.cpp-b11320-vulkan、CPU だけは llama.cpp-b11320-cpu）
-	[string]$LlamaDir = 'llama.cpp'
+	# 使う llama.cpp の bin 下のフォルダ名（Intel GPU は llama.cpp-b11320-vulkan、CPU だけは llama.cpp-b11320-cpu、auto は自動）。空なら config.cmd の LLM_BACKEND
+	[string]$LlamaDir = ''
 )
 # 10GB 以下の手持ちモデルを 1 本ずつ llama-server で起動し、Claude Code からファイルの読み・書きができるかを試す
 # 結果は logs/test-cc-tools/ に 1 モデル 1 行の JSON Lines で追記する
 $ErrorActionPreference = 'Stop'
 # -Tests には read・write のほか、sum（初期プログラミング）・echo（日本語が届くかの確認）も渡せる
 . (Join-Path $PSScriptRoot 'sum-judge.ps1')
-$root = (Resolve-Path "$PSScriptRoot/../..").Path
+. (Join-Path $PSScriptRoot 'paths.ps1')
+$root = $LlmRoot
+if (-not $ModelDir) { $ModelDir = $LlmModelDir }
+if (-not $LlamaDir) { $LlamaDir = $LlmBackend }
+$LlamaDir = Resolve-LlmBackend $LlamaDir
 $exe = Join-Path $root "bin/$LlamaDir/llama-server.exe"
 $logDir = Join-Path $root 'logs/test-cc-tools'
 New-Item -ItemType Directory -Force $logDir | Out-Null
@@ -27,8 +32,8 @@ if ($LlamaDir -ne 'llama.cpp') { $resultFile = $resultFile.Replace('-results.jso
 $utf8 = New-Object Text.UTF8Encoding($false)
 # エージェントは作業用のコピーの中で動かす。プロジェクトの本物のファイルを書き換えさせない（Aider が README.html を上書きした）
 # git のリポジトリの外に置く。中に置くと、モデルがリポジトリの root を推測して本物を読みにいく
-# 中身は 1 問ごとに消すので、専用のフォルダにする（W:/temp そのものにしない）
-$work = 'W:/temp/llama-cp-sandbox'
+# 中身は 1 問ごとに消すので、専用のフォルダにする（場所は paths.ps1）
+$work = $LlmSandbox
 function Reset-Sandbox {
 	if (Test-Path $work) { Get-ChildItem -LiteralPath $work -Force | Remove-Item -Recurse -Force }
 	New-Item -ItemType Directory -Force (Join-Path $work 'tmp'), (Join-Path $work '.claude') | Out-Null
@@ -53,7 +58,7 @@ Write-Host "対象 $(@($models).Count) 本"
 # ルールなし: 空のホームに向け、利用者の CLAUDE.md・メモリ・フックを読ませない
 # ホームもプロジェクトの外に置く。Claude Code は指示文にメモリの置き場（ホームの下）を書くため、
 # プロジェクトの中に置くと、そのパスからモデルがプロジェクト本体を推測して書きにいく
-$noRulesHome = 'W:/temp/llama-cp-home'
+$noRulesHome = $LlmCcHome
 if ($NoRules) {
 	New-Item -ItemType Directory -Force $noRulesHome | Out-Null
 	$resultFile = $resultFile.Replace('-results.jsonl', '-norules-results.jsonl')
@@ -97,7 +102,9 @@ function Invoke-Claude([string]$prompt, [string]$tag, [switch]$Trace, [string]$C
 # Windows PowerShell 5.1 は 2>&1 で受けた標準エラーの行をエラーとして扱い、Stop のままだと止まる
 $ErrorActionPreference = 'Continue'
 $llamaVersion = (& $exe --version 2>&1 | Select-String 'version' | Select-Object -First 1).Line
-$versions = [ordered]@{ agent = "$(claude.exe --version 2>&1 | Select-Object -First 1)".Trim(); llama = "$llamaVersion".Trim(); node = (node --version) }
+# 配布物には claude.exe が PATH に無く、npm の claude.cmd だけがある
+$claudeVer = if (Get-Command claude.exe -ErrorAction SilentlyContinue) { claude.exe --version 2>&1 } else { claude.cmd --version 2>&1 }
+$versions = [ordered]@{ agent = "$($claudeVer | Select-Object -First 1)".Trim(); llama = "$llamaVersion".Trim(); node = (node --version) }
 $ErrorActionPreference = 'Stop'
 Write-Host "版: Claude Code $($versions.agent) / llama.cpp $($versions.llama) / node $($versions.node)"
 
@@ -188,4 +195,4 @@ foreach ($m in $models) {
 		[IO.File]::AppendAllText($resultFile, (($rec | ConvertTo-Json -Compress -Depth 4) + "`n"), $utf8)
 	}
 }
-Write-Host "結果: logs/test-cc-tools/$runStamp-results.jsonl"
+Write-Host "結果: $($resultFile.Replace($root + [IO.Path]::DirectorySeparatorChar, ''))"

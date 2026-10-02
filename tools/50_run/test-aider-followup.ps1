@@ -1,6 +1,7 @@
 ﻿param(
 	[string]$Only = 'gemma-4-E4B',
-	[string]$ModelDir = 'C:\AI_Models',
+	# 空なら config.cmd の LLM_MODEL_DIR（paths.ps1）
+	[string]$ModelDir = '',
 	[int]$Repeat = 3,
 	[int]$Ctx = 65536,
 	[int]$TimeoutSec = 600,
@@ -10,14 +11,16 @@
 # 1 回目の指示は sum の試験と同じ。2 回目は同じ作業フォルダで Aider を起動し直して渡す
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'sum-judge.ps1')
-$root = (Resolve-Path "$PSScriptRoot/../..").Path
+. (Join-Path $PSScriptRoot 'paths.ps1')
+$root = $LlmRoot
+if (-not $ModelDir) { $ModelDir = $LlmModelDir }
 $exe = Join-Path $root 'bin/llama.cpp/llama-server.exe'
 $logDir = Join-Path $root 'logs/test-aider-followup'
 New-Item -ItemType Directory -Force $logDir | Out-Null
 $runStamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $resultFile = Join-Path $logDir "$runStamp-results.jsonl"
 $utf8 = New-Object Text.UTF8Encoding($false)
-$work = 'W:/temp/llama-cp-sandbox'
+$work = $LlmSandbox
 $aider = Join-Path $env:USERPROFILE '.local/bin/aider.exe'
 $followups = [ordered]@{
 	run  = 'node sum を実行して、表示された結果を教えて'

@@ -325,11 +325,15 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
   installers\
     node-v26.10.0-x64.msi
     gfx_win_101.7092.exe
+    drivers\               Intel GPU ドライバ
   models\                  .gguf（既定の置き場。設定で別の場所にもできる）
-  templates\               .jinja
   run\                     起動用の cmd（第 4 章）
-  tools\                   試験スクリプト
+  tools\50_run\            試験スクリプト・起動用の start-agent.ps1・paths.ps1
+    templates\             .jinja
+  .claude\settings.json    試験が作業フォルダに置く設定
+  README.html              試験が作業フォルダに置くファイル
   config.cmd               場所の設定（下の表）
+  配布物の説明.html        本書の写し
   work\                    エージェントの作業フォルダ・空のホーム（実行時に作る）
   logs\                    試験の結果（実行時に作る）</code></pre>
 
@@ -347,12 +351,16 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 <tr><td class="nowrap"><code>W:/temp/llama-cp-agent-home</code></td><td>Pi・OpenCode の空のホーム（<code>test-agents.ps1</code>）</td><td class="nowrap">（<code>LLM_WORK_DIR</code> の下）</td><td><code>&lt;配布先&gt;\work\agent-home</code></td></tr>
 <tr><td class="nowrap"><code>W:/temp/llama-cp-home</code></td><td>Claude Code の空のホーム（<code>test-cc-tools.ps1</code>）</td><td class="nowrap">（<code>LLM_WORK_DIR</code> の下）</td><td><code>&lt;配布先&gt;\work\cc-home</code></td></tr>
 <tr><td class="nowrap"><code>bin/llama.cpp</code></td><td>llama-server の場所（<code>-LlamaDir</code>）</td><td class="nowrap"><code>LLM_BACKEND</code></td><td>自動（第 4 章）</td></tr>
-<tr><td class="nowrap"><code>tools/50_run/templates</code></td><td>差し替え用のテンプレート</td><td class="nowrap">—</td><td><code>&lt;配布先&gt;\templates</code></td></tr>
+<tr><td class="nowrap"><code>tools/50_run/templates</code></td><td>差し替え用のテンプレート</td><td class="nowrap">—</td><td><code>&lt;配布先&gt;\tools\50_run\templates</code>（スクリプトの置き場所からの相対なので、そのまま）</td></tr>
 <tr><td class="nowrap">PATH の <code>node</code>・<code>pi</code>・<code>opencode</code>・<code>claude</code></td><td>エージェントの起動</td><td class="nowrap">—</td><td>cmd の中で <code>&lt;配布先&gt;\bin\node</code> を PATH の先頭に足す</td></tr>
 </tbody>
 </table>
 </div>
 <p>引数で渡せば、その回だけ設定より優先する（いまの <code>-ModelDir</code> などと同じ）。</p>
+<p>
+読み込みは <code>tools/50_run/paths.ps1</code> が受け持つ。root に <code>config.cmd</code> があればその <code>set</code> 行を読み、無ければ環境変数、それも無ければ開発用の PC の場所（上の表の「いまの値」）にする。
+開発用の PC には <code>config.cmd</code> を置かないので、今までどおりの場所で動く。
+</p>
 <div class="callout callout-warning">
 <strong>作業フォルダは配布物の中でも、プロジェクトの git の外に置く。</strong>
 試験では、作業フォルダがリポジトリの中にあると、モデルがリポジトリの root を推測して本物のファイルを読みにいった。配布物は git のリポジトリではないので <code>&lt;配布先&gt;\work</code> でよいが、開発用のこの PC で流すときは今までどおり外に置く。
@@ -373,10 +381,12 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 <tr><td class="nowrap"><code>claude-gemma-4-E4B.cmd</code></td><td>同じく Claude Code（npm 版）。<code>claude-exe-…</code> は単体の <code>claude.exe</code></td></tr>
 <tr><td class="nowrap"><code>opencode-gemma-4-E4B.cmd</code></td><td>同じく OpenCode</td></tr>
 <tr><td class="nowrap"><code>server-gemma-4-E4B.cmd</code></td><td>llama-server だけを立てる（エージェントを自分で開くとき）</td></tr>
+<tr><td class="nowrap"><code>bench-gemma-4-E4B.cmd</code></td><td>Vulkan 版（Intel GPU）と CPU 版で、llama-bench の速さを測る</td></tr>
+<tr><td class="nowrap"><code>list-devices.cmd</code></td><td>Vulkan 版から見える GPU を表示する（1 本だけ）</td></tr>
 </tbody>
 </table>
 </div>
-<p>エージェント 3 つ（Claude Code は npm 版と単体版）× モデル 4 本。cmd は手で書かず、モデルとエージェントの一覧から生成する。</p>
+<p>モデル 4 本 × 6 種類（Pi・OpenCode・Claude Code の npm 版と単体版・サーバだけ・速さ）＋ <code>list-devices.cmd</code> の 25 本。cmd は手で書かず、組み立てのスクリプトがモデルの一覧から生成する。中身はどれも <code>tools\50_run\start-agent.ps1</code> を引数付きで呼ぶだけ。</p>
 
 <h2>cmd がすること</h2>
 <ol>
@@ -392,14 +402,41 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 <section class="ch05" id="ch05">
 <h1>作業の手順と未確認のこと</h1>
 <h2>手順</h2>
-<ol>
-	<li>試験スクリプトの場所を <code>config.cmd</code> の設定と引数で変えられるようにする（第 3 章の表の箇所）</li>
-	<li>zip 版 Node.js を展開し、その中に Pi・OpenCode・Claude Code を npm で入れる。インストール時のスクリプトを止めずに入れ、OS 用の実行ファイルまでそろえる</li>
-	<li>起動用の cmd を生成するスクリプトを書く</li>
-	<li>配布物を組み立てるスクリプトを <code>tools/60_release/</code> に書く。出力先は <code>_releases/</code></li>
-	<li>この PC で、配布物を別のドライブ（例: <code>Y:\</code>）に置き、ネットを切った状態で cmd と試験が動くかを確かめる</li>
-	<li>現地で <code>--list-devices</code>・<code>llama-bench</code>・sum の試験を流す</li>
-</ol>
+<ul>
+	<li><span class="badge b-ok">済</span>試験スクリプトの場所を <code>config.cmd</code> の設定と引数で変えられるようにする（<code>tools/50_run/paths.ps1</code>）</li>
+	<li><span class="badge b-ok">済</span>zip 版 Node.js（SHA256 を照合）を展開し、その中に Claude Code 2.1.287・Pi 0.99.2・OpenCode 1.18.34 を npm で入れる</li>
+	<li><span class="badge b-ok">済</span>起動用の <code>tools/50_run/start-agent.ps1</code> を書き、組み立てのときに組み合わせごとの cmd を生成する</li>
+	<li><span class="badge b-ok">済</span>配布物を組み立てる <code>tools/60_release/make-offline-bundle.ps1</code> を書く。出力は <code>_releases/offline/llm-bundle-yyyyMMdd</code>（モデル込みで 20.4 GB）</li>
+	<li><span class="badge b-ok">済</span>この PC で、配布物をプロジェクトの外の別の場所に置き、<code>config.cmd</code> のモデルの場所を書き換えて動くかを確かめる（下の表）</li>
+	<li><span class="badge b-none">未</span>ネットを切った状態で動くかを確かめる</li>
+	<li><span class="badge b-none">未</span>現地で <code>list-devices.cmd</code>・<code>bench-….cmd</code>・sum の試験を流し、対話の cmd で使ってみる</li>
+</ul>
+
+<h2>別の場所に置いて確かめた結果</h2>
+<p>
+配布物をプロジェクトの外へ写し（モデルは除く）、<code>config.cmd</code> の <code>LLM_MODEL_DIR</code> を開発用の PC のモデルの場所に書き換えて流した。
+PATH は配布物の <code>bin\node</code> と Windows の最小限だけにし、この PC に入っている Node.js・エージェントを使わないようにした。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">確かめたこと</th><th>結果</th></tr></thead>
+<tbody>
+<tr><td class="nowrap"><code>list-devices.cmd</code></td><td>✅ Intel GPU（Vulkan0）が見えた</td></tr>
+<tr><td class="nowrap"><code>bench-gemma-4-E2B….cmd</code></td><td>✅ 書き換えた場所からモデルを見つけ、Vulkan 版と CPU 版で測れた（この PC は NVIDIA もあるので、Vulkan 版の値は NVIDIA と合わせた速さ）</td></tr>
+<tr><td class="nowrap">Pi の試験（E4B）</td><td>✅ 日本語の確認・sum とも合格。版は配布物の pi 0.99.2・node v26.10.0</td></tr>
+<tr><td class="nowrap">Claude Code npm 版の試験（E4B）</td><td>✅ 日本語の確認・sum とも合格</td></tr>
+<tr><td class="nowrap">Claude Code 単体版の試験（E4B）</td><td>✅ sum 合格（<code>bin\claude</code> を PATH の先頭にして <code>claude.exe</code> を使わせた）</td></tr>
+<tr><td class="nowrap">OpenCode の試験（E4B）</td><td>✅ sum 合格</td></tr>
+<tr><td class="nowrap">起動用の cmd（Pi・E2B）</td><td>✅ Vulkan 版を自動で選び、サーバを立て、Pi を開き、閉じたらサーバを止めた（入力をつながなかったので Pi はすぐ終わった。対話はまだ試していない）</td></tr>
+<tr><td class="nowrap">開発用の PC での試験</td><td>✅ <code>config.cmd</code> なしで、今までの場所のまま動いた</td></tr>
+</tbody>
+</table>
+</div>
+<p>試験は速さを見るものではないため、サーバは CUDA 版で動かした。</p>
+<div class="callout callout-important">
+<strong>Claude Code は試験のときより 1 つ新しい 2.1.287 を入れた。</strong>
+3 回ずつ流した試験は 2.1.286 だった。npm の版が自動で上がっていたため、配布物にはいま入っている 2.1.287 を入れている。
+</div>
 
 <h2>未確認のこと</h2>
 <ul>
