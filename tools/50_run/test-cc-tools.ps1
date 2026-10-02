@@ -8,7 +8,9 @@
 	[switch]$UseTemplates,
 	[string]$Tests = 'read,write',
 	[switch]$NoRules,
-	[string]$ExtraArgs = ''
+	[string]$ExtraArgs = '',
+	# 使う llama.cpp の bin 下のフォルダ名（Intel GPU は llama.cpp-b11320-vulkan、CPU だけは llama.cpp-b11320-cpu）
+	[string]$LlamaDir = 'llama.cpp'
 )
 # 10GB 以下の手持ちモデルを 1 本ずつ llama-server で起動し、Claude Code からファイルの読み・書きができるかを試す
 # 結果は logs/test-cc-tools/ に 1 モデル 1 行の JSON Lines で追記する
@@ -16,11 +18,12 @@ $ErrorActionPreference = 'Stop'
 # -Tests には read・write のほか、sum（初期プログラミング）・echo（日本語が届くかの確認）も渡せる
 . (Join-Path $PSScriptRoot 'sum-judge.ps1')
 $root = (Resolve-Path "$PSScriptRoot/../..").Path
-$exe = Join-Path $root 'bin/llama.cpp/llama-server.exe'
+$exe = Join-Path $root "bin/$LlamaDir/llama-server.exe"
 $logDir = Join-Path $root 'logs/test-cc-tools'
 New-Item -ItemType Directory -Force $logDir | Out-Null
 $runStamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $resultFile = Join-Path $logDir "$runStamp-results.jsonl"
+if ($LlamaDir -ne 'llama.cpp') { $resultFile = $resultFile.Replace('-results.jsonl', "-$LlamaDir-results.jsonl") }
 $utf8 = New-Object Text.UTF8Encoding($false)
 # エージェントは作業用のコピーの中で動かす。プロジェクトの本物のファイルを書き換えさせない（Aider が README.html を上書きした）
 # git のリポジトリの外に置く。中に置くと、モデルがリポジトリの root を推測して本物を読みにいく

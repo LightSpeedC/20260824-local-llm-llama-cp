@@ -9,18 +9,21 @@
 	[string]$ExtraArgs = '',
 	[ValidateSet('responses', 'chat')][string]$CodexWireApi = 'responses',
 	# read・write・sum（初期プログラミング）・echo（日本語が届くかの確認）をカンマ区切りで
-	[string]$Tests = 'read,write'
+	[string]$Tests = 'read,write',
+	# 使う llama.cpp の bin 下のフォルダ名（Intel GPU は llama.cpp-b11320-vulkan、CPU だけは llama.cpp-b11320-cpu）
+	[string]$LlamaDir = 'llama.cpp'
 )
 # Claude Code 以外のエージェント（Pi・OpenCode・Aider）を llama-server に繋ぎ、読み・書きができるかを試す
 # 試験の中身は test-cc-tools.ps1 と同じ。結果は logs/test-agents/ に 1 モデル 1 行の JSON Lines で追記する
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'sum-judge.ps1')
 $root = (Resolve-Path "$PSScriptRoot/../..").Path
-$exe = Join-Path $root 'bin/llama.cpp/llama-server.exe'
+$exe = Join-Path $root "bin/$LlamaDir/llama-server.exe"
 $logDir = Join-Path $root 'logs/test-agents'
 New-Item -ItemType Directory -Force $logDir | Out-Null
 $runStamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $resultFile = Join-Path $logDir "$runStamp-$Agent-results.jsonl"
+if ($LlamaDir -ne 'llama.cpp') { $resultFile = $resultFile.Replace('-results.jsonl', "-$LlamaDir-results.jsonl") }
 $utf8 = New-Object Text.UTF8Encoding($false)
 # エージェントは作業用のコピーの中で動かす。プロジェクトの本物のファイルを書き換えさせない（Aider が README.html を上書きした）
 # git のリポジトリの外に置く。中に置くと、モデルがリポジトリの root を推測して本物を読みにいく
