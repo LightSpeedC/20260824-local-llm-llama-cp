@@ -37,10 +37,10 @@ llama-server に繋いで使えそうなコーディングエージェントを�
 |---|---|---|---|
 | **Pi** | CLI | `~/.pi/agent/models.json` に baseUrl とモデルを書く | ✅ **本命** 最初に送る量が最小。gemma-4 系と組み合わせた記事がある |
 | **OpenCode** | CLI | `opencode.json` に provider（baseURL）を書く | ✅ **本命** 送る量が Claude Code の約 1/5。要求の先頭を毎回同じに保つためキャッシュが効きやすいとされる |
-| Qwen Code | CLI | modelProviders に baseUrl・contextWindowSize・envKey を書く（envKey を省くと認証エラー） | ⚠ **候補** Qwen3-Coder 向け。Gemini CLI 由来で送る量は多めの見込み（未確認） |
-| Codex CLI | CLI | `%USERPROFILE%\.codex\config.toml` の `[model_providers.*]`、または `--oss` | ⚠ **候補** gpt-oss-20b との組み合わせ例が多い。llama-server が Responses API に応じるかは要確認 |
-| Aider | CLI | LiteLLM 経由で `openai/` 接頭辞のモデル名を使う | ⚠ **候補** 道具呼び出しでなく差分の書式で編集するため、道具呼び出しが弱いモデルでも動く可能性。Python が要る |
-| Claude Code（軽量起動） | CLI | いまと同じ。共通ルール・メモリ・MCP を読ませない起動方法を探す | ⚠ **候補** 送る量を減らせれば、今回の試験結果が変わる可能性 |
+| Qwen Code | CLI | modelProviders に baseUrl・contextWindowSize・envKey を書く（envKey を省くと認証エラー） | ⚠️ **候補** Qwen3-Coder 向け。Gemini CLI 由来で送る量は多めの見込み（未確認） |
+| Codex CLI | CLI | `%USERPROFILE%\.codex\config.toml` の `[model_providers.*]`、または `--oss` | ⚠️ **候補** gpt-oss-20b との組み合わせ例が多い。llama-server が Responses API に応じるかは要確認 |
+| Aider | CLI | LiteLLM 経由で `openai/` 接頭辞のモデル名を使う | ⚠️ **候補** 道具呼び出しでなく差分の書式で編集するため、道具呼び出しが弱いモデルでも動く可能性。Python が要る |
+| Claude Code（軽量起動） | CLI | いまと同じ。共通ルール・メモリ・MCP を読ませない起動方法を探す | ⚠️ **候補** 送る量を減らせれば、今回の試験結果が変わる可能性 |
 
 > [!IMPORTANT]
 > **Aider は Python が要る。** 共通ルールでは Python を使わないことにしているため、入れるかどうかは利用者の判断が要る。

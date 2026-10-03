@@ -187,7 +187,7 @@ footer{
 	<div class="inner">
 		<h1>課題一覧 — ローカルLLM 実行環境</h1>
 		<div class="lead">これから解決すること。状態は 未 / 着手 / 済 の3段階</div>
-		<div class="date">📅 作成: 2026-09-27 / 更新: 2026-10-02</div>
+		<div class="date">📅 作成: 2026-09-27 / 更新: 2026-10-03</div>
 	</div>
 </div>
 
@@ -348,6 +348,9 @@ llama.cpp・エージェント・Node.js を最新にして、これまでの試
 	<li><span class="badge b-ok">済</span>E4B で 4 エージェントに日本語の確認と sum を流し、壊れていないことを確かめる（日本語は 4 つとも合格。sum は Claude Code・Pi・OpenCode が合格、Aider は実行したが結果を答えず、前回と同じ傾向）</li>
 	<li><span class="badge b-ok">済</span>主な速度を llama-bench で新旧を交互に測る（pp512・tg64。Qwen3-4B・E4B・Qwen3-30B-A3B は誤差の範囲。gpt-oss-20b の pp512 だけ 138 → 128 tok/s と約 7% 遅い。記録は <code>logs/bench-versions-20261001.txt</code>）</li>
 	<li><span class="badge b-warn">着手</span>sum の残り 18 本 × 4 エージェントをやり直し、前の版と比べて資料に反映する（1 セット目は Claude Code 12/19・Pi 15/19。前回の 16・14 との差が揺れか版の影響かを見るため、<code>tools/50_run/run-sum-sets.ps1</code> で 3 セット以上流す）</li>
+	<li><span class="badge b-ok">済</span>3 セットの表を仕上げる（OpenCode の 3 セット目と Devstral を入れ、合格数を数え直し、サイズ順にしてモデルの横に x.xGB を書く。<code>sum-table.ps1 -Sets</code> で結果のファイルから作るようにした）</li>
+	<li><span class="badge b-ok">済</span>実行の跡が無い合格を ☑️補欠合格 として表と判定（<code>sum-table.ps1</code>）に入れる（判定は <code>sum-judge.ps1</code> の <code>Get-SumMark</code>・<code>Format-SumCell</code>。テスト 36 件）</li>
+	<li><span class="badge b-none">未</span>Aider に別の指示で実行させた結果と、Intel GPU・CPU だけで流した結果を試験結果に書く</li>
 	<li><span class="badge b-none">未</span>読み書きの試験をやり直す（sum が「書く → 実行する」を含むため、sum の結果を見て要否を決める）</li>
 </ul>
 <p>関連: <a href="../01_research/r260930-01-エージェント試験の経緯と全実行の記録.html">試験の経緯と全実行の記録</a>（「試験した版」）</p>
@@ -416,6 +419,22 @@ N: ドライブが廃止され、プロジェクトは W:、共有ツールは T
 <p>関連: <a href="../10_plan/p261002-01-閉域網へ持っていく配布物.html">閉域網へ持っていく配布物</a></p>
 </details>
 
+<details class="md-flat" open>
+<summary><span class="badge b-none">未</span><span class="no">i261003-01</span>配布物の起動まわりの穴をふさぐ</summary>
+<p>全体を見直して見つけた、<code>start-agent.ps1</code>・<code>paths.ps1</code>・<code>make-offline-bundle.ps1</code> の弱いところ。現地でつまずく順に並べた。</p>
+<ul>
+	<li><span class="badge b-none">未</span>Claude Code の起動で <code>CLAUDE_CODE_ATTRIBUTION_HEADER=0</code> を渡す（<code>cc1.cmd</code> は渡している。無いと遅くなるかを測ってから直す）</li>
+	<li><span class="badge b-none">未</span>8080 番を別のプログラムが使っていても <code>/health</code> の確認が通ってしまう。起動前に空きを見て、使用中なら「使用中」と出して止める</li>
+	<li><span class="badge b-none">未</span>ポートだけ ps1 を直さないと変えられない。<code>config.cmd</code> に <code>LLM_PORT</code> を足し、<code>start-agent</code> と試験のスクリプトの既定にする（現地で変えるのは <code>config.cmd</code> だけ、を保つ）</li>
+	<li><span class="badge b-none">未</span>cmd の窓を × で閉じると <code>finally</code> が走らず llama-server が残る。次の起動で、配布物の llama-server が残っていれば知らせて止める</li>
+	<li><span class="badge b-none">未</span>3.2GB を超えるモデルに <code>-ngl</code> を付けないため、Vulkan でも 12B-QAT は CPU だけで動く。Vulkan のときは大きさに関わらず <code>-ngl 99</code> にし、この PC の Iris Xe で 12B を測ってから決める</li>
+	<li><span class="badge b-none">未</span><code>config.cmd</code> を <code>Encoding.Default</code> で読むため、pwsh 7 では日本語のパスが化ける。CP932 と決めて読み、<code>%USERPROFILE%</code> などの <code>%変数%</code> も環境変数で展開する</li>
+	<li><span class="badge b-none">未</span><code>SHASUMS256.txt</code> の取得に失敗したらその場で止める。npm の中に <code>claude.exe</code> が無ければ「置き場が変わった」と出す</li>
+	<li><span class="badge b-ok">済</span>配布物は約 20.4 GB で、12B-QAT は 1 ファイルで 4 GB を超える。運ぶ媒体が FAT32 なら書き込めないため、媒体と形式（exFAT・NTFS）を確かめる（利用者が確かめた。問題なし）</li>
+</ul>
+<p>関連: <a href="../10_plan/p261002-01-閉域網へ持っていく配布物.html">閉域網へ持っていく配布物</a></p>
+</details>
+
 </section>
 
 <section class="ch03" id="ch03">
@@ -428,6 +447,19 @@ N: ドライブが廃止され、プロジェクトは W:、共有ツールは T
 	<li><span class="badge b-none">未</span>develop → release を <code>--no-ff</code> でマージする</li>
 	<li><span class="badge b-none">未</span>release → master を <code>--no-ff</code> でマージし、注釈付きタグを打つ</li>
 </ul>
+</details>
+
+<details class="md-flat" open>
+<summary><span class="badge b-none">未</span><span class="no">i261003-02</span>古いスクリプトの置き場と、判定のテスト</summary>
+<p>配布物には入らないが、開発用の PC の置き場を変えたときに取り残されるものと、確かめる手段が無いもの。</p>
+<ul>
+	<li><span class="badge b-ok">済</span>モデルの置き場を現地と同じ <code>C:\AI-models</code> に改め、スクリプトと資料の <code>C:\AI_Models</code> をすべて書き換える</li>
+	<li><span class="badge b-none">未</span><code>start-agent</code>・<code>test-cc-tools</code> と役目が重なる <code>test-cc.ps1</code>・<code>run-server-*.cmd</code>・<code>bench.cmd</code> を消し、資料に出てくる名前を書き換える（消す対象は作業のときに 1 つずつ示す）</li>
+	<li><span class="badge b-none">未</span>root の <code>cc1.cmd</code> は、いちばん使えそうな組み合わせを動かす入口として残す。<code>start-agent</code> を呼ぶ形に書き換え、サーバの起動から停止までを 1 本で済ませる（直接書いた <code>W:\temp</code> も無くなる）</li>
+	<li><span class="badge b-none">未</span>README と実行計画の「LM Studio と共用・移動しない」を、置き場を <code>C:\AI-models</code> に改めた今の形に直す</li>
+	<li><span class="badge b-ok">済</span><code>tests/</code> を作り、<code>sum-judge.ps1</code> の判定（✅・☑️・❌）をテストする。ランチャーは <code>tools/40_test/</code>（<code>tests/sum-judge.tests.ps1</code> の 22 件。<code>tools/40_test/run-tests.cmd</code> で流す。表のマスを作る <code>sum-table.ps1</code> の <code>Format-Cell</code> は、☑️ を入れるときにテストを足す）</li>
+	<li><span class="badge b-none">未</span>どこにも書いていない <code>bin/llama.cpp-b11302</code>（1.1 GB）を消す（試験は b11320 で取り直した）</li>
+	<li><span class="badge b-none">未</span><code>tmp/</code> に残る 9/29 の試験の跡（<code>agent-home</code>・<code>home-norules</code>・<code>sandbox</code>）と、展開済みの llama.cpp の zip 2 本（0.6 GB）を全部消す</li></ul>
 </details>
 
 </section>
