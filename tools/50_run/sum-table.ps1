@@ -1,9 +1,12 @@
 ﻿# 初期プログラミングの試験結果（sum）から、試験結果の第 4 章の表の行を作る（p260930-02）
 # エージェント × モデルごとに、いちばん新しい結果を使う。判定は sum-judge.ps1 と同じ基準で出し直す
 # -All: 最新だけでなく、流したすべての回を 1 行ずつ出す（全実行の記録用）
-param([string]$Since = '20260930-2254', [switch]$All)
+# -Sets: 同じ組を何回も流したとき、1 マスに回の順で ✅☑️❌⏱️ を並べる（版を上げて 3 回ずつ流した表用）
+# -Until: この時刻より前の結果だけを使う（例: 版を上げた 3 セットは -Since 20261001-2300 -Until 20261002-0700）
+param([string]$Since = '20260930-2254', [string]$Until = '99999999', [switch]$All, [switch]$Sets)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'sum-judge.ps1')
+. (Join-Path $PSScriptRoot 'paths.ps1')
 $root = (Resolve-Path "$PSScriptRoot/../..").Path
 
 # ⑤ は保存してある作業ログから判定し直す（判定を直したとき、流し直さずに済むように）
@@ -33,7 +36,8 @@ $runs = @()
 $sources = @(
 	Get-ChildItem (Join-Path $root 'logs/test-cc-tools') -Filter '*-norules-results.jsonl' | ForEach-Object { @{ file = $_; agent = 'claude' } }
 	Get-ChildItem (Join-Path $root 'logs/test-agents') -Filter '*-results.jsonl' | ForEach-Object { @{ file = $_; agent = $null } }
-) | Where-Object { $_.file.Name -ge $Since } | Sort-Object { $_.file.Name }
+) | Where-Object { $_.file.Name -ge $Since -and $_.file.Name -lt $Until -and $_.file.Name -notmatch '-llama\.cpp-' } | Sort-Object { $_.file.Name }
+# 名前に -llama.cpp-… が付くのは、Vulkan 版・CPU 版など別の llama.cpp で流した結果なので混ぜない
 foreach ($s in $sources) {
 	foreach ($line in [IO.File]::ReadAllLines($s.file.FullName, [Text.Encoding]::UTF8)) {
 		if (-not $line.Trim()) { continue }
@@ -46,20 +50,18 @@ foreach ($s in $sources) {
 		$runs += [pscustomobject]@{ stamp = $s.file.Name.Substring(0, 15); agent = $agent; model = $o.model; sum = $o.sum }
 	}
 }
-function Format-Cell($r) {
-	if (-not $r) { return '—' }
-	$sec = [Math]::Round([double]$r.sec)
-	if ($r.status -ne 'ok') { return "<span class=`"badge b-none`">時間切れ</span>" }
-	$run = ($r.run_out -match '(?<!\d)55(?!\d)')
-	if ($r.file -eq 'あり' -and $run -and $r.report_pass) {
-		$trace = if ($r.log_ran) { '' } else { '（跡なし）' }
-		return "<span class=`"badge b-ok`">合格</span>$sec 秒$trace"
+if ($Sets) {
+	# 1 マスに回の順で記号を並べる。行はモデルの大きさ順にし、名前の横に GB を書く
+	$size = @{}
+	Get-ChildItem $LlmModelDir -Recurse -Filter *.gguf | ForEach-Object { $size[$_.BaseName] = $_.Length }
+	$marks = @{}
+	foreach ($r in $runs) { $marks["$($r.agent)|$($r.model)"] += (Get-SumMark $r.sum) }
+	foreach ($m in ($order | Sort-Object { $size[$_] })) {
+		$gb = if ($size[$m]) { '{0:N1} GB' -f ($size[$m] / 1GB) } else { '?' }
+		$tds = foreach ($a in $agents) { $v = $marks["$a|$m"]; if (-not $v) { $v = '—' }; "<td class=`"nowrap`">$v</td>" }
+		"<tr><td class=`"nowrap`">$m</td><td class=`"num nowrap`">$gb</td>$($tds -join '')</tr>"
 	}
-	$why = if ($r.file -ne 'あり') { 'sum.js を作らない' }
-		elseif (-not $run) { '書いたが 55 が出ない' }
-		elseif ($r.log_ran) { '実行したが結果を答えない' }
-		else { '書いたが実行・報告なし' }
-	return "<span class=`"badge b-ng`">不合格</span>$why"
+	return
 }
 if ($All) {
 	foreach ($r in $runs) {
@@ -67,11 +69,11 @@ if ($All) {
 		# 表に載っているのと同じ組の、より新しい回があれば、この回は流し直しで置き換えられた
 		$latest = ($cells["$($r.agent)|$($r.model)"] -eq $r.sum)
 		$valid = if ($latest) { '有効' } else { '無効：流し直した' }
-		"<tr><td class=`"nowrap`">$t</td><td class=`"nowrap`">$($agentNames[$r.agent])</td><td class=`"nowrap`">$($r.model)</td><td>$(Format-Cell $r.sum)</td><td class=`"num`">$([Math]::Round([double]$r.sum.sec)) 秒</td><td>$valid</td></tr>"
+		"<tr><td class=`"nowrap`">$t</td><td class=`"nowrap`">$($agentNames[$r.agent])</td><td class=`"nowrap`">$($r.model)</td><td>$(Format-SumCell $r.sum)</td><td class=`"num`">$([Math]::Round([double]$r.sum.sec)) 秒</td><td>$valid</td></tr>"
 	}
 	return
 }
 foreach ($m in $order) {
-	$tds = foreach ($a in $agents) { "<td>$(Format-Cell $cells["$a|$m"])</td>" }
+	$tds = foreach ($a in $agents) { "<td>$(Format-SumCell $cells["$a|$m"])</td>" }
 	"<tr><td class=`"nowrap`">$m</td>$($tds -join '')</tr>"
 }

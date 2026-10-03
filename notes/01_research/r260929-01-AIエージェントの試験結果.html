@@ -220,7 +220,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<div class="inner">
 		<h1>ローカルLLM で AI エージェントを使う — 試験結果</h1>
 		<div class="lead">llama-server に繋いだ Claude Code・Pi・OpenCode・Aider・Codex CLI で、20GB 以下のモデルがファイルを読み書きできるかを試した結果と、どれを使うか</div>
-		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-10-02</div>
+		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-10-03</div>
 	</div>
 </div>
 
@@ -408,7 +408,7 @@ Codex はファイルの読み書きに PowerShell のコマンドを使う。<c
 <pre><code class="language-text">1から10までの合計を表示するnode.jsプログラムをsum.jsに書く。node sumで実行する</code></pre>
 <p>
 判定は、<code>sum.js</code> ができ、試験側で <code>node sum</code> を実行すると 55 が出て、エージェントの答えに 55 がある、の 3 つがそろって合格。
-加えて、エージェントの作業ログに <code>node sum</code> の実行があるかを見た（「跡なし」は、実行せずに 55 と答えたもの）。
+加えて、エージェントの作業ログに <code>node sum</code> の実行があるかを見た。3 つがそろっても実行の跡が無いもの（実行せずに 55 と答えたもの）は ☑️ 補欠合格とした。
 問と判定の詳細は<a href="../10_plan/p260930-02-初期プログラミングの検証計画.html">初期プログラミングの検証計画</a>にある。サーバの設定は第 2 章と同じ。
 </p>
 <div class="tablewrap">
@@ -416,35 +416,35 @@ Codex はファイルの読み書きに PowerShell のコマンドを使う。<c
 <thead><tr><th>モデル</th><th class="nowrap">Claude Code</th><th class="nowrap">Pi</th><th class="nowrap">OpenCode</th><th class="nowrap">Aider</th></tr></thead>
 <tbody>
 <!-- AUTO:sum-rows -->
-<tr><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>32 秒</td><td><span class="badge b-ok">合格</span>7 秒</td><td><span class="badge b-ok">合格</span>11 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>63 秒</td><td><span class="badge b-ok">合格</span>21 秒</td><td><span class="badge b-ok">合格</span>26 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td><span class="badge b-ok">合格</span>77 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td><span class="badge b-ok">合格</span>119 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ok">合格</span>33 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td><span class="badge b-ok">合格</span>102 秒</td><td><span class="badge b-ok">合格</span>54 秒</td><td><span class="badge b-ok">合格</span>97 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">gpt-oss-20b-MXFP4</td><td><span class="badge b-ok">合格</span>80 秒（跡なし）</td><td><span class="badge b-ok">合格</span>32 秒（跡なし）</td><td><span class="badge b-ok">合格</span>84 秒（跡なし）</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td><span class="badge b-ok">合格</span>118 秒</td><td><span class="badge b-ok">合格</span>46 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td><span class="badge b-ok">合格</span>113 秒</td><td><span class="badge b-ok">合格</span>49 秒</td><td><span class="badge b-ok">合格</span>97 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>143 秒</td><td><span class="badge b-ok">合格</span>39 秒</td><td><span class="badge b-ok">合格</span>91 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>158 秒（跡なし）</td><td><span class="badge b-ok">合格</span>44 秒（跡なし）</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ok">合格</span>22 秒（跡なし）</td></tr>
-<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>170 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>173 秒</td><td><span class="badge b-ok">合格</span>24 秒</td><td><span class="badge b-ng">不合格</span>実行したが結果を答えない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Bonsai-27B-Q1_0</td><td><span class="badge b-ok">合格</span>445 秒</td><td><span class="badge b-ok">合格</span>57 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td><span class="badge b-ok">合格</span>227 秒</td><td><span class="badge b-ok">合格</span>35 秒</td><td><span class="badge b-ok">合格</span>102 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td><span class="badge b-ok">合格</span>504 秒（跡なし）</td><td><span class="badge b-ok">合格</span>111 秒（跡なし）</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td><span class="badge b-ok">合格</span>577 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ok">合格</span>175 秒</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td><span class="badge b-none">時間切れ</span></td><td><span class="badge b-ok">合格</span>18 秒</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
-<tr><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td><span class="badge b-none">時間切れ</span></td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td><td><span class="badge b-ng">不合格</span>書いたが 55 が出ない</td><td><span class="badge b-ok">合格</span>40 秒（跡なし）</td></tr>
-<tr><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td><span class="badge b-none">時間切れ</span></td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>sum.js を作らない</td><td><span class="badge b-ng">不合格</span>書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td>✅ 合格 32 秒</td><td>✅ 合格 7 秒</td><td>✅ 合格 11 秒</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td>✅ 合格 63 秒</td><td>✅ 合格 21 秒</td><td>✅ 合格 26 秒</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td>✅ 合格 77 秒</td><td>❌ 不合格 書いたが実行・報告なし</td><td>❌ 不合格 書いたが実行・報告なし</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td>✅ 合格 119 秒</td><td>❌ 不合格 書いたが実行・報告なし</td><td>✅ 合格 33 秒</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td>✅ 合格 102 秒</td><td>✅ 合格 54 秒</td><td>✅ 合格 97 秒</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">gpt-oss-20b-MXFP4</td><td>☑️ 補欠合格 80 秒</td><td>☑️ 補欠合格 32 秒</td><td>☑️ 補欠合格 84 秒</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td>✅ 合格 118 秒</td><td>✅ 合格 46 秒</td><td>❌ 不合格 sum.js を作らない</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td>✅ 合格 113 秒</td><td>✅ 合格 49 秒</td><td>✅ 合格 97 秒</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td>✅ 合格 143 秒</td><td>✅ 合格 39 秒</td><td>✅ 合格 91 秒</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td>☑️ 補欠合格 158 秒</td><td>☑️ 補欠合格 44 秒</td><td>❌ 不合格 書いたが実行・報告なし</td><td>☑️ 補欠合格 22 秒</td></tr>
+<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td>✅ 合格 170 秒</td><td>❌ 不合格 sum.js を作らない</td><td>❌ 不合格 sum.js を作らない</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td>✅ 合格 173 秒</td><td>✅ 合格 24 秒</td><td>❌ 不合格 実行したが結果を答えない</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Bonsai-27B-Q1_0</td><td>✅ 合格 445 秒</td><td>✅ 合格 57 秒</td><td>❌ 不合格 sum.js を作らない</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td>✅ 合格 227 秒</td><td>✅ 合格 35 秒</td><td>✅ 合格 102 秒</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td>☑️ 補欠合格 504 秒</td><td>☑️ 補欠合格 111 秒</td><td>❌ 不合格 sum.js を作らない</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td>✅ 合格 577 秒</td><td>❌ 不合格 sum.js を作らない</td><td>✅ 合格 175 秒</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td>⏱️ 時間切れ</td><td>✅ 合格 18 秒</td><td>❌ 不合格 sum.js を作らない</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td>⏱️ 時間切れ</td><td>❌ 不合格 書いたが実行・報告なし</td><td>❌ 不合格 書いたが 55 が出ない</td><td>☑️ 補欠合格 40 秒</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td>⏱️ 時間切れ</td><td>❌ 不合格 sum.js を作らない</td><td>❌ 不合格 sum.js を作らない</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
 <!-- /AUTO:sum-rows -->
 </tbody>
 </table>
 </div>
-<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">1 組 1 回ずつ流した結果。表は <code>tools\50_run\sum-table.ps1</code> で結果のファイルから作った。「書いたが実行・報告なし」は、正しい <code>sum.js</code> を書いたが、自分では実行せず、答えにも 55 が無かったもの。「実行したが結果を答えない」は、<code>node sum</code> を実行して 55 を得たのに、答えには書かなかったもの。「時間切れ」は 10 分で終わらなかったもの。</p>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">1 組 1 回ずつ流した結果。表は <code>tools\50_run\sum-table.ps1 -Until 20261001-2250</code> で結果のファイルから作った。「書いたが実行・報告なし」は、正しい <code>sum.js</code> を書いたが、自分では実行せず、答えにも 55 が無かったもの。「実行したが結果を答えない」は、<code>node sum</code> を実行して 55 を得たのに、答えには書かなかったもの。「時間切れ」は 10 分で終わらなかったもの。</p>
 
 <h2>エージェントごとの合格数</h2>
 <div class="tablewrap">
 <table>
-<thead><tr><th class="nowrap">エージェント</th><th class="num">合格</th><th class="num">うち実行の跡あり</th><th>落ち方</th></tr></thead>
+<thead><tr><th class="nowrap">エージェント</th><th class="num">✅ 合格 ＋ ☑️ 補欠合格</th><th class="num">うち ✅ 合格</th><th>落ち方</th></tr></thead>
 <tbody>
 <tr><td class="nowrap">Claude Code（ルールなし）</td><td class="num"><strong>16 / 19</strong></td><td class="num">13</td><td>落ちた 3 本は時間切れ。合格の多くは 1〜3 分かかる</td></tr>
 <tr><td class="nowrap">Pi</td><td class="num">14 / 19</td><td class="num">11</td><td>合格はどれも 2 分以内で、多くは 1 分以内。書いただけで止まるか、<code>sum.js</code> を作らない</td></tr>
@@ -493,44 +493,44 @@ llama.cpp を b11320 に、エージェントを最新に上げて（版は<a hr
 <p>
 1 マスに 1 回目・2 回目・3 回目の順に並べた。
 ✅ 合格（書いて、<code>node</code> で実行して、55 と答えた）／
-🉑 補欠合格（正しい <code>sum.js</code> を書いて 55 と答えたが、<code>node</code> で実行していない）／
+☑️ 補欠合格（正しい <code>sum.js</code> を書いて 55 と答えたが、<code>node</code> で実行していない）／
 ❌ 不合格（作らない・55 が出ない・実行したが答えない など）／
-⏱ 時間切れ（10 分）。
+⏱️ 時間切れ（10 分）。
 </p>
 <div class="tablewrap">
 <table>
-<thead><tr><th>モデル</th><th class="nowrap">Claude Code</th><th class="nowrap">Pi</th><th class="nowrap">OpenCode</th><th class="nowrap">Aider</th></tr></thead>
+<thead><tr><th>モデル</th><th class="num">大きさ</th><th class="nowrap">Claude Code</th><th class="nowrap">Pi</th><th class="nowrap">OpenCode</th><th class="nowrap">Aider</th></tr></thead>
 <tbody>
 <!-- AUTO:sum-sets -->
-<tr><td class="nowrap">gemma-4-E2B</td><td class="nowrap">❌✅🉑</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">gemma-4-E4B</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Ministral-3-3B</td><td class="nowrap">✅❌✅</td><td class="nowrap">❌✅❌</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Qwen3-4B-Instruct</td><td class="nowrap">❌✅🉑</td><td class="nowrap">🉑❌❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Qwen3.5-9B</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅🉑❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">🉑❌❌</td><td class="nowrap">🉑🉑🉑</td><td class="nowrap">🉑❌🉑</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">gemma-4-12B-QAT</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">gemma-4-12B</td><td class="nowrap">❌✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">gemma-4-26B-A4B</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Qwen3-30B-A3B</td><td class="nowrap">🉑🉑🉑</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌❌</td><td class="nowrap">🉑🉑</td></tr>
-<tr><td class="nowrap">Qwen3-Coder-30B</td><td class="nowrap">🉑🉑✅</td><td class="nowrap">❌✅🉑</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">GLM-4.7-Flash</td><td class="nowrap">✅✅🉑</td><td class="nowrap">🉑✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Bonsai-27B</td><td class="nowrap">✅✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Qwen3.6-35B-A3B</td><td class="nowrap">❌✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Ministral-3-14B</td><td class="nowrap">❌❌🉑</td><td class="nowrap">✅✅❌</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Devstral-Small-2507</td><td class="nowrap">🉑⏱✅</td><td class="nowrap">✅❌❌</td><td class="nowrap">✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Nemotron-3-Nano-4B</td><td class="nowrap">⏱⏱⏱</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Qwen3-4B-Thinking</td><td class="nowrap">🉑🉑⏱</td><td class="nowrap">🉑🉑❌</td><td class="nowrap">⏱⏱</td><td class="nowrap">🉑🉑</td></tr>
-<tr><td class="nowrap">GLM-4.6V-Flash</td><td class="nowrap">❌⏱⏱</td><td class="nowrap">⏱❌❌</td><td class="nowrap">❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td class="num nowrap">2.0 GB</td><td class="nowrap">✅❌✅</td><td class="nowrap">❌✅❌</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td class="num nowrap">2.3 GB</td><td class="nowrap">❌✅☑️</td><td class="nowrap">☑️❌❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td class="num nowrap">2.3 GB</td><td class="nowrap">☑️☑️⏱️</td><td class="nowrap">☑️☑️❌</td><td class="nowrap">⏱️⏱️⏱️</td><td class="nowrap">☑️☑️</td></tr>
+<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td class="num nowrap">2.6 GB</td><td class="nowrap">⏱️⏱️⏱️</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td class="num nowrap">3.2 GB</td><td class="nowrap">❌✅☑️</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Bonsai-27B-Q1_0</td><td class="num nowrap">3.5 GB</td><td class="nowrap">✅✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td class="num nowrap">5.0 GB</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td class="num nowrap">5.2 GB</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅☑️❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td class="num nowrap">5.7 GB</td><td class="nowrap">❌⏱️⏱️</td><td class="nowrap">⏱️❌❌</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td class="num nowrap">6.5 GB</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td class="num nowrap">6.9 GB</td><td class="nowrap">❌✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td class="num nowrap">7.7 GB</td><td class="nowrap">❌❌☑️</td><td class="nowrap">✅✅❌</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gpt-oss-20b-MXFP4</td><td class="num nowrap">11.3 GB</td><td class="nowrap">☑️❌❌</td><td class="nowrap">☑️☑️☑️</td><td class="nowrap">☑️❌☑️</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td class="num nowrap">13.5 GB</td><td class="nowrap">☑️⏱️✅</td><td class="nowrap">✅❌❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td class="num nowrap">15.7 GB</td><td class="nowrap">❌✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td class="num nowrap">15.8 GB</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td class="num nowrap">16.3 GB</td><td class="nowrap">✅✅☑️</td><td class="nowrap">☑️✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td class="num nowrap">16.5 GB</td><td class="nowrap">☑️☑️✅</td><td class="nowrap">❌✅☑️</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td class="num nowrap">16.5 GB</td><td class="nowrap">☑️☑️☑️</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌❌</td><td class="nowrap">☑️☑️</td></tr>
 <!-- /AUTO:sum-sets -->
 </tbody>
 </table>
 </div>
-<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">Aider は 2 回まで流した（朝 7 時の期限で 3 回目を流せなかった）。OpenCode の 3 回目は流している途中で、欠けているマスはまだ流していない。</p>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">行はモデルのファイルの大きさ順。表は <code>tools\50_run\sum-table.ps1 -Sets -Since 20261001-2250 -Until 20261002-0700</code> で結果のファイルから作った。Aider は 2 回まで流した（朝 7 時の期限で 3 回目を流せなかった）。</p>
 <ul>
 	<li><strong>3 回とも ✅ だったのは、gemma-4-E4B と gemma-4-26B-A4B（Claude Code・Pi・OpenCode のどれでも）</strong>。Qwen3.5-9B と gemma-4-12B-QAT は Claude Code と Pi で 3 回とも ✅</li>
 	<li><strong>同じモデル・同じエージェントでも、多くの組み合わせで ✅ と ❌ が入れ替わる</strong>。1 回だけの結果では合否を決められない。前の版との 1 回ずつの差（Claude Code 16 → 12 本など）は、この揺れの範囲に入る</li>
 	<li><strong>Pi は揺れが小さい</strong>。19 本中 9 本が 3 回とも ✅ で、どれも 1 分前後で終わる</li>
-	<li><strong>🉑 はモデルの癖として出る</strong>。gpt-oss-20b と Qwen3-30B-A3B は、どのエージェントでも 🉑 が多い。作業ログでは、ファイルを書く道具を 1 回呼んだだけで、<code>node</code> を実行する道具は呼んでいない。1〜10 の合計は暗算でも出るため、答えは合う</li>
+	<li><strong>☑️ はモデルの癖として出る</strong>。gpt-oss-20b と Qwen3-30B-A3B は、どのエージェントでも ☑️ が多い。作業ログでは、ファイルを書く道具を 1 回呼んだだけで、<code>node</code> を実行する道具は呼んでいない。1〜10 の合計は暗算でも出るため、答えは合う</li>
 	<li><strong>Aider は揺れずに落ちる</strong>。どのモデルも正しい <code>sum.js</code> を書くが、Aider は自分では実行しない</li>
 </ul>
 </section>

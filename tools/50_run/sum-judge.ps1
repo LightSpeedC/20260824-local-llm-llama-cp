@@ -36,6 +36,31 @@ function Test-SumResult([string]$work, [string]$answer, [string]$toolLog, [strin
 	return $r
 }
 
+# 結果ファイルの 1 回分を記号にする。✅ 合格・☑️ 補欠合格（合っているが node で実行した跡が無い）・❌ 不合格・⏱️ 時間切れ
+function Get-SumMark($r) {
+	if (-not $r) { return '—' }
+	if ($r.status -ne 'ok') { return '⏱️' }
+	$run = ($r.run_out -match '(?<!\d)55(?!\d)')
+	if ($r.file -eq 'あり' -and $run -and $r.report_pass) { if ($r.log_ran) { return '✅' } else { return '☑️' } }
+	return '❌'
+}
+
+# 1 回だけの表のマス。合格には秒数、不合格には落ち方を添える
+function Format-SumCell($r) {
+	$mark = Get-SumMark $r
+	switch ($mark) {
+		'—' { return '—' }
+		'⏱️' { return '⏱️ 時間切れ' }
+		'✅' { return "✅ 合格 $([Math]::Round([double]$r.sec)) 秒" }
+		'☑️' { return "☑️ 補欠合格 $([Math]::Round([double]$r.sec)) 秒" }
+	}
+	$why = if ($r.file -ne 'あり') { 'sum.js を作らない' }
+		elseif ($r.run_out -notmatch '(?<!\d)55(?!\d)') { '書いたが 55 が出ない' }
+		elseif ($r.log_ran) { '実行したが結果を答えない' }
+		else { '書いたが実行・報告なし' }
+	return "❌ 不合格 $why"
+}
+
 # ⑤ 道具の呼び出し（JSON の command）か、Aider の「Running」行に node で sum を実行した跡があるか
 # パス付き（node /w/temp/llama-cp-sandbox/sum.js・node W:\\temp\\…\\sum.js）も拾う
 function Test-SumTrace([string]$toolLog) {
