@@ -6,7 +6,7 @@ RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで llama.cpp を動�
 
 [lightspeedc.com](../)
 
-手元のノートPCでローカルLLMを動かすための検討と実測をまとめている。 実行基盤は **llama.cpp**、モデルは `C:\AI_Models` にある手持ちの GGUF を使う。 公開ページは [https://lightspeedc.com/20260824-local-llm-llama-cp/](https://lightspeedc.com/20260824-local-llm-llama-cp/) にある。
+手元のノートPCでローカルLLMを動かすための検討と実測をまとめている。 実行基盤は **llama.cpp**、モデルは `C:\AI-models` にある手持ちの GGUF を使う。 公開ページは [https://lightspeedc.com/20260824-local-llm-llama-cp/](https://lightspeedc.com/20260824-local-llm-llama-cp/) にある。
 
 ## 1. 計画
 
@@ -40,7 +40,7 @@ RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで llama.cpp を動�
 | GPU | NVIDIA GeForce RTX 3050 Ti Laptop（VRAM 4 GB） |
 | CPU / RAM | Intel Core i7-11370H（4コア8スレッド）／31.8 GB |
 | 実行基盤 | llama.cpp（CUDA 12.4 の配布バイナリ） |
-| モデル置き場 | `C:\AI_Models`（LM Studio と共用） |
+| モデル置き場 | `C:\AI-models`（LM Studio と共用） |
 
 ## フォルダ構成
 
@@ -61,7 +61,7 @@ RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで llama.cpp を動�
 │   └─ 80_ops/              … 温度・クロックの記録
 └─ bin/llama.cpp/           … 配布バイナリ（git 管理外）
 
-C:\AI_Models\                … GGUF の実体（LM Studio と共用・移動しない）
+C:\AI-models\                … GGUF の実体（LM Studio と共用・移動しない）
 ```
 
 [lightspeedc.com](../)

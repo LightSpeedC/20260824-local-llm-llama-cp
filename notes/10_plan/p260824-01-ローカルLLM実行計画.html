@@ -430,9 +430,9 @@ GUIのスライダーや自動判定に任せると、ここで数tok/sを取り
 ├─ etc/                     … 補助スクリプト（git管理外）
 └─ tmp/                     … 一時ファイル（git管理外）
 
-C:\AI_Models\                … GGUF の実体（LM Studio と共用・移動しない）</code></pre>
+C:\AI-models\                … GGUF の実体（LM Studio と共用・移動しない）</code></pre>
 <p>
-モデルは既に <code>C:\AI_Models</code> にあり、LM Studio と共用する。
+モデルは既に <code>C:\AI-models</code> にあり、LM Studio と共用する。
 プロジェクト配下に複製せず、起動スクリプトから絶対パスで参照する（第7章 Step 2）。
 </p>
 
@@ -623,7 +623,7 @@ C: の空きは約 385 GB あるので、13 GB の追加インストール自体
 <h1>モデルの選択 — 手持ち資産の棚卸し</h1>
 
 <p>
-モデルは新規に選ぶのではなく、<strong>既に <code>C:\AI_Models</code> にあるものから選ぶ</strong>。
+モデルは新規に選ぶのではなく、<strong>既に <code>C:\AI-models</code> にあるものから選ぶ</strong>。
 まずサイズ帯ごとの性格を押さえ、そのうえで手持ちを仕分ける。
 </p>
 
@@ -670,7 +670,7 @@ C: の空きは約 385 GB あるので、13 GB の追加インストール自体
 
 <h2>手持ちのモデル資産</h2>
 <p>
-<code>C:\AI_Models</code> に LM Studio 経由で取得済みのGGUFが <strong>26ファイル・約 86.0 GB</strong> ある
+<code>C:\AI-models</code> に LM Studio 経由で取得済みのGGUFが <strong>26ファイル・約 86.0 GB</strong> ある
 （当初 30ファイル・98.5 GB あったが、後述のとおり重複分を整理した）。
 新規ダウンロードを検討する前に、この中から選べるかを確認する。以下は本体モデル（mmproj を除く）の一覧。
 </p>
@@ -1245,7 +1245,7 @@ MoEが期待外れなら優先度3は不要になり、13 GB の取得を省け�
 
 <h3>取得時の置き場</h3>
 <p>
-LM Studio の検索から落とせば <code>C:\AI_Models</code> 配下の既存の系列フォルダに入り、
+LM Studio の検索から落とせば <code>C:\AI-models</code> 配下の既存の系列フォルダに入り、
 llama.cpp からも同じ絶対パスで参照できる。Hugging Face から直接取得する場合も、
 <code>&lt;配布元&gt;\&lt;モデル名&gt;-GGUF\</code> という既存の規約に合わせて置く。
 </p>
@@ -1284,15 +1284,15 @@ llama.cpp からも同じ絶対パスで参照できる。Hugging Face から直
 
 <h2>Step 2 — 手持ちモデルの参照方法を決める</h2>
 <p>
-第5章のとおり新規ダウンロードは不要で、<code>C:\AI_Models</code> の Qwen3-4B-Instruct-2507 をそのまま使う。
+第5章のとおり新規ダウンロードは不要で、<code>C:\AI-models</code> の Qwen3-4B-Instruct-2507 をそのまま使う。
 ただし 98.5 GB あるモデル群をプロジェクト配下にコピーするのは無駄なので、参照方法を選ぶ。
 </p>
 <div class="tablewrap">
 <table>
 <thead><tr><th>案</th><th>やり方</th><th>評価</th></tr></thead>
 <tbody>
-<tr><td class="nowrap"><span class="badge b-ok">推奨</span>絶対パス指定</td><td><code>-m "C:\AI_Models\qwen\...\Qwen3-4B-Instruct-2507-Q4_K_M.gguf"</code></td><td>追加作業ゼロ。起動スクリプトを見れば実体がどこか分かる</td></tr>
-<tr><td class="nowrap">ジャンクション</td><td><code>mklink /J models C:\AI_Models</code></td><td>パスが短くなるが、実体が別ドライブにあることが見えにくくなる</td></tr>
+<tr><td class="nowrap"><span class="badge b-ok">推奨</span>絶対パス指定</td><td><code>-m "C:\AI-models\qwen\...\Qwen3-4B-Instruct-2507-Q4_K_M.gguf"</code></td><td>追加作業ゼロ。起動スクリプトを見れば実体がどこか分かる</td></tr>
+<tr><td class="nowrap">ジャンクション</td><td><code>mklink /J models C:\AI-models</code></td><td>パスが短くなるが、実体が別ドライブにあることが見えにくくなる</td></tr>
 <tr><td class="nowrap"><span class="badge b-ng">不採用</span>コピー</td><td><code>models\</code> に実ファイルを複製</td><td>数GB単位で二重に持つことになり、LM Studio 側との更新のずれも生む</td></tr>
 </tbody>
 </table>
@@ -1303,7 +1303,7 @@ llama.cpp からも同じ絶対パスで参照できる。Hugging Face から直
 <p><code>tools\50_run\run-server.cmd</code> として、以下を出発点にする。</p>
 <pre><code>@echo off
 "%~dp0..\..\bin\llama.cpp\llama-server.exe" ^
-  -m "C:\AI_Models\qwen\Qwen3-4B-Instruct-2507-GGUF\Qwen3-4B-Instruct-2507-Q4_K_M.gguf" ^
+  -m "C:\AI-models\qwen\Qwen3-4B-Instruct-2507-GGUF\Qwen3-4B-Instruct-2507-Q4_K_M.gguf" ^
   -ngl 99 ^
   -c 8192 ^
   --host 127.0.0.1 ^
@@ -1391,7 +1391,7 @@ LM Studio と llama.cpp のサーバは<strong>ポートを分けて同時に立
 第7章の優先度1にあたる。手持ちの gpt-oss-20b を、<strong>expert 層だけCPUに逃がす</strong>指定で起動する。
 </p>
 <pre><code>llama-server.exe ^
-  -m "C:\AI_Models\OpenAI\gpt-oss-20b-GGUF\gpt-oss-20b-MXFP4.gguf" ^
+  -m "C:\AI-models\OpenAI\gpt-oss-20b-GGUF\gpt-oss-20b-MXFP4.gguf" ^
   -ngl 99 ^
   --n-cpu-moe 24 ^
   -c 4096 ^
@@ -1432,7 +1432,7 @@ VRAMが余っていれば値を下げていく。小さいほどエキスパー�
 差分の Per-Layer Embeddings がオフロードされるかどうかで結果が変わる。これも追加取得ゼロで判定できる。
 </p>
 <pre><code>llama-server.exe ^
-  -m "C:\AI_Models\gemma\gemma-4-E4B-it-GGUF\gemma-4-E4B-it-Q4_K_M.gguf" ^
+  -m "C:\AI-models\gemma\gemma-4-E4B-it-GGUF\gemma-4-E4B-it-Q4_K_M.gguf" ^
   -ngl 99 ^
   -c 4096 ^
   --host 127.0.0.1 --port 8080</code></pre>

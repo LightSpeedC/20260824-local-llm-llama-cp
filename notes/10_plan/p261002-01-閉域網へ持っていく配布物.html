@@ -331,9 +331,10 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
   tools\50_run\            試験スクリプト・起動用の start-agent.ps1・paths.ps1
     templates\             .jinja
   .claude\settings.json    試験が作業フォルダに置く設定
-  README.html              試験が作業フォルダに置くファイル
+  README.html              このプロジェクトの README（試験が作業フォルダにも写す）
+  notes\                   資料（html と画像）。元の階層のまま写すので、README からのリンクが切れない
   config.cmd               場所の設定（下の表）
-  配布物の説明.html        本書の写し
+  使い方.html              現地での手順（持っていくもの・設定・動かす順番・試験・うまく動かないとき）
   work\                    エージェントの作業フォルダ・空のホーム（実行時に作る）
   logs\                    試験の結果（実行時に作る）</code></pre>
 
@@ -346,7 +347,7 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 <table>
 <thead><tr><th class="nowrap">いまの値</th><th>使っているところ</th><th class="nowrap">設定の名前</th><th>配布物での既定</th></tr></thead>
 <tbody>
-<tr><td class="nowrap"><code>C:\AI_Models</code></td><td><code>test-agents.ps1</code>・<code>test-cc-tools.ps1</code>・<code>test-aider-followup.ps1</code> の <code>-ModelDir</code></td><td class="nowrap"><code>LLM_MODEL_DIR</code></td><td><code>&lt;配布先&gt;\models</code></td></tr>
+<tr><td class="nowrap"><code>C:\AI-models</code></td><td><code>test-agents.ps1</code>・<code>test-cc-tools.ps1</code>・<code>test-aider-followup.ps1</code> の <code>-ModelDir</code></td><td class="nowrap"><code>LLM_MODEL_DIR</code></td><td><code>&lt;配布先&gt;\models</code></td></tr>
 <tr><td class="nowrap"><code>W:/temp/llama-cp-sandbox</code></td><td>エージェントの作業フォルダ（3 本とも）</td><td class="nowrap"><code>LLM_WORK_DIR</code></td><td><code>&lt;配布先&gt;\work</code></td></tr>
 <tr><td class="nowrap"><code>W:/temp/llama-cp-agent-home</code></td><td>Pi・OpenCode の空のホーム（<code>test-agents.ps1</code>）</td><td class="nowrap">（<code>LLM_WORK_DIR</code> の下）</td><td><code>&lt;配布先&gt;\work\agent-home</code></td></tr>
 <tr><td class="nowrap"><code>W:/temp/llama-cp-home</code></td><td>Claude Code の空のホーム（<code>test-cc-tools.ps1</code>）</td><td class="nowrap">（<code>LLM_WORK_DIR</code> の下）</td><td><code>&lt;配布先&gt;\work\cc-home</code></td></tr>
@@ -408,6 +409,7 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 	<li><span class="badge b-ok">済</span>起動用の <code>tools/50_run/start-agent.ps1</code> を書き、組み立てのときに組み合わせごとの cmd を生成する</li>
 	<li><span class="badge b-ok">済</span>配布物を組み立てる <code>tools/60_release/make-offline-bundle.ps1</code> を書く。出力は <code>_releases/offline/llm-bundle-yyyyMMdd</code>（モデル込みで 20.4 GB）</li>
 	<li><span class="badge b-ok">済</span>この PC で、配布物をプロジェクトの外の別の場所に置き、<code>config.cmd</code> のモデルの場所を書き換えて動くかを確かめる（下の表）</li>
+	<li><span class="badge b-ok">済</span>現地での手順を <code>tools/60_release/bundle/使い方.html</code> に書き、配布物の root に入れる。手順のとおりに配布物の中で <code>test-agents.cmd</code> を流し、PATH を足さずに配布物の node が使われ、Vulkan 版が自動で選ばれることを確かめた</li>
 	<li><span class="badge b-none">未</span>ネットを切った状態で動くかを確かめる</li>
 	<li><span class="badge b-none">未</span>現地で <code>list-devices.cmd</code>・<code>bench-….cmd</code>・sum の試験を流し、対話の cmd で使ってみる</li>
 </ul>

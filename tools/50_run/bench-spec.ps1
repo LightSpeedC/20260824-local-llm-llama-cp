@@ -1,8 +1,8 @@
 ﻿# Speculative Decoding の効果を測る（r260825-01 の検証計画）
 # 構成ごとに llama-server を立て、同じ問を温度 0 で投げて、生成速度・受理率・VRAM・出力の同一性を記録する
 param(
-	[string]$Model = "C:/AI_Models/qwen/Qwen3-4B-Instruct-2507-GGUF/Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
-	[string]$Draft = "C:/AI_Models/qwen/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
+	[string]$Model = "C:/AI-models/qwen/Qwen3-4B-Instruct-2507-GGUF/Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+	[string]$Draft = "C:/AI-models/qwen/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
 	[int]$Context = 4096,
 	[int]$MaxTokens = 256,
 	[int]$Port = 8080,

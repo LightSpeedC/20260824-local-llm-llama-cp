@@ -1,4 +1,4 @@
-﻿param([string]$ModelDir = 'C:\AI_Models')
+﻿param([string]$ModelDir = 'C:\AI-models')
 # Hugging Face から Claude Code 試験用のモデルを取得する。取得済みで大きさが一致するものは飛ばす
 $ErrorActionPreference = 'Stop'
 $list = @(

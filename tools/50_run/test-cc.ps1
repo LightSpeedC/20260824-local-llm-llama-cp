@@ -1,5 +1,5 @@
 ﻿param(
-	[string]$Model = 'C:\AI_Models\qwen\Qwen3-4B-Instruct-2507-GGUF\Qwen3-4B-Instruct-2507-Q4_K_M.gguf',
+	[string]$Model = 'C:\AI-models\qwen\Qwen3-4B-Instruct-2507-GGUF\Qwen3-4B-Instruct-2507-Q4_K_M.gguf',
 	[string]$Alias = 'qwen3-4b-instruct-2507',
 	[int]$Ctx = 65536,
 	[string]$ServerArgs = '-ngl 99 -nkvo -ctk q8_0 -ctv q8_0 -fa on',

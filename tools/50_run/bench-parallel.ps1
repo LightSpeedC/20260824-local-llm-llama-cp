@@ -1,7 +1,7 @@
 ﻿# 並列スロットのスループットを測る（p260825-01 の Phase 1）
 # --parallel N で llama-server を立て、N 本のリクエストを同時に投げて合計 tok/s と VRAM を記録する
 param(
-	[string]$Model = "C:/AI_Models/qwen/Qwen3-4B-Instruct-2507-GGUF/Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+	[string]$Model = "C:/AI-models/qwen/Qwen3-4B-Instruct-2507-GGUF/Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
 	# -File 経由では配列を渡せないため、カンマ区切りの文字列で受ける（"1,2,4"）
 	[string]$Parallel = "1,2,4",
 	[int]$Context = 8192,

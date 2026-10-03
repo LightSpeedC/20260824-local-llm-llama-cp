@@ -18,8 +18,11 @@ function Get-LlmSetting([string]$name, [string]$default) {
 	if ($v) { return $v }
 	return $default
 }
+# 配布物では bin\node（エージェント入りの Node.js）を先に探す。開発用の PC には無いので何も変わらない
+$llmNode = Join-Path $LlmRoot 'bin\node'
+if ((Test-Path $llmNode) -and -not ($env:PATH -like "$llmNode;*")) { $env:PATH = "$llmNode;$env:PATH" }
 # モデルの置き場
-$LlmModelDir = Get-LlmSetting 'LLM_MODEL_DIR' 'C:\AI_Models'
+$LlmModelDir = Get-LlmSetting 'LLM_MODEL_DIR' 'C:\AI-models'
 # エージェントの作業フォルダと空のホーム。git のリポジトリの外に置く（中に置くと、モデルが root を推測して本物を読みにいく）
 $llmWork = Get-LlmSetting 'LLM_WORK_DIR' ''
 if ($llmWork) {

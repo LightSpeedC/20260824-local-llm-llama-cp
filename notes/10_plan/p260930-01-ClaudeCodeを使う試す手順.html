@@ -252,7 +252,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 <thead><tr><th>もの</th><th>場所</th><th>備考</th></tr></thead>
 <tbody>
 <tr><td class="nowrap">llama-server</td><td><code>bin\llama.cpp\llama-server.exe</code></td><td>一度置いたものを使い続ける。起動のたびにダウンロードはしない（git 管理外）</td></tr>
-<tr><td class="nowrap">モデル</td><td><code>C:\AI_Models\&lt;作者&gt;\&lt;名前&gt;-GGUF\</code></td><td>起動のたびにディスクから読むだけ。追加の取得は <code>tools\10_setup\download-models.cmd</code></td></tr>
+<tr><td class="nowrap">モデル</td><td><code>C:\AI-models\&lt;作者&gt;\&lt;名前&gt;-GGUF\</code></td><td>起動のたびにディスクから読むだけ。追加の取得は <code>tools\10_setup\download-models.cmd</code></td></tr>
 <tr><td class="nowrap">差し替えたテンプレート</td><td><code>tools\50_run\templates\</code></td><td>Ministral 2 本・Bonsai・Qwen3.5-9B 用</td></tr>
 <tr><td class="nowrap">ルールなしのホーム</td><td><code>W:\temp\cc1-home</code>（cc1）<br><code>W:\temp\llama-cp-home</code>（試験）</td><td>無ければ自動で作る</td></tr>
 <tr><td class="nowrap">試験の作業用コピー</td><td><code>W:\temp\llama-cp-sandbox</code></td><td>1 問ごとに中身を消して作り直す</td></tr>
@@ -269,7 +269,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 
 <h2>llama-server</h2>
 <pre><code class="language-batch">"bin\llama.cpp\llama-server.exe" ^
-  -m "C:\AI_Models\Gemma\gemma-4-E4B-it-GGUF\gemma-4-E4B-it-Q4_K_M.gguf" ^
+  -m "C:\AI-models\Gemma\gemma-4-E4B-it-GGUF\gemma-4-E4B-it-Q4_K_M.gguf" ^
   -c 65536 -np 1 ^
   -nkvo -ctk q8_0 -ctv q8_0 -fa on ^
   --reasoning off ^

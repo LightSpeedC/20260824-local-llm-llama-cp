@@ -6,7 +6,7 @@ REM 4.97 GB あり全層は GPU に載らないので、-ngl は渡さず自動配置に任せる
 REM 停止するには このウィンドウで Ctrl+C
 echo Claude Code 向けに llama-server を起動します (http://127.0.0.1:8080)
 "%~dp0..\..\bin\llama.cpp\llama-server.exe" ^
-  -m "C:\AI_Models\Gemma\gemma-4-E4B-it-GGUF\gemma-4-E4B-it-Q4_K_M.gguf" ^
+  -m "C:\AI-models\Gemma\gemma-4-E4B-it-GGUF\gemma-4-E4B-it-Q4_K_M.gguf" ^
   -c 65536 ^
   -np 1 ^
   -nkvo ^

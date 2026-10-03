@@ -23,7 +23,7 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
 | もの | 場所 | 備考 |
 |---|---|---|
 | llama-server | `bin\llama.cpp\llama-server.exe` | 一度置いたものを使い続ける。起動のたびにダウンロードはしない（git 管理外） |
-| モデル | `C:\AI_Models\<作者>\<名前>-GGUF\` | 起動のたびにディスクから読むだけ。追加の取得は `tools\10_setup\download-models.cmd` |
+| モデル | `C:\AI-models\<作者>\<名前>-GGUF\` | 起動のたびにディスクから読むだけ。追加の取得は `tools\10_setup\download-models.cmd` |
 | 差し替えたテンプレート | `tools\50_run\templates\` | Ministral 2 本・Bonsai・Qwen3.5-9B 用 |
 | ルールなしのホーム | `W:\temp\cc1-home`（cc1）<br>`W:\temp\llama-cp-home`（試験） | 無ければ自動で作る |
 | 試験の作業用コピー | `W:\temp\llama-cp-sandbox` | 1 問ごとに中身を消して作り直す |
@@ -37,7 +37,7 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
 
 ```batch
 "bin\llama.cpp\llama-server.exe" ^
-  -m "C:\AI_Models\Gemma\gemma-4-E4B-it-GGUF\gemma-4-E4B-it-Q4_K_M.gguf" ^
+  -m "C:\AI-models\Gemma\gemma-4-E4B-it-GGUF\gemma-4-E4B-it-Q4_K_M.gguf" ^
   -c 65536 -np 1 ^
   -nkvo -ctk q8_0 -ctv q8_0 -fa on ^
   --reasoning off ^
