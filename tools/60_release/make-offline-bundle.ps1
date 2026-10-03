@@ -87,8 +87,11 @@ Copy-Item (Join-Path $root 'README.html') $OutDir
 New-Item -ItemType Directory -Force (Join-Path $OutDir '.claude') | Out-Null
 Copy-Item (Join-Path $root '.claude/settings.json') (Join-Path $OutDir '.claude')
 Copy-Item (Join-Path $PSScriptRoot 'bundle/config.cmd') $OutDir
-Copy-Item (Join-Path $root 'notes/10_plan/p261002-01-閉域網へ持っていく配布物.html') (Join-Path $OutDir '配布物の説明.html')
-Write-Host '  試験スクリプト・設定・説明'
+Copy-Item (Join-Path $PSScriptRoot 'bundle/使い方.html') $OutDir
+# 資料は README と notes を元の階層のまま写す。相対リンクがそのまま合い、どこから読んでも切れない（Markdown は写さない）
+robocopy (Join-Path $root 'notes') (Join-Path $OutDir 'notes') /E /XF *.md /NFL /NDL /NJH /NJS /NP | Out-Null
+if ($LASTEXITCODE -ge 8) { throw 'notes のコピーに失敗' }
+Write-Host '  試験スクリプト・設定・使い方・資料（README と notes）'
 
 # 3. 起動用の cmd を、エージェントとモデルの組み合わせごとに作る
 $run = Join-Path $OutDir 'run'
