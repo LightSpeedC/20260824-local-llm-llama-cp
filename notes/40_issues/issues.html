@@ -187,7 +187,7 @@ footer{
 	<div class="inner">
 		<h1>課題一覧 — ローカルLLM 実行環境</h1>
 		<div class="lead">これから解決すること。状態は 未 / 着手 / 済 の3段階</div>
-		<div class="date">📅 作成: 2026-09-27 / 更新: 2026-10-03</div>
+		<div class="date">📅 作成: 2026-09-27 / 更新: 2026-10-04</div>
 	</div>
 </div>
 
@@ -334,8 +334,8 @@ Claude Code で速かったモデルを Pi でも試し、どちらを使うか�
 <p>関連: <a href="../10_plan/p260930-02-初期プログラミングの検証計画.html">初期プログラミングの検証計画</a></p>
 </details>
 
-<details class="md-flat" open>
-<summary><span class="badge b-warn">着手</span><span class="no">i261001-01</span>版を上げて試験をやり直す</summary>
+<details class="md-flat">
+<summary><span class="badge b-ok">済</span><span class="no">i261001-01</span>版を上げて試験をやり直す</summary>
 <p>
 llama.cpp・エージェント・Node.js を最新にして、これまでの試験をやり直す。版が上がると結果が変わりうるため、閉域網へ持っていく前に、持っていく版で結果を取り直す。
 </p>
@@ -347,11 +347,13 @@ llama.cpp・エージェント・Node.js を最新にして、これまでの試
 	<li><span class="badge b-ok">済</span>画面表示の出力先を確かめる（内蔵 GPU が出していた。VRAM の空きは nvidia-smi で 3962 MiB で、前回の再測定と同じ。llama.cpp の <code>--list-devices</code> は CUDA から見た値で 3287 MiB と出るため、比べるときは同じ測り方にそろえる）</li>
 	<li><span class="badge b-ok">済</span>E4B で 4 エージェントに日本語の確認と sum を流し、壊れていないことを確かめる（日本語は 4 つとも合格。sum は Claude Code・Pi・OpenCode が合格、Aider は実行したが結果を答えず、前回と同じ傾向）</li>
 	<li><span class="badge b-ok">済</span>主な速度を llama-bench で新旧を交互に測る（pp512・tg64。Qwen3-4B・E4B・Qwen3-30B-A3B は誤差の範囲。gpt-oss-20b の pp512 だけ 138 → 128 tok/s と約 7% 遅い。記録は <code>logs/bench-versions-20261001.txt</code>）</li>
-	<li><span class="badge b-warn">着手</span>sum の残り 18 本 × 4 エージェントをやり直し、前の版と比べて資料に反映する（1 セット目は Claude Code 12/19・Pi 15/19。前回の 16・14 との差が揺れか版の影響かを見るため、<code>tools/50_run/run-sum-sets.ps1</code> で 3 セット以上流す）</li>
+	<li><span class="badge b-ok">済</span>sum の残り 18 本 × 4 エージェントをやり直し、前の版と比べて資料に反映する（1 セット目は Claude Code 12/19・Pi 15/19。前回の 16・14 との差が揺れか版の影響かを見るため、<code>tools/50_run/run-sum-sets.ps1</code> で 3 セット以上流す）</li>
 	<li><span class="badge b-ok">済</span>3 セットの表を仕上げる（OpenCode の 3 セット目と Devstral を入れ、合格数を数え直し、サイズ順にしてモデルの横に x.xGB を書く。<code>sum-table.ps1 -Sets</code> で結果のファイルから作るようにした）</li>
 	<li><span class="badge b-ok">済</span>実行の跡が無い合格を ☑️補欠合格 として表と判定（<code>sum-table.ps1</code>）に入れる（判定は <code>sum-judge.ps1</code> の <code>Get-SumMark</code>・<code>Format-SumCell</code>。テスト 36 件）</li>
-	<li><span class="badge b-none">未</span>Aider に別の指示で実行させた結果と、Intel GPU・CPU だけで流した結果を試験結果に書く</li>
-	<li><span class="badge b-none">未</span>読み書きの試験をやり直す（sum が「書く → 実行する」を含むため、sum の結果を見て要否を決める）</li>
+	<li><span class="badge b-ok">済</span>NVIDIA GPU で 10 分以内に終わった 55 組を、Intel GPU（Vulkan 版・30 分）と NVIDIA GPU（4 回目・10 分）で流し、10 分で ⏱️ があった 6 組を 40 分で流し直して、試験結果に書く（判定は標準出力だけで見るように直した。<code>tools/50_run/run-sum-matrix.ps1</code>）</li>
+	<li><span class="badge b-ok">済</span>Aider に別の指示で実行させた結果と、CPU だけで流した結果を試験結果に書く（「Aider に別の指示で実行させた結果」「CPU で流した結果」「調査結果のまとめ」）</li>
+	<li><span class="badge b-ok">済</span>時間切れの既定を、NVIDIA GPU 10 分・Intel GPU 15 分、名前に Thinking・Reasoning が入るモデルはその倍にする（<code>run-sum-matrix.ps1</code>・<code>test-agents.ps1</code>・<code>test-cc-tools.ps1</code>。決め方は試験結果の「これからの時間切れの決め方」。<code>paths.ps1</code> の <code>Get-LlmTimeout</code> にまとめ、<code>-TimeoutSec</code> を渡せばそちらを使う。CPU 版は Intel GPU と同じ 15 分。テスト <code>tests/paths.tests.ps1</code>）</li>
+	<li><span class="badge b-ok">済</span>読み書きの試験をやり直す（2026-10-05。前の版で両方合格の 16 本のうち 15 本が今回も合格。試験結果の「版を上げて流し直した結果」）</li>
 </ul>
 <p>関連: <a href="../01_research/r260930-01-エージェント試験の経緯と全実行の記録.html">試験の経緯と全実行の記録</a>（「試験した版」）</p>
 </details>

@@ -220,7 +220,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<div class="inner">
 		<h1>ローカルLLM で AI エージェントを使う — 試験結果</h1>
 		<div class="lead">llama-server に繋いだ Claude Code・Pi・OpenCode・Aider・Codex CLI で、20GB 以下のモデルがファイルを読み書きできるかを試した結果と、どれを使うか</div>
-		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-10-03</div>
+		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-10-05</div>
 	</div>
 </div>
 
@@ -333,6 +333,49 @@ Claude Code を共通ルールなし・思考なし（<code>--reasoning off</cod
 	<li>読み・書きの両方に合格したのは 16 本。15 分以内に限ると 15 本（Qwen3-4B-Thinking の書きは約 20 分）</li>
 	<li>20GB 級の MoE（gemma-4-26B-A4B・Qwen3-30B-A3B・Qwen3.6-35B-A3B・Qwen3-Coder-30B・GLM-4.7-Flash）は合格したが、読みに 127〜203 秒かかる。生成速度は Qwen3-30B-A3B が 16.6 tok/s（<code>-ncmoe 40</code>。<a href="../10_plan/p260824-01-ローカルLLM実行計画.html">ローカルLLM 実行計画</a>の「32GB での再測定」）。ほかの 4 本は測っていない</li>
 	<li>「ホームを外に移してから合格」の 3 本は、ホームがプロジェクトの中にあった回では、プロジェクトの本物のファイルを読み書きしにいって不合格だった（第 5 章）</li>
+</ul>
+
+<h2>版を上げて流し直した結果</h2>
+<p>
+llama.cpp を b11320 に、Claude Code を 2.1.289 に上げて、同じ読み・書きを 1 回ずつ流した（2026-10-05、NVIDIA GPU）。
+時間切れは 10 分、名前に Thinking・Reasoning が入るモデルは 20 分。PC の休止と Claude Code の自動更新に重なった 2 問（Qwen3-4B-Thinking の読み、Devstral の書き）は流し直した。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="nowrap">読み</th><th class="nowrap">書き</th><th>前の版との違い</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">gemma-4-E2B-it</td><td class="nowrap">✅ 合格 17 秒</td><td class="nowrap">✅ 合格 9 秒</td><td>同じ</td></tr>
+<tr><td class="nowrap">gemma-4-E4B-it</td><td class="nowrap">✅ 合格 36 秒</td><td class="nowrap">✅ 合格 25 秒</td><td>同じ</td></tr>
+<tr><td class="nowrap">Ministral-3-3B-Instruct-2512</td><td class="nowrap">✅ 合格 65 秒</td><td class="nowrap">✅ 合格 123 秒</td><td>2 倍ほど遅い（前は思考を切る前の回）</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Instruct-2507</td><td class="nowrap">✅ 合格 73 秒</td><td class="nowrap">✅ 合格 142 秒</td><td>遅い（前は思考を切る前の回）</td></tr>
+<tr><td class="nowrap">gpt-oss-20b</td><td class="nowrap">✅ 合格 81 秒</td><td class="nowrap">✅ 合格 19 秒</td><td>同じ</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-QAT</td><td class="nowrap">✅ 合格 93 秒</td><td class="nowrap">✅ 合格 59 秒</td><td>同じ</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it</td><td class="nowrap">✅ 合格 115 秒</td><td class="nowrap">✅ 合格 65 秒</td><td>同じ</td></tr>
+<tr><td class="nowrap">gemma-4-26B-A4B-it</td><td class="nowrap">✅ 合格 137 秒</td><td class="nowrap">✅ 合格 61 秒</td><td>同じ</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507</td><td class="nowrap">✅ 合格 145 秒</td><td class="nowrap">✅ 合格 57 秒</td><td>同じ</td></tr>
+<tr><td class="nowrap">Bonsai-27B（Q1_0）</td><td class="nowrap">✅ 合格 131 秒</td><td class="nowrap">✅ 合格 88 秒</td><td>同じ</td></tr>
+<tr><td class="nowrap">Qwen3.6-35B-A3B（UD-Q3_K_XL）</td><td class="nowrap">✅ 合格 148 秒</td><td class="nowrap">❌ 不合格 161 秒</td><td>書きが落ちた。「作成しました」と答えたが、Write ツールを呼ばずファイルが無い</td></tr>
+<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct</td><td class="nowrap">✅ 合格 195 秒</td><td class="nowrap">✅ 合格 67 秒</td><td>同じ</td></tr>
+<tr><td class="nowrap">GLM-4.7-Flash</td><td class="nowrap">✅ 合格 213 秒</td><td class="nowrap">✅ 合格 59 秒</td><td>同じ</td></tr>
+<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512</td><td class="nowrap">✅ 合格 161 秒</td><td class="nowrap">✅ 合格 240 秒</td><td>少し速い</td></tr>
+<tr><td class="nowrap">Devstral-Small-2507（24B）</td><td class="nowrap">✅ 合格 212 秒</td><td class="nowrap">✅ 合格 377 秒</td><td>同じ</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B</td><td class="nowrap">✅ 合格 73 秒</td><td class="nowrap">✅ 合格 47 秒</td><td>読みが ⚠️ から ✅ に（答えに空白を足さなくなった）</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507</td><td class="nowrap">✅ 合格 800 秒</td><td class="nowrap">✅ 合格 1140 秒</td><td>読みが 291 → 800 秒。20 分の枠で両方合格</td></tr>
+<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B</td><td class="nowrap">⏱️ 時間切れ</td><td class="nowrap">❌ 不合格</td><td>同じく不可</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash</td><td class="nowrap">⏱️ 時間切れ</td><td class="nowrap">⏱️ 時間切れ</td><td>同じく不可</td></tr>
+<tr><td class="nowrap">Qwen2.5-Coder-14B-Instruct</td><td class="nowrap">❌ 不合格</td><td class="nowrap">❌ 不合格</td><td>同じく不可</td></tr>
+<tr><td class="nowrap">Qwen3-0.6B</td><td class="nowrap">⏱️ 時間切れ</td><td class="nowrap">✅ 合格 101 秒</td><td>今回はじめて試した</td></tr>
+<tr><td class="nowrap">Qwen3.8-27B</td><td class="nowrap">❌ 不合格</td><td class="nowrap">❌ 不合格</td><td>今回はじめて試した</td></tr>
+<tr><td class="nowrap">Muse-Glimmer-30B</td><td class="nowrap">⏱️ 時間切れ</td><td class="nowrap">⏱️ 時間切れ</td><td>今回はじめて試した</td></tr>
+</tbody>
+</table>
+</div>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">流したのは <code>tools\50_run\test-cc-tools.ps1 -UseTemplates -Tests read,write -ExtraArgs "--reasoning off" -MaxSizeGB 20 -NoRules</code>。結果は <code>logs\test-cc-tools\20261005-092541-norules-results.jsonl</code> と、流し直しの <code>20261005-23*</code>。</p>
+<ul>
+	<li><strong>前の版で読み・書きの両方に合格した 16 本のうち、15 本が今回も両方に合格した</strong>。落ちたのは Qwen3.6-35B-A3B の書きだけで、sum の試験と同じく 1 回ごとの揺れと見られる</li>
+	<li><strong>かかる時間はほぼ同じ</strong>。版を上げて遅くなったモデルは無い（Ministral-3B・Qwen3-4B は、前の版の数字が思考を切る前の回）</li>
+	<li>不可の 3 本（Nemotron・GLM-4.6V・Qwen2.5-Coder-14B）は、版を上げても変わらない</li>
+	<li>第 1 章の結論（勧めるモデル）は変えなくてよい</li>
 </ul>
 </section>
 
@@ -469,10 +512,11 @@ Codex はファイルの読み書きに PowerShell のコマンドを使う。<c
 この変数を渡さないように直して流し直した（<code>cc1.cmd</code> は空のホームで動くので、もともと PowerShell の道具は無い）。
 </div>
 
-<h2>版を上げて 3 回ずつ流した結果</h2>
+<h2>版を上げて 4 回ずつ流した結果</h2>
 <p>
 llama.cpp を b11320 に、エージェントを最新に上げて（版は<a href="r260930-01-エージェント試験の経緯と全実行の記録.html">試験の経緯と全実行の記録</a>の「試験した版」）、同じ問を 1 組 3 回ずつ流した（2026-10-01〜10-02）。
 1 回目の結果が前の版と食い違ったため、揺れか版の違いかを見るためである。
+2026-10-04 に、3 回のうち 1 回でも 10 分以内に終わった組（Aider を除く 55 組）を、もう 1 回流した。
 </p>
 <h3>エージェントに渡した指示文</h3>
 <p>どのエージェントにも、次の 1 文だけを渡した。補足の文や例は付けていない。</p>
@@ -489,9 +533,9 @@ llama.cpp を b11320 に、エージェントを最新に上げて（版は<a hr
 </tbody>
 </table>
 </div>
-<h3>3 回の結果</h3>
+<h3>4 回の結果</h3>
 <p>
-1 マスに 1 回目・2 回目・3 回目の順に並べた。
+1 マスに 1 回目から 4 回目の順に並べた。
 ✅ 合格（書いて、<code>node</code> で実行して、55 と答えた）／
 ☑️ 補欠合格（正しい <code>sum.js</code> を書いて 55 と答えたが、<code>node</code> で実行していない）／
 ❌ 不合格（作らない・55 が出ない・実行したが答えない など）／
@@ -502,36 +546,211 @@ llama.cpp を b11320 に、エージェントを最新に上げて（版は<a hr
 <thead><tr><th>モデル</th><th class="num">大きさ</th><th class="nowrap">Claude Code</th><th class="nowrap">Pi</th><th class="nowrap">OpenCode</th><th class="nowrap">Aider</th></tr></thead>
 <tbody>
 <!-- AUTO:sum-sets -->
-<tr><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td class="num nowrap">2.0 GB</td><td class="nowrap">✅❌✅</td><td class="nowrap">❌✅❌</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td class="num nowrap">2.3 GB</td><td class="nowrap">❌✅☑️</td><td class="nowrap">☑️❌❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td class="num nowrap">2.3 GB</td><td class="nowrap">☑️☑️⏱️</td><td class="nowrap">☑️☑️❌</td><td class="nowrap">⏱️⏱️⏱️</td><td class="nowrap">☑️☑️</td></tr>
-<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td class="num nowrap">2.6 GB</td><td class="nowrap">⏱️⏱️⏱️</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td class="num nowrap">3.2 GB</td><td class="nowrap">❌✅☑️</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Bonsai-27B-Q1_0</td><td class="num nowrap">3.5 GB</td><td class="nowrap">✅✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td class="num nowrap">5.0 GB</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td class="num nowrap">5.2 GB</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅☑️❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td class="num nowrap">5.7 GB</td><td class="nowrap">❌⏱️⏱️</td><td class="nowrap">⏱️❌❌</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td class="num nowrap">6.5 GB</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td class="num nowrap">6.9 GB</td><td class="nowrap">❌✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td class="num nowrap">7.7 GB</td><td class="nowrap">❌❌☑️</td><td class="nowrap">✅✅❌</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">gpt-oss-20b-MXFP4</td><td class="num nowrap">11.3 GB</td><td class="nowrap">☑️❌❌</td><td class="nowrap">☑️☑️☑️</td><td class="nowrap">☑️❌☑️</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td class="num nowrap">13.5 GB</td><td class="nowrap">☑️⏱️✅</td><td class="nowrap">✅❌❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td class="num nowrap">15.7 GB</td><td class="nowrap">❌✅❌</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td class="num nowrap">15.8 GB</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">✅✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td class="num nowrap">16.3 GB</td><td class="nowrap">✅✅☑️</td><td class="nowrap">☑️✅✅</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td class="num nowrap">16.5 GB</td><td class="nowrap">☑️☑️✅</td><td class="nowrap">❌✅☑️</td><td class="nowrap">❌❌❌</td><td class="nowrap">❌❌</td></tr>
-<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td class="num nowrap">16.5 GB</td><td class="nowrap">☑️☑️☑️</td><td class="nowrap">❌✅✅</td><td class="nowrap">❌❌❌</td><td class="nowrap">☑️☑️</td></tr>
+<tr><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td class="num nowrap">2.0 GB</td><td class="nowrap">✅❌✅✅</td><td class="nowrap">❌✅❌❌</td><td class="nowrap">❌❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td class="num nowrap">2.3 GB</td><td class="nowrap">❌✅☑️❌</td><td class="nowrap">☑️❌❌❌</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td class="num nowrap">2.3 GB</td><td class="nowrap">☑️☑️⏱️⏱️</td><td class="nowrap">☑️☑️❌❌</td><td class="nowrap">⏱️⏱️⏱️</td><td class="nowrap">☑️☑️</td></tr>
+<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td class="num nowrap">2.6 GB</td><td class="nowrap">⏱️⏱️⏱️</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">❌❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td class="num nowrap">3.2 GB</td><td class="nowrap">❌✅☑️❌</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">❌❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Bonsai-27B-Q1_0</td><td class="num nowrap">3.5 GB</td><td class="nowrap">✅✅❌❌</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">❌✅❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td class="num nowrap">5.0 GB</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td class="num nowrap">5.2 GB</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">✅✅✅❌</td><td class="nowrap">✅☑️❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td class="num nowrap">5.7 GB</td><td class="nowrap">❌⏱️⏱️⏱️</td><td class="nowrap">⏱️❌❌❌</td><td class="nowrap">❌❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td class="num nowrap">6.5 GB</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">❌✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td class="num nowrap">6.9 GB</td><td class="nowrap">❌✅❌☑️</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">❌❌✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td class="num nowrap">7.7 GB</td><td class="nowrap">❌❌☑️☑️</td><td class="nowrap">✅✅❌❌</td><td class="nowrap">❌❌❌❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gpt-oss-20b-MXFP4</td><td class="num nowrap">11.3 GB</td><td class="nowrap">☑️❌❌☑️</td><td class="nowrap">☑️☑️☑️☑️</td><td class="nowrap">☑️❌☑️❌</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td class="num nowrap">13.5 GB</td><td class="nowrap">☑️⏱️✅✅</td><td class="nowrap">✅❌❌❌</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td class="num nowrap">15.7 GB</td><td class="nowrap">❌✅❌✅</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">❌✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td class="num nowrap">15.8 GB</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">✅✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td class="num nowrap">16.3 GB</td><td class="nowrap">✅✅☑️✅</td><td class="nowrap">☑️✅✅✅</td><td class="nowrap">❌✅✅✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td class="num nowrap">16.5 GB</td><td class="nowrap">☑️☑️✅☑️</td><td class="nowrap">❌✅☑️❌</td><td class="nowrap">❌❌❌✅</td><td class="nowrap">❌❌</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td class="num nowrap">16.5 GB</td><td class="nowrap">☑️☑️☑️☑️</td><td class="nowrap">❌✅✅✅</td><td class="nowrap">❌❌❌❌</td><td class="nowrap">☑️☑️</td></tr>
 <!-- /AUTO:sum-sets -->
 </tbody>
 </table>
 </div>
-<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">行はモデルのファイルの大きさ順。表は <code>tools\50_run\sum-table.ps1 -Sets -Since 20261001-2250 -Until 20261002-0700</code> で結果のファイルから作った。Aider は 2 回まで流した（朝 7 時の期限で 3 回目を流せなかった）。</p>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">行はモデルのファイルの大きさ順。表は <code>tools\50_run\sum-table.ps1 -Sets -Ranges "20261001-2250..20261002-0700,20261004-0322..20261004-0730"</code> で結果のファイルから作った。Aider は 2 回まで流した（朝 7 時の期限で 3 回目を流せず、4 回目は配布物から外したため流していない）。3 回とも ⏱️ だった組（Claude Code の Nemotron、OpenCode の Qwen3-4B-Thinking）は 4 回目を流していない。55 が出たかは、試験側で <code>node sum</code> を実行した標準出力だけで見ている。</p>
 <ul>
-	<li><strong>3 回とも ✅ だったのは、gemma-4-E4B と gemma-4-26B-A4B（Claude Code・Pi・OpenCode のどれでも）</strong>。Qwen3.5-9B と gemma-4-12B-QAT は Claude Code と Pi で 3 回とも ✅</li>
-	<li><strong>同じモデル・同じエージェントでも、多くの組み合わせで ✅ と ❌ が入れ替わる</strong>。1 回だけの結果では合否を決められない。前の版との 1 回ずつの差（Claude Code 16 → 12 本など）は、この揺れの範囲に入る</li>
-	<li><strong>Pi は揺れが小さい</strong>。19 本中 9 本が 3 回とも ✅ で、どれも 1 分前後で終わる</li>
+	<li><strong>4 回とも ✅ だったのは、gemma-4-E4B と gemma-4-26B-A4B（Claude Code・Pi・OpenCode のどれでも）</strong>。gemma-4-12B-QAT は Claude Code と Pi で 4 回とも ✅</li>
+	<li><strong>同じモデル・同じエージェントでも、多くの組み合わせで ✅ と ❌ が入れ替わる</strong>。1 回だけの結果では合否を決められない。前の版との 1 回ずつの差（Claude Code 16 → 12 本など）は、この揺れの範囲に入る。4 回目も、3 回とも ✅ だった Qwen3.5-9B（Pi）が初めて ❌ になり、3 回とも ❌ だった Qwen3-Coder-30B（OpenCode）が初めて ✅ になった</li>
+	<li><strong>Pi は揺れが小さい</strong>。19 本中 8 本が 4 回とも ✅ で、どれも 1 分前後で終わる</li>
 	<li><strong>☑️ はモデルの癖として出る</strong>。gpt-oss-20b と Qwen3-30B-A3B は、どのエージェントでも ☑️ が多い。作業ログでは、ファイルを書く道具を 1 回呼んだだけで、<code>node</code> を実行する道具は呼んでいない。1〜10 の合計は暗算でも出るため、答えは合う</li>
 	<li><strong>Aider は揺れずに落ちる</strong>。どのモデルも正しい <code>sum.js</code> を書くが、Aider は自分では実行しない</li>
+</ul>
+
+<h2>時間切れを 40 分にした結果</h2>
+<p>
+10 分の枠で 1 回でも ⏱️ になった組を、NVIDIA GPU のまま時間切れを 40 分にして 1 回ずつ流した（2026-10-04）。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="nowrap">エージェント</th><th>10 分の枠（4 回）</th><th>40 分の枠</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td class="nowrap">Claude Code</td><td class="nowrap">☑️☑️⏱️⏱️</td><td>✅ 合格 869 秒</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td class="nowrap">OpenCode</td><td class="nowrap">⏱️⏱️⏱️</td><td>❌ 不合格 1153 秒（書いて実行したが、55 と答えない）</td></tr>
+<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td class="nowrap">Claude Code</td><td class="nowrap">⏱️⏱️⏱️</td><td>❌ 不合格 909 秒（sum.js を作らない）</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td class="nowrap">Claude Code</td><td class="nowrap">❌⏱️⏱️⏱️</td><td>⏱️ 時間切れ（40 分）</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td class="nowrap">Pi</td><td class="nowrap">⏱️❌❌❌</td><td>❌ 不合格 25 秒（sum.js を作らない）</td></tr>
+<tr><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td class="nowrap">Claude Code</td><td class="nowrap">☑️⏱️✅✅</td><td>☑️ 補欠合格 364 秒</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>時間を延ばして通ったのは Qwen3-4B-Thinking の Claude Code だけ</strong>。思考を切れない版で、1 問に 15 分ほどかかる</li>
+	<li>ほかの組は、時間を延ばしても sum.js を作らないか、答えに 55 を書かない。10 分の枠での ⏱️ は、時間が足りないというより、止まらずに回り続けた結果と見てよい</li>
+</ul>
+<h3>これからの時間切れの決め方</h3>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">GPU</th><th class="nowrap">ふつうのモデル</th><th class="nowrap">名前に Thinking・Reasoning が入るモデル</th><th>根拠</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">NVIDIA GPU</td><td class="nowrap">10 分</td><td class="nowrap">20 分</td><td>合格はすべて 10 分以内（最長 577 秒）。Qwen3-4B-Thinking の Claude Code は 869 秒かかった</td></tr>
+<tr><td class="nowrap">Intel GPU</td><td class="nowrap">15 分</td><td class="nowrap">30 分</td><td>Claude Code の合格は最長 643 秒。Qwen3-4B-Thinking の Claude Code は 1013 秒かかった</td></tr>
+</tbody>
+</table>
+</div>
+<p>思考を切れない版や推論用の版は、<code>--reasoning off</code> でも長く考えるため、倍にする。名前に Thinking・Reasoning が入るのは、今回の 19 本では Qwen3-4B-Thinking-2507 と Ministral-3-14B-Reasoning-2512 の 2 本。</p>
+
+<h2>Intel GPU で流した結果</h2>
+<p>
+閉域網へ持っていく先の PC は Intel の内蔵 GPU なので、この PC の Intel Iris Xe（共有メモリ 16GB）で同じ問を流した（2026-10-04）。
+llama.cpp は b11320 の Vulkan 版、時間切れは 30 分。対象は NVIDIA GPU で 1 回でも 10 分以内に終わった 55 組で、1 組 1 回ずつ流した。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="num">大きさ</th><th class="nowrap">Claude Code</th><th class="nowrap">Pi</th><th class="nowrap">OpenCode</th></tr></thead>
+<tbody>
+<!-- AUTO:sum-intel -->
+<tr><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td class="num nowrap">2.0 GB</td><td>❌ 不合格 書いたが 55 が出ない</td><td>❌ 不合格 書いたが実行・報告なし</td><td>☑️ 補欠合格 25 秒</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td class="num nowrap">2.3 GB</td><td>✅ 合格 501 秒</td><td>❌ 不合格 書いたが実行・報告なし</td><td>✅ 合格 41 秒</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td class="num nowrap">2.3 GB</td><td>☑️ 補欠合格 1013 秒</td><td>☑️ 補欠合格 105 秒</td><td>—</td></tr>
+<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td class="num nowrap">2.6 GB</td><td>—</td><td>✅ 合格 63 秒</td><td>❌ 不合格 sum.js を作らない</td></tr>
+<tr><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td class="num nowrap">3.2 GB</td><td>❌ 不合格 書いたが 55 が出ない</td><td>✅ 合格 4 秒</td><td>❌ 不合格 書いたが 55 が出ない</td></tr>
+<tr><td class="nowrap">Bonsai-27B-Q1_0</td><td class="num nowrap">3.5 GB</td><td>❌ 不合格 書いたが 55 が出ない</td><td>✅ 合格 96 秒</td><td>❌ 不合格 sum.js を作らない</td></tr>
+<tr><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td class="num nowrap">5.0 GB</td><td>✅ 合格 117 秒</td><td>✅ 合格 19 秒</td><td>✅ 合格 48 秒</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td class="num nowrap">5.2 GB</td><td>☑️ 補欠合格 115 秒</td><td>✅ 合格 52 秒</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td class="num nowrap">5.7 GB</td><td>⏱️ 時間切れ</td><td>❌ 不合格 sum.js を作らない</td><td>❌ 不合格 sum.js を作らない</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td class="num nowrap">6.5 GB</td><td>✅ 合格 170 秒</td><td>✅ 合格 76 秒</td><td>☑️ 補欠合格 284 秒</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td class="num nowrap">6.9 GB</td><td>✅ 合格 164 秒</td><td>✅ 合格 60 秒</td><td>✅ 合格 160 秒</td></tr>
+<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td class="num nowrap">7.7 GB</td><td>❌ 不合格 書いたが実行・報告なし</td><td>❌ 不合格 書いたが実行・報告なし</td><td>❌ 不合格 sum.js を作らない</td></tr>
+<tr><td class="nowrap">gpt-oss-20b-MXFP4</td><td class="num nowrap">11.3 GB</td><td>☑️ 補欠合格 155 秒</td><td>☑️ 補欠合格 46 秒</td><td>☑️ 補欠合格 137 秒</td></tr>
+<tr><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td class="num nowrap">13.5 GB</td><td>❌ 不合格 書いたが実行・報告なし</td><td>☑️ 補欠合格 118 秒</td><td>❌ 不合格 sum.js を作らない</td></tr>
+<tr><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td class="num nowrap">15.7 GB</td><td>✅ 合格 288 秒</td><td>✅ 合格 72 秒</td><td>✅ 合格 190 秒</td></tr>
+<tr><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td class="num nowrap">15.8 GB</td><td>✅ 合格 208 秒</td><td>✅ 合格 64 秒</td><td>✅ 合格 127 秒</td></tr>
+<tr><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td class="num nowrap">16.3 GB</td><td>✅ 合格 638 秒</td><td>✅ 合格 40 秒</td><td>✅ 合格 286 秒</td></tr>
+<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td class="num nowrap">16.5 GB</td><td>✅ 合格 643 秒</td><td>❌ 不合格 sum.js を作らない</td><td>❌ 不合格 sum.js を作らない</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td class="num nowrap">16.5 GB</td><td>☑️ 補欠合格 532 秒</td><td>☑️ 補欠合格 41 秒</td><td>❌ 不合格 書いたが実行・報告なし</td></tr>
+<!-- /AUTO:sum-intel -->
+</tbody>
+</table>
+</div>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">表は <code>tools\50_run\sum-table.ps1 -Since 20261004-0100 -LlamaDir llama.cpp-b11320-vulkan</code> の結果を大きさ順に並べた。流したのは <code>tools\50_run\run-sum-matrix.ps1 -LlamaDir llama.cpp-b11320-vulkan -TimeoutSec 1800</code>。— は NVIDIA GPU で 3 回とも ⏱️ だったため流していない組。</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">エージェント</th><th class="num">✅ 合格</th><th class="num">☑️ 補欠合格</th><th class="num">❌ 不合格</th><th class="num">⏱️ 時間切れ</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Claude Code（18 組）</td><td class="num">8</td><td class="num">4</td><td class="num">5</td><td class="num">1</td></tr>
+<tr><td class="nowrap">Pi（19 組）</td><td class="num">10</td><td class="num">4</td><td class="num">5</td><td class="num">0</td></tr>
+<tr><td class="nowrap">OpenCode（18 組）</td><td class="num">6</td><td class="num">3</td><td class="num">9</td><td class="num">0</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>Intel GPU で 3 つのエージェントとも ✅ だったのは 5 本</strong>: gemma-4-E4B、gemma-4-12B（Q4_K_M）、Qwen3.6-35B-A3B、gemma-4-26B-A4B、GLM-4.7-Flash。16GB 級の MoE も共有メモリに載って動いた</li>
+	<li><strong>合否の傾向は NVIDIA GPU とほぼ同じ</strong>。55 組のうち 48 組は、NVIDIA GPU の 4 回のどれかと同じ結果だった。違った 7 組のうち 4 組は、✅ と ☑️ の違い（55 は出て答えたが、実行の跡があるかどうか）だけだった</li>
+	<li><strong>Devstral は 3 つのエージェントとも NVIDIA GPU と違った</strong>。OpenCode は NVIDIA で 4 回とも ✅ だったが、Intel では sum.js を作らなかった。Claude Code も ❌、Pi は ☑️。1 回だけなので、揺れか Intel GPU のせいかは決められない</li>
+	<li><strong>違いは主に速さ</strong>。Claude Code は最初に送る量が多く、プロンプトの処理が遅い Intel GPU の影響を強く受ける（Qwen3-4B-Instruct は 44 → 501 秒、GLM-4.7-Flash・Qwen3-Coder-30B は 10 分を超えた）。Pi・OpenCode は 1〜2 倍ほどで済む</li>
+	<li><strong>Intel GPU では Pi が向く</strong>。合格が最も多く、どれも 2 分以内で終わる</li>
+</ul>
+
+<h2>Aider に別の指示で実行させた結果</h2>
+<p>
+Aider は sum.js を書くだけで実行しなかったため、書かせたあとに別の指示を渡せば実行するかを試した（2026-10-02、NVIDIA GPU）。
+モデルは gemma-4-E4B。1 回目は sum の問をそのまま渡し、2 回目は同じ作業フォルダで Aider を起動し直し、<code>--file sum.js</code> で sum.js を会話に載せて次の指示を渡した。指示ごとに 3 回流した。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>2 回目の指示</th><th class="nowrap">結果（3 回）</th><th>Aider の答え</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">node sum を実行して、表示された結果を教えて</td><td class="nowrap">☑️☑️☑️</td><td>3 回とも、コードを読んで「表示される結果は 55」と答えた。<code>node</code> は実行していない（13〜14 秒）</td></tr>
+<tr><td class="nowrap">sum.js をテストして</td><td class="nowrap">❌❌❌</td><td>3 回とも、どんなテストをしたいのかを聞き返して終わった（16〜20 秒）</td></tr>
+</tbody>
+</table>
+</div>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">流したのは <code>tools\50_run\test-aider-followup.ps1</code>。☑️ は 55 と答えたが実行の跡が無いもの、❌ は実行も 55 の答えも無いもの。</p>
+<ul>
+	<li><strong>指示を足しても、Aider は自分では実行しない</strong>。「実行して」と明示しても、モデルはコードから結果を推測して答えるだけで、Aider が実行するコマンドを書かない</li>
+	<li>Aider で実行まで任せる使い方はできない。書かせたあとの実行と確かめは、人が行う</li>
+</ul>
+
+<h2>CPU で流した結果</h2>
+<p>
+GPU が使えない場合に備え、この PC の CPU だけで同じ問を流した（2026-10-04〜10-05）。
+llama.cpp は b11320 の CPU 版、時間切れは 15 分（名前に Thinking・Reasoning が入るモデルは 30 分）。対象は NVIDIA GPU で 3 分以内に終わったことがある 50 組で、1 組 1 回ずつ流した。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="num">大きさ</th><th class="nowrap">Claude Code</th><th class="nowrap">Pi</th><th class="nowrap">OpenCode</th></tr></thead>
+<tbody>
+<!-- AUTO:sum-cpu -->
+<tr><td class="nowrap">Ministral-3-3B-Instruct-2512-Q4_K_M</td><td class="num nowrap">2.0 GB</td><td>⏱️ 時間切れ</td><td>✅ 合格 110 秒</td><td>⏱️ 時間切れ</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Instruct-2507-Q4_K_M</td><td class="num nowrap">2.3 GB</td><td>⏱️ 時間切れ</td><td>❌ 不合格 書いたが実行・報告なし</td><td>⏱️ 時間切れ</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking-2507-Q4_K_M</td><td class="num nowrap">2.3 GB</td><td>—</td><td>☑️ 補欠合格 377 秒</td><td>—</td></tr>
+<tr><td class="nowrap">NVIDIA-Nemotron-3-Nano-4B-Q4_K_M</td><td class="num nowrap">2.6 GB</td><td>—</td><td>❌ 不合格 書いたが 55 が出ない</td><td>—</td></tr>
+<tr><td class="nowrap">gemma-4-E2B-it-Q4_K_M</td><td class="num nowrap">3.2 GB</td><td>✅ 合格 705 秒</td><td>✅ 合格 35 秒</td><td>❌ 不合格 書いたが 55 が出ない</td></tr>
+<tr><td class="nowrap">Bonsai-27B-Q1_0</td><td class="num nowrap">3.5 GB</td><td>⏱️ 時間切れ</td><td>✅ 合格 598 秒</td><td>⏱️ 時間切れ</td></tr>
+<tr><td class="nowrap">gemma-4-E4B-it-Q4_K_M</td><td class="num nowrap">5.0 GB</td><td>✅ 合格 870 秒</td><td>✅ 合格 48 秒</td><td>✅ 合格 374 秒</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B-Q4_K_M</td><td class="num nowrap">5.2 GB</td><td>⏱️ 時間切れ</td><td>✅ 合格 84 秒</td><td>✅ 合格 683 秒</td></tr>
+<tr><td class="nowrap">GLM-4.6V-Flash-Q4_K_M</td><td class="num nowrap">5.7 GB</td><td>⏱️ 時間切れ</td><td>❌ 不合格 sum.js を作らない</td><td>⏱️ 時間切れ</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-QAT-Q4_0</td><td class="num nowrap">6.5 GB</td><td>⏱️ 時間切れ</td><td>✅ 合格 147 秒</td><td>⏱️ 時間切れ</td></tr>
+<tr><td class="nowrap">gemma-4-12B-it-Q4_K_M</td><td class="num nowrap">6.9 GB</td><td>⏱️ 時間切れ</td><td>✅ 合格 119 秒</td><td>⏱️ 時間切れ</td></tr>
+<tr><td class="nowrap">Ministral-3-14B-Reasoning-2512-Q4_K_M</td><td class="num nowrap">7.7 GB</td><td>—</td><td>☑️ 補欠合格 162 秒</td><td>⏱️ 時間切れ</td></tr>
+<tr><td class="nowrap">gpt-oss-20b-MXFP4</td><td class="num nowrap">11.3 GB</td><td>⏱️ 時間切れ</td><td>☑️ 補欠合格 92 秒</td><td>⏱️ 時間切れ</td></tr>
+<tr><td class="nowrap">Devstral-Small-2507-UD-Q4_K_XL</td><td class="num nowrap">13.5 GB</td><td>—</td><td>❌ 不合格 sum.js を作らない</td><td>—</td></tr>
+<tr><td class="nowrap">Qwen3.6-35B-A3B-UD-Q3_K_XL</td><td class="num nowrap">15.7 GB</td><td>⏱️ 時間切れ</td><td>✅ 合格 99 秒</td><td>✅ 合格 686 秒</td></tr>
+<tr><td class="nowrap">gemma-4-26B-A4B-it-UD-Q4_K_XL</td><td class="num nowrap">15.8 GB</td><td>⏱️ 時間切れ</td><td>✅ 合格 109 秒</td><td>✅ 合格 767 秒</td></tr>
+<tr><td class="nowrap">GLM-4.7-Flash-UD-Q4_K_XL</td><td class="num nowrap">16.3 GB</td><td>⏱️ 時間切れ</td><td>✅ 合格 121 秒</td><td>⏱️ 時間切れ</td></tr>
+<tr><td class="nowrap">Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL</td><td class="num nowrap">16.5 GB</td><td>⏱️ 時間切れ</td><td>❌ 不合格 書いたが実行・報告なし</td><td>⏱️ 時間切れ</td></tr>
+<tr><td class="nowrap">Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL</td><td class="num nowrap">16.5 GB</td><td>⏱️ 時間切れ</td><td>☑️ 補欠合格 104 秒</td><td>⏱️ 時間切れ</td></tr>
+<!-- /AUTO:sum-cpu -->
+</tbody>
+</table>
+</div>
+<p style="color:var(--ink-soft, #4a5568);background:none;font-size:0.9em;">表は <code>tools\50_run\sum-table.ps1 -Since 20261004-1400 -LlamaDir llama.cpp-b11320-cpu</code> の結果を大きさ順に並べた。流したのは <code>tools\50_run\run-sum-matrix.ps1 -LlamaDir llama.cpp-b11320-cpu</code>（時間切れは既定の自動）。— は NVIDIA GPU で 3 分以内に終わったことが無いため流していない組。</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">エージェント</th><th class="num">✅ 合格</th><th class="num">☑️ 補欠合格</th><th class="num">❌ 不合格</th><th class="num">⏱️ 時間切れ</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">Claude Code（15 組）</td><td class="num">2</td><td class="num">0</td><td class="num">0</td><td class="num">13</td></tr>
+<tr><td class="nowrap">Pi（19 組）</td><td class="num">10</td><td class="num">4</td><td class="num">5</td><td class="num">0</td></tr>
+<tr><td class="nowrap">OpenCode（16 組）</td><td class="num">4</td><td class="num">0</td><td class="num">1</td><td class="num">11</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>CPU で使えるのは Pi だけ</strong>。19 組中 14 組が ✅ か ☑️ で、Bonsai（598 秒）を除けばどれも 1〜6 分で終わる。✅・☑️・❌ の顔ぶれは GPU のときとほぼ同じ</li>
+	<li><strong>Claude Code は 15 組中 13 組が時間切れ</strong>。最初に送る 2 万トークン近くの処理に CPU では数分かかり、それを何往復も繰り返すため。通ったのは gemma-4-E2B（705 秒）と E4B（870 秒）だけ</li>
+	<li>OpenCode も 16 組中 11 組が時間切れ。通った 4 本も 6〜13 分かかる</li>
+</ul>
+
+<h2>調査結果のまとめ</h2>
+<p>NVIDIA GPU・Intel GPU・CPU で流した結果をまとめる。</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">環境</th><th class="nowrap">向くエージェント</th><th class="nowrap">勧めるモデル</th><th>根拠</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">NVIDIA GPU</td><td class="nowrap">Claude Code・Pi</td><td>gemma-4-E4B・gemma-4-26B-A4B</td><td>この 2 本は 3 つのエージェントで 4 回とも ✅。通る本数は Claude Code、速さは Pi が上</td></tr>
+<tr><td class="nowrap">Intel GPU</td><td class="nowrap">Pi</td><td>gemma-4-E4B・gemma-4-12B・gemma-4-26B-A4B・Qwen3.6-35B-A3B・GLM-4.7-Flash</td><td>この 5 本は 3 つのエージェントとも ✅。Pi は合格が最も多く 2 分以内。Claude Code は 2〜10 倍遅くなる</td></tr>
+<tr><td class="nowrap">CPU</td><td class="nowrap">Pi</td><td>gemma-4-E4B・gemma-4-E2B・Qwen3.5-9B</td><td>Pi は 1 分前後で通る。Claude Code・OpenCode はほとんど時間切れ</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>gemma-4-E4B は、NVIDIA GPU・Intel GPU・CPU のどれでも、3 つのエージェントすべてで合格した</strong>。どの環境でもまず試すモデルになる</li>
+	<li><strong>合否はモデルとエージェントの組で決まり、GPU の種類ではほとんど変わらない</strong>。変わるのは速さで、最初に送る量が多い Claude Code ほど遅い環境の影響を強く受ける</li>
+	<li><strong>同じ組でも結果は揺れる</strong>。1 回だけの合否で組を決めず、複数回流して確かめる</li>
+	<li><strong>☑️（実行せずに答える）はモデルの癖</strong>。gpt-oss-20b・Qwen3-30B-A3B・Ministral-3-14B-Reasoning は、どの環境・エージェントでも ☑️ が多い</li>
+	<li><strong>時間切れは、NVIDIA GPU で 10 分、Intel GPU と CPU で 15 分、名前に Thinking・Reasoning が入るモデルは倍</strong>。延ばしても通る組はほとんど増えない</li>
 </ul>
 </section>
 
@@ -562,7 +781,6 @@ llama.cpp を b11320 に、エージェントを最新に上げて（版は<a hr
 	<li><strong>Pi で試したのは 6 本だけ</strong>。20GB 級の MoE や、Claude Code で遅かったモデルを Pi で動かしたときの速さは測っていない</li>
 	<li>Pi で gemma-4-E2B が答えを書かずに終わる理由は調べていない。Codex CLI でも、E2B の読みは「これから読む」と答えたところで終わった</li>
 	<li><strong>試験は 1 ファイルを読む・1 行書く・10 行ほどのプログラムを書いて実行するだけ</strong>。複数のファイルにまたがる編集や、大きなコードを書く作業での品質は評価していない</li>
-	<li>プログラムの問（第 4 章）は 1 組 1 回ずつで、同じ組でも結果が揺れるかは確かめていない。読みの問では、gemma-4-E2B が Pi で 3 回中 1 回しか答えなかった</li>
 	<li><strong>20GB 級の MoE の生成速度は、Qwen3-30B-A3B のほかは測っていない</strong></li>
 	<li>Nemotron が Claude Code でだけ読み書きしない理由は調べていない。Pi・OpenCode では通る</li>
 	<li>チャットテンプレートで 500 エラーになった 4 本が、モデル側の問題か、llama-server のテンプレート処理の問題かは切り分けていない</li>
