@@ -7,7 +7,7 @@ $EchoPrompt = "次の文を、そのまま一字も変えずに繰り返して�
 
 function Test-SumResult([string]$work, [string]$answer, [string]$toolLog, [string]$saveAs) {
 	$src = Join-Path $work 'sum.js'
-	$r = [ordered]@{ file = 'なし'; run_out = ''; run_pass = $false; report_pass = $false; log_ran = $false; pass = $false }
+	$r = [ordered]@{ file = 'なし'; run_out = ''; run_stdout = ''; run_pass = $false; report_pass = $false; log_ran = $false; pass = $false }
 	if (Test-Path $src) {
 		$r.file = 'あり'
 		$code = [IO.File]::ReadAllText($src, [Text.Encoding]::UTF8)
@@ -26,9 +26,9 @@ function Test-SumResult([string]$work, [string]$answer, [string]$toolLog, [strin
 		$outTask = $p.StandardOutput.ReadToEndAsync()
 		$errTask = $p.StandardError.ReadToEndAsync()
 		if (-not $p.WaitForExit(20000)) { $p.Kill(); $r.run_out = '（20 秒で終わらない）' }
-		else { $r.run_out = ($outTask.Result + $errTask.Result).Trim() }
-		# 「1から10までの合計: 55」のような表示も正しい。55 という数が単独で出ていれば合格にする
-		$r.run_pass = ($outTask.Result -match '(?<!\d)55(?!\d)')
+		else { $r.run_out = ($outTask.Result + $errTask.Result).Trim(); $r.run_stdout = $outTask.Result.Trim() }
+		# 「1から10までの合計: 55」のような表示も正しい。55 という数が標準出力に単独で出ていれば合格にする
+		$r.run_pass = Test-SumRunPass $r
 	}
 	$r.report_pass = ($answer -match '(?<!\d)55(?!\d)')
 	$r.log_ran = Test-SumTrace $toolLog
@@ -36,11 +36,19 @@ function Test-SumResult([string]$work, [string]$answer, [string]$toolLog, [strin
 	return $r
 }
 
+# 55 が出たか。標準出力（run_stdout）だけを見る
+# - run_out は標準エラーも含むので使わない。文法エラーで止まると、node はソースの行（… = 55）を標準エラーに出す
+# - 9/30 の結果の run_pass は、55 だけが出たときに合格とする古い判定で書かれているので使わない
+# - run_stdout の無い古い結果は、sum-table.ps1 が保存した sum.js を実行し直して埋める
+function Test-SumRunPass($r) {
+	return ([string]$r.run_stdout -match '(?<!\d)55(?!\d)')
+}
+
 # 結果ファイルの 1 回分を記号にする。✅ 合格・☑️ 補欠合格（合っているが node で実行した跡が無い）・❌ 不合格・⏱️ 時間切れ
 function Get-SumMark($r) {
 	if (-not $r) { return '—' }
 	if ($r.status -ne 'ok') { return '⏱️' }
-	$run = ($r.run_out -match '(?<!\d)55(?!\d)')
+	$run = Test-SumRunPass $r
 	if ($r.file -eq 'あり' -and $run -and $r.report_pass) { if ($r.log_ran) { return '✅' } else { return '☑️' } }
 	return '❌'
 }
@@ -55,7 +63,7 @@ function Format-SumCell($r) {
 		'☑️' { return "☑️ 補欠合格 $([Math]::Round([double]$r.sec)) 秒" }
 	}
 	$why = if ($r.file -ne 'あり') { 'sum.js を作らない' }
-		elseif ($r.run_out -notmatch '(?<!\d)55(?!\d)') { '書いたが 55 が出ない' }
+		elseif (-not (Test-SumRunPass $r)) { '書いたが 55 が出ない' }
 		elseif ($r.log_ran) { '実行したが結果を答えない' }
 		else { '書いたが実行・報告なし' }
 	return "❌ 不合格 $why"

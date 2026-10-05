@@ -36,6 +36,25 @@ if ($llmWork) {
 }
 # 使う llama.cpp（bin の下のフォルダ名）。auto は Vulkan 版に GPU が見えれば Vulkan、見えなければ CPU
 $LlmBackend = Get-LlmSetting 'LLM_BACKEND' 'llama.cpp'
+# エージェントの出力ファイルを読む。時間切れで止めた後も子プロセスが開いたままのことがあるので、
+# ほかのプロセスが開いていても読める開き方にし、読めなければ何回かやり直す。それでも駄目なら空を返す
+function Read-LlmText([string]$path) {
+	if (-not (Test-Path $path)) { return '' }
+	for ($i = 0; $i -lt 10; $i++) {
+		try {
+			$fs = New-Object IO.FileStream($path, [IO.FileMode]::Open, [IO.FileAccess]::Read, ([IO.FileShare]::ReadWrite -bor [IO.FileShare]::Delete))
+			try { $sr = New-Object IO.StreamReader($fs, [Text.Encoding]::UTF8); return $sr.ReadToEnd() } finally { $fs.Dispose() }
+		} catch { Start-Sleep -Milliseconds 500 }
+	}
+	return ''
+}
+# 時間切れの既定（秒）。NVIDIA GPU（CUDA 版）は 10 分、Intel GPU（Vulkan 版）と CPU 版は 15 分（r260929-01）
+# 名前に Thinking・Reasoning が入るモデルは、--reasoning off でも長く考えるので倍にする
+function Get-LlmTimeout([string]$llamaDir, [string]$model) {
+	$sec = if ($llamaDir -eq 'llama.cpp' -or $llamaDir -like '*-cuda') { 600 } else { 900 }
+	if ($model -match 'Thinking|Reasoning') { $sec *= 2 }
+	return $sec
+}
 function Resolve-LlmBackend([string]$name) {
 	if ($name -ne 'auto') { return $name }
 	$vk = Join-Path $LlmRoot 'bin/llama.cpp-b11320-vulkan/llama-server.exe'

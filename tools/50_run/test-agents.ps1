@@ -4,7 +4,8 @@
 	# 空なら config.cmd の LLM_MODEL_DIR（paths.ps1）
 	[string]$ModelDir = '',
 	[int]$Ctx = 65536,
-	[int]$TimeoutSec = 600,
+	# 0 ならモデルと llama.cpp から決める（paths.ps1 の Get-LlmTimeout）
+	[int]$TimeoutSec = 0,
 	[int]$Port = 8080,
 	[switch]$UseTemplates,
 	[string]$ExtraArgs = '',
@@ -71,7 +72,7 @@ function Invoke-Agent([string]$prompt, [string]$name, [string]$tag, [switch]$Tra
 	$done = $cc.WaitForExit($TimeoutSec * 1000)
 	$sw.Stop()
 	if (-not $done) { taskkill /PID $cc.Id /T /F | Out-Null }
-	$text = if (Test-Path $out) { [IO.File]::ReadAllText($out, [Text.Encoding]::UTF8) } else { '' }
+	$text = Read-LlmText $out
 	$toolLog = $text
 	if ($Trace -and $Agent -eq 'pi' -and (Test-Path $piSession)) {
 		$toolLog = (Get-ChildItem $piSession -Recurse -Filter *.jsonl | ForEach-Object { [IO.File]::ReadAllText($_.FullName, [Text.Encoding]::UTF8) }) -join "`n"
@@ -103,15 +104,18 @@ $ErrorActionPreference = 'Stop'
 Write-Host "版: $Agent $($versions.agent) / llama.cpp $($versions.llama) / node $($versions.node)"
 
 $readExpect = 'ローカルLLM 実行環境'
+$fixedTimeout = $TimeoutSec
 foreach ($m in $models) {
 	$name = $m.BaseName
+	# エージェントを呼ぶ関数はこの $TimeoutSec を読む
+	$TimeoutSec = if ($fixedTimeout) { $fixedTimeout } else { Get-LlmTimeout $LlamaDir $name }
 	$tag = "$runStamp-$Agent-$name"
 	$ngl = if ($m.Length -le 3.2GB) { '-ngl 99' } else { '' }
 	$tpl = Join-Path $PSScriptRoot "templates/$name.jinja"
 	$tplArg = if ($UseTemplates -and (Test-Path $tpl)) { "--chat-template-file `"$tpl`"" } else { '' }
 	$argList = "-m `"$($m.FullName)`" -c $Ctx -np 1 $ngl -nkvo -ctk q8_0 -ctv q8_0 -fa on $tplArg $ExtraArgs --alias $name --host 127.0.0.1 --port $Port"
-	Write-Host "=== $Agent / $name"
-	$rec = [ordered]@{ agent = $Agent; model = $name; versions = $versions; server = $argList; load = ''; read = $null; write = $null; echo = $null; sum = $null }
+	Write-Host "=== $Agent / $name（時間切れ $TimeoutSec 秒）"
+	$rec = [ordered]@{ agent = $Agent; model = $name; versions = $versions; timeoutSec = $TimeoutSec; server = $argList; load = ''; read = $null; write = $null; echo = $null; sum = $null }
 
 	# エージェントごとの接続設定を空のホームに書く
 	switch ($Agent) {

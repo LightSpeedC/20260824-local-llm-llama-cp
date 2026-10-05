@@ -3,7 +3,8 @@
 	[string]$ModelDir = '',
 	[double]$MaxSizeGB = 10,
 	[int]$Ctx = 65536,
-	[int]$TimeoutSec = 600,
+	# 0 ならモデルと llama.cpp から決める（paths.ps1 の Get-LlmTimeout）
+	[int]$TimeoutSec = 0,
 	[int]$Port = 8080,
 	[string]$Only = '',
 	[switch]$UseTemplates,
@@ -87,7 +88,7 @@ function Invoke-Claude([string]$prompt, [string]$tag, [switch]$Trace, [string]$C
 	$sw.Stop()
 	if (-not $done) { taskkill /PID $cc.Id /T /F | Out-Null }
 	$r = [ordered]@{ status = $(if ($done) { 'ok' } else { 'timeout' }); sec = [Math]::Round($sw.Elapsed.TotalSeconds, 1); turns = $null; is_error = $null; result = ''; toolLog = '' }
-	if (Test-Path $out) { $r.toolLog = [IO.File]::ReadAllText($out, [Text.Encoding]::UTF8) }
+	$r.toolLog = Read-LlmText $out
 	if ($done -and (Test-Path $out)) {
 		$line = $r.toolLog -split "`n" | Where-Object { $_.TrimStart().StartsWith('{') } | Select-Object -Last 1
 		try {
@@ -109,9 +110,12 @@ $ErrorActionPreference = 'Stop'
 Write-Host "版: Claude Code $($versions.agent) / llama.cpp $($versions.llama) / node $($versions.node)"
 
 $readExpect = 'ローカルLLM 実行環境'
+$fixedTimeout = $TimeoutSec
 foreach ($m in $models) {
 	$name = $m.BaseName
 	$tag = "$runStamp-$name"
+	# Invoke-Claude はこの $TimeoutSec を読む
+	$TimeoutSec = if ($fixedTimeout) { $fixedTimeout } else { Get-LlmTimeout $LlamaDir $name }
 	$sizeGB = [Math]::Round($m.Length / 1GB, 2)
 	# 3.2GB 以下は全層 GPU、それより大きいものは -ngl を渡さず llama-server の自動配置に任せる
 	$ngl = if ($m.Length -le 3.2GB) { '-ngl 99' } else { '' }
@@ -119,8 +123,8 @@ foreach ($m in $models) {
 	$tpl = Join-Path $PSScriptRoot "templates/$name.jinja"
 	$tplArg = if ($UseTemplates -and (Test-Path $tpl)) { "--chat-template-file `"$tpl`"" } else { '' }
 	$argList = "-m `"$($m.FullName)`" -c $Ctx -np 1 $ngl -nkvo -ctk q8_0 -ctv q8_0 -fa on $tplArg $ExtraArgs --alias $name --host 127.0.0.1 --port $Port"
-	Write-Host "=== $name（$sizeGB GB）"
-	$rec = [ordered]@{ model = $name; sizeGB = $sizeGB; versions = $versions; server = $argList; load = ''; read = $null; write = $null; echo = $null; sum = $null }
+	Write-Host "=== $name（$sizeGB GB・時間切れ $TimeoutSec 秒）"
+	$rec = [ordered]@{ model = $name; sizeGB = $sizeGB; versions = $versions; timeoutSec = $TimeoutSec; server = $argList; load = ''; read = $null; write = $null; echo = $null; sum = $null }
 	$srvLog = Join-Path $logDir "$tag-server.log"
 	$srv = Start-Process -FilePath $exe -ArgumentList $argList -PassThru -WindowStyle Hidden -RedirectStandardError $srvLog -RedirectStandardOutput "$srvLog.out"
 	try {

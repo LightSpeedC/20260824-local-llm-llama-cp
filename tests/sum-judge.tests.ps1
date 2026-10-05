@@ -46,11 +46,17 @@ $save = Join-Path $root 'tmp/tests-sum-judge-save'
 $w = New-Work 'console.log(55)'
 $r = Test-SumResult $w '合計は 55 です' '{"command": "node sum.js"}' $save
 Assert-Equal '書いて・実行して・55 と答えれば合格' $true $r.pass
+Assert-Equal '　標準出力を run_stdout に別に残す' '55' $r.run_stdout
 Assert-Equal '　そのとき実行の跡あり（✅）' $true $r.log_ran
 
 $r = Test-SumResult $w '合計は 55 です' '{"name": "write"}' $save
 Assert-Equal '跡が無くても、55 が出て 55 と答えれば合格' $true $r.pass
 Assert-Equal '　そのとき実行の跡なし（☑️補欠合格の元）' $false $r.log_ran
+
+$w = New-Work 'console.error(55)'
+$r = Test-SumResult $w '55' '' $save
+Assert-Equal 'console.error の 55 は run_stdout に入らない' '' $r.run_stdout
+Assert-Equal '　console.error の 55 では不合格' $false $r.pass
 
 $w = New-Work 'console.log("1から10までの合計: " + 55)'
 $r = Test-SumResult $w '55' '' $save
@@ -72,13 +78,26 @@ Assert-Equal 'sum.js が無ければ file は なし' 'なし' $r.file
 Assert-Equal '　sum.js が無ければ不合格' $false $r.pass
 
 Write-Host '■ Get-SumMark：結果ファイルの 1 回分を ✅・☑️・❌・⏱️ にする'
-# 結果ファイル（*-results.jsonl）の sum と同じ形。run_out は試験側で node sum を実行した出力
-function New-Run($status, $file, $out, $report, $ran, $sec = 30) { [pscustomobject]@{ status = $status; file = $file; run_out = $out; report_pass = $report; log_ran = $ran; sec = $sec } }
+# 結果ファイル（*-results.jsonl）の sum と同じ形。run_stdout は試験側で node sum を実行した標準出力、run_out は標準エラーも含む
+function New-Run($status, $file, $out, $report, $ran, $sec = 30) { [pscustomobject]@{ status = $status; file = $file; run_out = $out; run_stdout = $out; report_pass = $report; log_ran = $ran; sec = $sec } }
 Assert-Equal '書いて・実行して・55 と答えれば ✅' '✅' (Get-SumMark (New-Run 'ok' 'あり' '55' $true $true))
 Assert-Equal '実行の跡が無ければ ☑️' '☑️' (Get-SumMark (New-Run 'ok' 'あり' '55' $true $false))
 Assert-Equal 'sum.js が無ければ ❌' '❌' (Get-SumMark (New-Run 'ok' 'なし' '' $true $false))
 Assert-Equal '55 が出なければ ❌' '❌' (Get-SumMark (New-Run 'ok' 'あり' '45' $true $true))
 Assert-Equal '実行したが答えなければ ❌' '❌' (Get-SumMark (New-Run 'ok' 'あり' '55' $false $true))
+# 55 は標準出力だけで見る。sum.js が文法エラーで止まると、node は標準エラーにソースの行（1 + … = 55）を出すが、出力したのではない
+$err = New-Run 'ok' 'あり' "sum.js:1`n1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 = 55`nSyntaxError: Invalid left-hand side in assignment" $true $true
+$err.run_stdout = ''
+Assert-Equal '標準エラーにだけ 55 があるなら ❌' '❌' (Get-SumMark $err)
+Assert-Equal '　そのときの落ち方は「55 が出ない」' '❌ 不合格 書いたが 55 が出ない' (Format-SumCell $err)
+# console.error で出した 55 も標準出力ではないので数えない
+$stderrOnly = New-Run 'ok' 'あり' '55' $true $true
+$stderrOnly.run_stdout = ''
+Assert-Equal 'console.error で 55 を出しても ❌' '❌' (Get-SumMark $stderrOnly)
+# 9/30 の結果の run_pass は、55 だけが出たときに合格とする古い判定で書かれている。標準出力から判定し直す
+$old = New-Run 'ok' 'あり' '1 から 10 までの合計は 55' $true $true
+$old | Add-Member -NotePropertyName run_pass -NotePropertyValue $false -Force
+Assert-Equal '古い判定で run_pass が False でも、標準出力に「合計は 55」があれば ✅' '✅' (Get-SumMark $old)
 Assert-Equal '時間切れは ⏱️' '⏱️' (Get-SumMark (New-Run 'timeout' 'あり' '55' $true $true))
 Assert-Equal '結果が無ければ —' '—' (Get-SumMark $null)
 

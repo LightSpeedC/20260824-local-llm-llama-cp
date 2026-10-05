@@ -43,7 +43,7 @@ function Invoke-Aider([string]$prompt, [string]$tag, [string]$extra = '') {
 	$cc = Start-Process -FilePath 'cmd.exe' -ArgumentList "/d /s /c `"$cmdLine < nul > `"$out`" 2>&1`"" -WorkingDirectory $work -PassThru -WindowStyle Hidden
 	$done = $cc.WaitForExit($TimeoutSec * 1000)
 	if (-not $done) { taskkill /PID $cc.Id /T /F | Out-Null }
-	$text = if (Test-Path $out) { [IO.File]::ReadAllText($out, [Text.Encoding]::UTF8) } else { '' }
+	$text = Read-LlmText $out
 	return [ordered]@{ status = $(if ($done) { 'ok' } else { 'timeout' }); sec = [Math]::Round($sw.Elapsed.TotalSeconds, 1); text = $text }
 }
 
