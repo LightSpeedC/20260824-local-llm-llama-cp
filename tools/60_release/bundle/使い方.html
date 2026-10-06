@@ -253,6 +253,11 @@ footer{
 <code>LLM_BACKEND=auto</code>（既定）は、Intel GPU が見えれば Vulkan 版、見えなければ CPU 版を使う。
 固定したいときは <code>llama.cpp-b11320-vulkan</code>・<code>llama.cpp-b11320-cpu</code>・<code>llama.cpp-b11320-cuda</code> のどれかを書く。
 </p>
+<h2>「ポート 8080 は使用中です」と出たとき</h2>
+<p>
+ほかのプログラムが 8080 番を使っている。そのプログラムを止めるか、<code>config.cmd</code> の <code>LLM_PORT</code> を空いている番号に書き換える。
+</p>
+<pre><code class="language-batch">set "LLM_PORT=8081"</code></pre>
 </section>
 
 <!-- ============ 3 ============ -->
@@ -274,7 +279,7 @@ footer{
 <tr><td class="nowrap"><code>opencode-</code></td><td>OpenCode を開く</td></tr>
 <tr><td class="nowrap"><code>claude-</code></td><td>Claude Code（npm 版）を開く</td></tr>
 <tr><td class="nowrap"><code>claude-exe-</code></td><td>Claude Code（単体の <code>claude.exe</code>）を開く</td></tr>
-<tr><td class="nowrap"><code>server-</code></td><td>llama-server だけを開く（接続先は <code>http://127.0.0.1:8080/v1</code>）。止めるときは Ctrl+C</td></tr>
+<tr><td class="nowrap"><code>server-</code></td><td>llama-server だけを開く（接続先は <code>http://127.0.0.1:8080/v1</code>。番号は <code>LLM_PORT</code>）。止めるときは Ctrl+C</td></tr>
 <tr><td class="nowrap"><code>bench-</code></td><td>Vulkan 版と CPU 版で速さを測る</td></tr>
 </tbody>
 </table>

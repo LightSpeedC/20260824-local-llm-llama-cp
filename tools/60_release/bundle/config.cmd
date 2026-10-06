@@ -8,3 +8,5 @@ set "LLM_WORK_DIR=%~dp0work"
 rem 使う llama.cpp。auto は Intel GPU が見えれば Vulkan 版、見えなければ CPU 版
 rem 固定するときは llama.cpp-b11320-vulkan / llama.cpp-b11320-cpu / llama.cpp-b11320-cuda
 set "LLM_BACKEND=auto"
+rem llama-server のポート。ほかのプログラムが 8080 を使っていて起動できないときだけ書き換える（例: set "LLM_PORT=8081"）
+set "LLM_PORT=8080"

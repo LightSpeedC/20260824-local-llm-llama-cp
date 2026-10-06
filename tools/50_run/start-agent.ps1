@@ -4,7 +4,8 @@
 	# モデルのファイル名に含まれる語（例: gemma-4-E4B-it-Q4_K_M）
 	[Parameter(Mandatory)][string]$Model,
 	[int]$Ctx = 65536,
-	[int]$Port = 8080,
+	# 0 なら config.cmd の LLM_PORT（無ければ 8080）
+	[int]$Port = 0,
 	# エージェントが作業するフォルダ。空なら work の下の project
 	[string]$WorkDir = ''
 )
@@ -12,6 +13,7 @@
 # サーバの設定は試験と同じ（思考なし・差し替えたテンプレートがあれば使う）
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'paths.ps1')
+if (-not $Port) { $Port = $LlmPort }
 $utf8 = New-Object Text.UTF8Encoding($false)
 
 $m = Get-ChildItem $LlmModelDir -Recurse -Filter *.gguf | Where-Object { $_.BaseName -like "*$Model*" -and $_.Name -notmatch 'mmproj' } | Select-Object -First 1
@@ -36,6 +38,11 @@ $argList = "-m `"$($m.FullName)`" -c $Ctx -np 1 $ngl -nkvo -ctk q8_0 -ctv q8_0 -
 $show = { param($s) $s.Replace($LlmRoot.TrimEnd('\'), '<配布先>').Replace($env:USERPROFILE, '~') }
 Write-Host "モデル: $name"
 Write-Host "llama.cpp: $backend"
+if (-not (Test-LlmPortFree $Port)) {
+	$who = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1 | ForEach-Object { (Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue).ProcessName }
+	$whoText = if ($who) { "（$who が使っています）" } else { '' }
+	throw "ポート $Port は使用中です$whoText。そのプログラムを止めるか、別のポートを使ってください"
+}
 
 if ($Agent -eq 'server') {
 	Write-Host 'llama-server を開きます。止めるときは Ctrl+C'

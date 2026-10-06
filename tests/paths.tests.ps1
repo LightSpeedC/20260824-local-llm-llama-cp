@@ -33,6 +33,23 @@ try { Assert-Equal 'ほかのプロセスが書き込み用に開いていても
 Remove-Item $p
 Assert-Equal '無いファイルは空' '' (Read-LlmText (Join-Path $root 'tmp/tests-no-such-file.txt'))
 
+Write-Host '■ Test-LlmPortFree：llama-server を立てる前にポートの空きを見る'
+# 別のプログラムが同じポートで待っていると、/health の確認がそちらに届いて通ってしまう（i261003-01）
+$l = New-Object Net.Sockets.TcpListener([Net.IPAddress]::Loopback, 0)
+$l.Start()
+$busy = $l.LocalEndpoint.Port
+try { Assert-Equal 'ほかのプログラムが待っているポートは空いていない' $false (Test-LlmPortFree $busy) } finally { $l.Stop() }
+Assert-Equal '閉じたあとのポートは空いている' $true (Test-LlmPortFree $busy)
+
+Write-Host '■ LlmPort：llama-server のポート'
+# 現地で変えるのは config.cmd だけ、を保つため、ポートも LLM_PORT で変えられるようにする（i261003-01）
+# 読み込みは 1 回きりなので、別の PowerShell で読み直して確かめる
+$pathsPs1 = Join-Path $root 'tools/50_run/paths.ps1'
+$env:LLM_PORT = $null
+Assert-Equal 'LLM_PORT が無ければ 8080' '8080' (powershell -NoProfile -Command ". '$pathsPs1'; `$LlmPort")
+$env:LLM_PORT = '18081'
+try { Assert-Equal 'LLM_PORT があればその値' '18081' (powershell -NoProfile -Command ". '$pathsPs1'; `$LlmPort") } finally { $env:LLM_PORT = $null }
+
 Write-Host ''
 Write-Host "合格 $script:passed 件 / 不合格 $script:failed 件"
 if ($script:failed) { exit 1 }

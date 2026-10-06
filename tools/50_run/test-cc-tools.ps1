@@ -5,7 +5,8 @@
 	[int]$Ctx = 65536,
 	# 0 ならモデルと llama.cpp から決める（paths.ps1 の Get-LlmTimeout）
 	[int]$TimeoutSec = 0,
-	[int]$Port = 8080,
+	# 0 なら config.cmd の LLM_PORT（無ければ 8080）
+	[int]$Port = 0,
 	[string]$Only = '',
 	[switch]$UseTemplates,
 	[string]$Tests = 'read,write',
@@ -20,6 +21,7 @@ $ErrorActionPreference = 'Stop'
 # -Tests には read・write のほか、sum（初期プログラミング）・echo（日本語が届くかの確認）も渡せる
 . (Join-Path $PSScriptRoot 'sum-judge.ps1')
 . (Join-Path $PSScriptRoot 'paths.ps1')
+if (-not $Port) { $Port = $LlmPort }
 $root = $LlmRoot
 if (-not $ModelDir) { $ModelDir = $LlmModelDir }
 if (-not $LlamaDir) { $LlamaDir = $LlmBackend }

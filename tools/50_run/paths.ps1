@@ -36,6 +36,8 @@ if ($llmWork) {
 }
 # 使う llama.cpp（bin の下のフォルダ名）。auto は Vulkan 版に GPU が見えれば Vulkan、見えなければ CPU
 $LlmBackend = Get-LlmSetting 'LLM_BACKEND' 'llama.cpp'
+# llama-server のポート。各スクリプトの -Port を省いたときに使う
+$LlmPort = [int](Get-LlmSetting 'LLM_PORT' '8080')
 # エージェントの出力ファイルを読む。時間切れで止めた後も子プロセスが開いたままのことがあるので、
 # ほかのプロセスが開いていても読める開き方にし、読めなければ何回かやり直す。それでも駄目なら空を返す
 function Read-LlmText([string]$path) {
@@ -47,6 +49,17 @@ function Read-LlmText([string]$path) {
 		} catch { Start-Sleep -Milliseconds 500 }
 	}
 	return ''
+}
+# llama-server を立てる前に、ポートが空いているかを見る（i261003-01）
+# 別のプログラムが待っていると、/health の確認がそちらに届いて通ってしまう
+# 繋がれば使用中。0.0.0.0 で待つプログラムには 127.0.0.1 で bind できてしまうことがあるため、先に繋いで確かめる
+function Test-LlmPortFree([int]$port) {
+	$c = New-Object Net.Sockets.TcpClient
+	try {
+		if ($c.ConnectAsync('127.0.0.1', $port).Wait(500) -and $c.Connected) { return $false }
+	} catch {} finally { $c.Close() }
+	$l = New-Object Net.Sockets.TcpListener([Net.IPAddress]::Loopback, $port)
+	try { $l.Start(); return $true } catch { return $false } finally { $l.Stop() }
 }
 # 時間切れの既定（秒）。NVIDIA GPU（CUDA 版）は 10 分、Intel GPU（Vulkan 版）と CPU 版は 15 分（r260929-01）
 # 名前に Thinking・Reasoning が入るモデルは、--reasoning off でも長く考えるので倍にする

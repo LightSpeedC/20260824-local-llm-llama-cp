@@ -6,7 +6,8 @@
 	[int]$Ctx = 65536,
 	# 0 ならモデルと llama.cpp から決める（paths.ps1 の Get-LlmTimeout）
 	[int]$TimeoutSec = 0,
-	[int]$Port = 8080,
+	# 0 なら config.cmd の LLM_PORT（無ければ 8080）
+	[int]$Port = 0,
 	[switch]$UseTemplates,
 	[string]$ExtraArgs = '',
 	[ValidateSet('responses', 'chat')][string]$CodexWireApi = 'responses',
@@ -20,6 +21,7 @@
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'sum-judge.ps1')
 . (Join-Path $PSScriptRoot 'paths.ps1')
+if (-not $Port) { $Port = $LlmPort }
 $root = $LlmRoot
 if (-not $ModelDir) { $ModelDir = $LlmModelDir }
 if (-not $LlamaDir) { $LlamaDir = $LlmBackend }

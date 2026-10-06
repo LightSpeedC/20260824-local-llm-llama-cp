@@ -5,13 +5,15 @@
 	[int]$Repeat = 3,
 	[int]$Ctx = 65536,
 	[int]$TimeoutSec = 600,
-	[int]$Port = 8080
+	# 0 なら config.cmd の LLM_PORT（無ければ 8080）
+	[int]$Port = 0
 )
 # Aider に sum.js を書かせたあと、別の指示で実行・テストさせると node を実行するかを試す（i261001-01）
 # 1 回目の指示は sum の試験と同じ。2 回目は同じ作業フォルダで Aider を起動し直して渡す
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'sum-judge.ps1')
 . (Join-Path $PSScriptRoot 'paths.ps1')
+if (-not $Port) { $Port = $LlmPort }
 $root = $LlmRoot
 if (-not $ModelDir) { $ModelDir = $LlmModelDir }
 $exe = Join-Path $root 'bin/llama.cpp/llama-server.exe'

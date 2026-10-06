@@ -218,7 +218,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<div class="inner">
 		<h1>閉域網へ持っていく配布物</h1>
 		<div class="lead">ネットに出られない別の PC（Intel の内蔵 GPU）で、ローカル LLM とエージェントを試せるように、モデル以外も含めて 1 つにまとめて運ぶ</div>
-		<div class="date">📅 作成: 2026-10-02 / 更新: 2026-10-02</div>
+		<div class="date">📅 作成: 2026-10-02 / 更新: 2026-10-06</div>
 	</div>
 </div>
 
@@ -352,6 +352,7 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 <tr><td class="nowrap"><code>W:/temp/llama-cp-agent-home</code></td><td>Pi・OpenCode の空のホーム（<code>test-agents.ps1</code>）</td><td class="nowrap">（<code>LLM_WORK_DIR</code> の下）</td><td><code>&lt;配布先&gt;\work\agent-home</code></td></tr>
 <tr><td class="nowrap"><code>W:/temp/llama-cp-home</code></td><td>Claude Code の空のホーム（<code>test-cc-tools.ps1</code>）</td><td class="nowrap">（<code>LLM_WORK_DIR</code> の下）</td><td><code>&lt;配布先&gt;\work\cc-home</code></td></tr>
 <tr><td class="nowrap"><code>bin/llama.cpp</code></td><td>llama-server の場所（<code>-LlamaDir</code>）</td><td class="nowrap"><code>LLM_BACKEND</code></td><td>自動（第 4 章）</td></tr>
+<tr><td class="nowrap"><code>8080</code></td><td>llama-server のポート（<code>start-agent.ps1</code> と試験 3 本の <code>-Port</code>）</td><td class="nowrap"><code>LLM_PORT</code></td><td><code>8080</code>（使用中なら起動前に止まる）</td></tr>
 <tr><td class="nowrap"><code>tools/50_run/templates</code></td><td>差し替え用のテンプレート</td><td class="nowrap">—</td><td><code>&lt;配布先&gt;\tools\50_run\templates</code>（スクリプトの置き場所からの相対なので、そのまま）</td></tr>
 <tr><td class="nowrap">PATH の <code>node</code>・<code>pi</code>・<code>opencode</code>・<code>claude</code></td><td>エージェントの起動</td><td class="nowrap">—</td><td>cmd の中で <code>&lt;配布先&gt;\bin\node</code> を PATH の先頭に足す</td></tr>
 </tbody>
@@ -393,6 +394,7 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 <ol>
 	<li><code>config.cmd</code> を読む（モデルの場所など）</li>
 	<li>llama.cpp の版を選ぶ。<code>LLM_BACKEND</code> が空なら、Vulkan 版の <code>--list-devices</code> に GPU が出れば Vulkan 版、出なければ CPU 版</li>
+	<li>ポート（<code>LLM_PORT</code>、既定 8080）が空いているかを見る。使用中なら、使っているプログラム名を出して止める</li>
 	<li>llama-server を立てる。オプションは試験と同じ（<code>-c 65536 -np 1 -fa on -ctk q8_0 -ctv q8_0 --reasoning off</code>、テンプレートがあれば <code>--chat-template-file</code>）</li>
 	<li>エージェントの接続設定を <code>work\</code> の下の空のホームに書き、そのホームでエージェントを開く（利用者のいつもの設定には触れない）</li>
 </ol>
