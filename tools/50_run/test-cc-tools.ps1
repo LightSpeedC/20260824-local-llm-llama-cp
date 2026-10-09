@@ -26,6 +26,7 @@ $root = $LlmRoot
 if (-not $ModelDir) { $ModelDir = $LlmModelDir }
 if (-not $LlamaDir) { $LlamaDir = $LlmBackend }
 $LlamaDir = Resolve-LlmBackend $LlamaDir
+$llmDevices = Get-LlmDevices $LlamaDir
 $exe = Join-Path $root "bin/$LlamaDir/llama-server.exe"
 $logDir = Join-Path $root 'logs/test-cc-tools'
 New-Item -ItemType Directory -Force $logDir | Out-Null
@@ -119,8 +120,8 @@ foreach ($m in $models) {
 	# Invoke-Claude はこの $TimeoutSec を読む
 	$TimeoutSec = if ($fixedTimeout) { $fixedTimeout } else { Get-LlmTimeout $LlamaDir $name }
 	$sizeGB = [Math]::Round($m.Length / 1GB, 2)
-	# 3.2GB 以下は全層 GPU、それより大きいものは -ngl を渡さず llama-server の自動配置に任せる
-	$ngl = if ($m.Length -le 3.2GB) { '-ngl 99' } else { '' }
+	# GPU に何層載せるかは llama.cpp の版と大きさで決める（paths.ps1 の Get-LlmGpuArgs）
+	$ngl = Get-LlmGpuArgs $LlamaDir $m.Length $llmDevices
 	# 差し替えたチャットテンプレートがあれば使う（templates/<モデル名>.jinja）
 	$tpl = Join-Path $PSScriptRoot "templates/$name.jinja"
 	$tplArg = if ($UseTemplates -and (Test-Path $tpl)) { "--chat-template-file `"$tpl`"" } else { '' }
@@ -149,6 +150,8 @@ foreach ($m in $models) {
 		$env:CLAUDE_CODE_MAX_CONTEXT_TOKENS = "$Ctx"
 		$env:API_TIMEOUT_MS = "$($TimeoutSec * 1000)"
 		$env:CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = '1'
+		# 帰属ヘッダを切る。これまでの試験は、呼び出したセッションの設定（.claude/settings.json）から引き継いでいた
+		$env:CLAUDE_CODE_ATTRIBUTION_HEADER = '0'
 
 		# 読み: 答えは README を読まないと分からない
 		if ($Tests -match 'read') {

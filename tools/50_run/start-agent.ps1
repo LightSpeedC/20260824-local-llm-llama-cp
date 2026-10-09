@@ -29,9 +29,10 @@ if ($Agent -eq 'bench') {
 	return
 }
 $backend = Resolve-LlmBackend $LlmBackend
+$llmDevices = Get-LlmDevices $backend
 $exe = Join-Path $LlmRoot "bin/$backend/llama-server.exe"
 if (-not (Test-Path $exe)) { throw "llama-server が見つかりません: bin/$backend" }
-$ngl = if ($m.Length -le 3.2GB) { '-ngl 99' } else { '' }
+$ngl = Get-LlmGpuArgs $backend $m.Length $llmDevices
 $tpl = Join-Path $PSScriptRoot "templates/$name.jinja"
 $tplArg = if (Test-Path $tpl) { "--chat-template-file `"$tpl`"" } else { '' }
 $argList = "-m `"$($m.FullName)`" -c $Ctx -np 1 $ngl -nkvo -ctk q8_0 -ctv q8_0 -fa on $tplArg --reasoning off --alias $name --host 127.0.0.1 --port $Port"
@@ -54,7 +55,11 @@ if ($Agent -eq 'server') {
 $logDir = Join-Path $LlmRoot 'logs/start-agent'
 New-Item -ItemType Directory -Force $logDir | Out-Null
 $srvLog = Join-Path $logDir "$(Get-Date -Format 'yyyyMMdd-HHmmss')-$name-server.log"
-$srv = Start-Process -FilePath $exe -ArgumentList $argList -PassThru -WindowStyle Hidden -RedirectStandardError $srvLog -RedirectStandardOutput "$srvLog.out"
+# エージェントと同じ窓で起動する。窓を × で閉じると、窓につながる llama-server にも閉じる知らせが届いて終わる
+# 出力はログへ送り、エージェントの画面に混ぜない
+$srv = Start-Process -FilePath $exe -ArgumentList $argList -PassThru -NoNewWindow -RedirectStandardError $srvLog -RedirectStandardOutput "$srvLog.out"
+# この PowerShell が強制終了・異常終了しても、OS が llama-server を止める
+try { Add-LlmKillOnClose $srv } catch { Write-Host "（llama-server を窓と一緒に止める設定ができませんでした: $($_.Exception.Message)）" }
 try {
 	Write-Host 'llama-server を起動しています…'
 	$ready = $false
@@ -97,6 +102,8 @@ try {
 			$env:CLAUDE_CODE_MAX_CONTEXT_TOKENS = "$Ctx"
 			$env:API_TIMEOUT_MS = '600000'
 			$env:CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = '1'
+			# 帰属ヘッダを切る。付けたままだと、E4B の読みが 35 秒前後のところ 1 回だけ 380 秒かかった（i261003-01）
+			$env:CLAUDE_CODE_ATTRIBUTION_HEADER = '0'
 			$env:CLAUDE_CODE_USE_POWERSHELL_TOOL = $null
 			if ($Agent -eq 'claude') { & claude.cmd } else { & (Join-Path $LlmRoot 'bin/claude/claude.exe') }
 		}

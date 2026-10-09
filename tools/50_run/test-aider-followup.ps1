@@ -32,7 +32,8 @@ $followups = [ordered]@{
 $m = Get-ChildItem $ModelDir -Recurse -Filter *.gguf | Where-Object { $_.BaseName -like "*$Only*" -and $_.Name -notmatch 'mmproj' } | Select-Object -First 1
 if (-not $m) { throw 'モデルが見つかりません' }
 $name = $m.BaseName
-$ngl = if ($m.Length -le 3.2GB) { '-ngl 99' } else { '' }
+$llmDevices = ''
+$ngl = Get-LlmGpuArgs 'llama.cpp' $m.Length $llmDevices
 $tpl = Join-Path $PSScriptRoot "templates/$name.jinja"
 $tplArg = if (Test-Path $tpl) { "--chat-template-file `"$tpl`"" } else { '' }
 $argList = "-m `"$($m.FullName)`" -c $Ctx -np 1 $ngl -nkvo -ctk q8_0 -ctv q8_0 -fa on $tplArg --reasoning off --alias $name --host 127.0.0.1 --port $Port"

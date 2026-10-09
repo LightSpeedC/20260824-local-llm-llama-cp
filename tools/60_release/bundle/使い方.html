@@ -217,13 +217,13 @@ footer{
 <tbody>
 <tr><td class="nowrap"><code>run\</code></td><td>ダブルクリックで動かす cmd（第 3 章）</td></tr>
 <tr><td class="nowrap"><code>config.cmd</code></td><td>場所の設定。モデルを別の場所に置くときだけ書き換える（第 2 章）</td></tr>
-<tr><td class="nowrap"><code>models\</code></td><td>モデル 4 本（gemma-4-E4B・gemma-4-E2B・Ministral-3-3B・gemma-4-12B-QAT）</td></tr>
+<tr><td class="nowrap"><code>models\</code></td><td>モデル 4 本（gemma-4-E4B・gemma-4-E2B・Ministral-3-3B・gemma-4-12B-QAT）。大きいので別に持ってくる。持ってきた <code>models</code> フォルダをここに置く</td></tr>
 <tr><td class="nowrap"><code>bin\llama.cpp-b11320-vulkan\</code></td><td>llama.cpp（Intel GPU を使う版）</td></tr>
 <tr><td class="nowrap"><code>bin\llama.cpp-b11320-cpu\</code></td><td>llama.cpp（CPU だけの版）</td></tr>
 <tr><td class="nowrap"><code>bin\llama.cpp-b11320-cuda\</code></td><td>llama.cpp（NVIDIA の GPU を使う版）</td></tr>
 <tr><td class="nowrap"><code>bin\node\</code></td><td>Node.js v26.10.0。中に Claude Code・Pi・OpenCode が入っている。インストールは要らない</td></tr>
 <tr><td class="nowrap"><code>bin\claude\claude.exe</code></td><td>Claude Code の単体版</td></tr>
-<tr><td class="nowrap"><code>installers\</code></td><td>Node.js の msi（PC に入れて使いたいとき）と Intel GPU のドライバ</td></tr>
+<tr><td class="nowrap"><code>installers\</code></td><td>Node.js の msi（PC に入れて使いたいとき）</td></tr>
 <tr><td class="nowrap"><code>tools\50_run\</code></td><td>試験スクリプト（第 4 章）</td></tr>
 <tr><td class="nowrap"><code>README.html</code>・<code>notes\</code></td><td>このプロジェクトの資料（試験の結果・計画・課題）。README から順にたどれる</td></tr>
 </tbody>
@@ -318,7 +318,7 @@ tools\50_run\test-cc-tools.cmd -Only "gemma-4-E4B" -MaxSizeGB 20 -UseTemplates -
 <table>
 <thead><tr><th class="nowrap">起きたこと</th><th>見るところ</th></tr></thead>
 <tbody>
-<tr><td class="nowrap"><code>list-devices.cmd</code> で GPU が出ない</td><td>Intel GPU のドライバが古いか、Vulkan に対応していない。そのままでも CPU 版で動く（<code>auto</code> なら自動で CPU 版になる）。ドライバは <code>installers\drivers\</code> にある（入れるかはその PC の管理者が決める）</td></tr>
+<tr><td class="nowrap"><code>list-devices.cmd</code> で GPU が出ない</td><td>Intel GPU のドライバが古いか、Vulkan に対応していない。そのままでも CPU 版で動く（<code>auto</code> なら自動で CPU 版になる）。ドライバは別に持ってくる <code>drivers</code> フォルダにある（入れるかはその PC の管理者が決める）</td></tr>
 <tr><td class="nowrap">GPU の名前が UHD Graphics と出る</td><td>メモリが 1 枚だけのことがある。2 枚にすると Iris Xe になり、速くなる</td></tr>
 <tr><td class="nowrap">「モデルが見つかりません」</td><td><code>config.cmd</code> の <code>LLM_MODEL_DIR</code> が、モデルのある場所を指しているか</td></tr>
 <tr><td class="nowrap">「llama-server が起動しません」</td><td>メモリが足りないことが多い。小さいモデル（E2B・E4B）にする。ログは <code>logs\start-agent\</code> にある</td></tr>

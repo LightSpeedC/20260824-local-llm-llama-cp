@@ -26,6 +26,7 @@ $root = $LlmRoot
 if (-not $ModelDir) { $ModelDir = $LlmModelDir }
 if (-not $LlamaDir) { $LlamaDir = $LlmBackend }
 $LlamaDir = Resolve-LlmBackend $LlamaDir
+$llmDevices = Get-LlmDevices $LlamaDir
 $exe = Join-Path $root "bin/$LlamaDir/llama-server.exe"
 $logDir = Join-Path $root 'logs/test-agents'
 New-Item -ItemType Directory -Force $logDir | Out-Null
@@ -112,7 +113,7 @@ foreach ($m in $models) {
 	# エージェントを呼ぶ関数はこの $TimeoutSec を読む
 	$TimeoutSec = if ($fixedTimeout) { $fixedTimeout } else { Get-LlmTimeout $LlamaDir $name }
 	$tag = "$runStamp-$Agent-$name"
-	$ngl = if ($m.Length -le 3.2GB) { '-ngl 99' } else { '' }
+	$ngl = Get-LlmGpuArgs $LlamaDir $m.Length $llmDevices
 	$tpl = Join-Path $PSScriptRoot "templates/$name.jinja"
 	$tplArg = if ($UseTemplates -and (Test-Path $tpl)) { "--chat-template-file `"$tpl`"" } else { '' }
 	$argList = "-m `"$($m.FullName)`" -c $Ctx -np 1 $ngl -nkvo -ctk q8_0 -ctv q8_0 -fa on $tplArg $ExtraArgs --alias $name --host 127.0.0.1 --port $Port"

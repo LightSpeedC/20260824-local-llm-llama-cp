@@ -3,7 +3,9 @@
 	[string]$OutDir = '',
 	# 入れるモデル（ファイル名の拡張子を除いた部分）
 	[string[]]$Models = @('gemma-4-E4B-it-Q4_K_M', 'gemma-4-E2B-it-Q4_K_M', 'Ministral-3-3B-Instruct-2512-Q4_K_M', 'gemma-4-12B-it-QAT-Q4_0'),
-	# モデルを入れない（現地にモデルがあるとき）
+	# モデルの出力先。モデルは大きいので配布物とは別に置く。空なら _releases/models
+	[string]$ModelsDir = '',
+	# モデルを写さない（現地にモデルがあるとき）
 	[switch]$NoModels,
 	# 入れる版
 	[string]$NodeVersion = '26.10.0',
@@ -12,12 +14,14 @@
 	[switch]$RebuildNode
 )
 # 閉域網へ持っていく配布物を組み立てる（p261002-01）
-# llama.cpp・Node.js（エージェント入り）・単体の claude.exe・モデル・試験スクリプト・起動用の cmd を 1 つのフォルダにまとめる
+# 持ち込むものは 3 つに分ける。offline（llama.cpp・Node.js とエージェント・単体の claude.exe・試験スクリプト・起動用の cmd・資料）、
+# models（モデル。現地で offline の配布物の下の models に置く）、drivers（Intel GPU のドライバ。_releases/drivers をそのまま持っていく）
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path "$PSScriptRoot/../..").Path
 . (Join-Path $root 'tools/50_run/paths.ps1')
 $show = { param($s) $s.Replace($root, '<proj>').Replace($env:USERPROFILE, '~') }
 if (-not $OutDir) { $OutDir = Join-Path $root "_releases/offline/llm-bundle-$(Get-Date -Format 'yyyyMMdd')" }
+if (-not $ModelsDir) { $ModelsDir = Join-Path $root '_releases/models' }
 if (Test-Path $OutDir) { throw "出力先がすでにあります: $(& $show $OutDir)" }
 function Copy-Dir([string]$from, [string]$to) {
 	# robocopy は 8 未満が成功
@@ -34,10 +38,12 @@ if (-not (Test-Path $node)) {
 	Write-Host "Node.js v$NodeVersion を取得して、エージェントを入れます"
 	New-Item -ItemType Directory -Force $inst | Out-Null
 	$base = "https://nodejs.org/dist/v$NodeVersion"
-	curl.exe -sSL -o (Join-Path $inst 'SHASUMS256.txt') "$base/SHASUMS256.txt"
+	# -f を付けないと、404 などでもエラーの HTML を保存して終了コード 0 で終わる
+	curl.exe -fsSL -o (Join-Path $inst 'SHASUMS256.txt') "$base/SHASUMS256.txt"
+	if ($LASTEXITCODE) { throw "取得に失敗: $base/SHASUMS256.txt（版 $NodeVersion が無いか、ネットに繋がらない）" }
 	foreach ($f in "node-v$NodeVersion-win-x64.zip", "node-v$NodeVersion-x64.msi") {
 		$p = Join-Path $inst $f
-		if (-not (Test-Path $p)) { curl.exe -sSL -o $p "$base/$f"; if ($LASTEXITCODE) { throw "取得に失敗: $f" } }
+		if (-not (Test-Path $p)) { curl.exe -fsSL -o $p "$base/$f"; if ($LASTEXITCODE) { if (Test-Path $p) { Remove-Item $p }; throw "取得に失敗: $f" } }
 		$h = (Get-FileHash $p -Algorithm SHA256).Hash.ToLower()
 		if (-not (Select-String -Path (Join-Path $inst 'SHASUMS256.txt') -Pattern "$h  $f" -SimpleMatch -Quiet)) { throw "SHA256 が合いません: $f" }
 	}
@@ -58,24 +64,13 @@ Copy-Dir (Join-Path $root 'bin/llama.cpp') (Join-Path $OutDir 'bin/llama.cpp-b11
 Write-Host '  llama.cpp（Vulkan・CPU・CUDA）'
 Copy-Dir $node (Join-Path $OutDir 'bin/node')
 New-Item -ItemType Directory -Force (Join-Path $OutDir 'bin/claude') | Out-Null
-Copy-Item (Join-Path $node 'node_modules/@anthropic-ai/claude-code/bin/claude.exe') (Join-Path $OutDir 'bin/claude')
+$claudeExe = Join-Path $node 'node_modules/@anthropic-ai/claude-code/bin/claude.exe'
+if (-not (Test-Path $claudeExe)) { throw "npm の Claude Code の中に claude.exe がありません。置き場が変わった可能性があります: $(& $show $claudeExe)" }
+Copy-Item $claudeExe (Join-Path $OutDir 'bin/claude')
 Write-Host '  Node.js（エージェント入り）・単体の claude.exe'
 New-Item -ItemType Directory -Force (Join-Path $OutDir 'installers') | Out-Null
 Copy-Item (Join-Path $inst "node-v$NodeVersion-x64.msi") (Join-Path $OutDir 'installers')
-$drv = Join-Path $root '_releases/drivers'
-if (Test-Path $drv) { Copy-Dir $drv (Join-Path $OutDir 'installers/drivers') }
-Write-Host '  インストーラ（Node.js の msi・Intel GPU ドライバ）'
-if (-not $NoModels) {
-	New-Item -ItemType Directory -Force (Join-Path $OutDir 'models') | Out-Null
-	$all = Get-ChildItem $LlmModelDir -Recurse -Filter *.gguf
-	foreach ($name in $Models) {
-		$m = $all | Where-Object { $_.BaseName -eq $name } | Select-Object -First 1
-		if (-not $m) { throw "モデルが見つかりません: $name" }
-		robocopy $m.DirectoryName (Join-Path $OutDir 'models') $m.Name /NFL /NDL /NJH /NJS /NP | Out-Null
-		if ($LASTEXITCODE -ge 8) { throw "コピーに失敗: $name" }
-		Write-Host ("  モデル {0}（{1:N1} GB）" -f $name, ($m.Length / 1GB))
-	}
-}
+Write-Host '  インストーラ（Node.js の msi）'
 $t = Join-Path $OutDir 'tools/50_run'
 New-Item -ItemType Directory -Force $t | Out-Null
 foreach ($f in 'paths.ps1', 'sum-judge.ps1', 'start-agent.ps1', 'start-agent.cmd', 'test-agents.ps1', 'test-agents.cmd', 'test-cc-tools.ps1', 'test-cc-tools.cmd') {
@@ -124,5 +119,23 @@ convert-encoding $cmd --to cmd | Out-Null
 $count++
 Write-Host "  起動用の cmd $count 本"
 
+# 4. モデルは大きいので最後に写す（配布物とは別のフォルダ）
+if (-not $NoModels) {
+	New-Item -ItemType Directory -Force $ModelsDir | Out-Null
+	$all = Get-ChildItem $LlmModelDir -Recurse -Filter *.gguf
+	foreach ($name in $Models) {
+		$m = $all | Where-Object { $_.BaseName -eq $name } | Select-Object -First 1
+		if (-not $m) { throw "モデルが見つかりません: $name" }
+		robocopy $m.DirectoryName $ModelsDir $m.Name /NFL /NDL /NJH /NJS /NP | Out-Null
+		if ($LASTEXITCODE -ge 8) { throw "コピーに失敗: $name" }
+		Write-Host ("  モデル {0}（{1:N1} GB）" -f $name, ($m.Length / 1GB))
+	}
+}
+
 $size = (Get-ChildItem $OutDir -Recurse -File | Measure-Object Length -Sum).Sum
 Write-Host ("完成: {0}（{1:N1} GB）" -f (& $show $OutDir), ($size / 1GB))
+if (-not $NoModels) {
+	$msize = (Get-ChildItem $ModelsDir -File | Measure-Object Length -Sum).Sum
+	Write-Host ("モデル: {0}（{1:N1} GB）。現地では配布物の下の models に置く" -f (& $show $ModelsDir), ($msize / 1GB))
+}
+Write-Host 'ドライバ: <proj>\_releases\drivers をそのまま持っていく'

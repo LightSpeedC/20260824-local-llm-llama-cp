@@ -2,16 +2,19 @@
 # root に config.cmd があれば、その set 行を読む（配布物ではこれを書き換えるだけで場所が変わる）
 # 無ければ環境変数、それも無ければ開発用の PC の場所にする
 $LlmRoot = (Resolve-Path "$PSScriptRoot/../..").Path
-$llmConfig = @{}
-$configCmd = Join-Path $LlmRoot 'config.cmd'
-if (Test-Path $configCmd) {
-	foreach ($line in [IO.File]::ReadAllLines($configCmd, [Text.Encoding]::Default)) {
+# config.cmd の set 行を読む。cmd のファイルは SJIS なので CP932 と決めて読む（Encoding.Default は pwsh 7 では UTF-8 になる）
+# %~dp0 は config.cmd の置き場所（末尾に \ が付く）。ほかの %変数% は cmd と同じく環境変数で展開する
+function Read-LlmConfig([string]$path, [string]$root) {
+	$conf = @{}
+	if (-not (Test-Path $path)) { return $conf }
+	foreach ($line in [IO.File]::ReadAllLines($path, [Text.Encoding]::GetEncoding(932))) {
 		if ($line -match '^\s*set\s+"?(LLM_[A-Z_]+)=([^"]*)"?\s*$') {
-			# %~dp0 は config.cmd の置き場所（末尾に \ が付く）
-			$llmConfig[$Matches[1]] = $Matches[2].Replace('%~dp0', $LlmRoot.TrimEnd('\') + '\')
+			$conf[$Matches[1]] = [Environment]::ExpandEnvironmentVariables($Matches[2].Replace('%~dp0', $root.TrimEnd('\') + '\'))
 		}
 	}
+	return $conf
 }
+$llmConfig = Read-LlmConfig (Join-Path $LlmRoot 'config.cmd') $LlmRoot
 function Get-LlmSetting([string]$name, [string]$default) {
 	if ($llmConfig[$name]) { return $llmConfig[$name] }
 	$v = [Environment]::GetEnvironmentVariable($name)
@@ -61,12 +64,68 @@ function Test-LlmPortFree([int]$port) {
 	$l = New-Object Net.Sockets.TcpListener([Net.IPAddress]::Loopback, $port)
 	try { $l.Start(); return $true } catch { return $false } finally { $l.Stop() }
 }
+# 起動したプロセスを、この PowerShell が終わったら OS が止めるようにする（i261003-01）
+# 窓を × で閉じる・強制終了すると finally が走らず、llama-server が残っていた
+# ジョブオブジェクトに「最後のハンドルが閉じたら中を止める」を付けて入れる。ハンドルはこの PowerShell が持ち、終われば OS が閉じる
+function Add-LlmKillOnClose([Diagnostics.Process]$proc) {
+	if (-not ('LlmJob' -as [type])) {
+		Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class LlmJob {
+	[StructLayout(LayoutKind.Sequential)] struct BASIC { public long a, b; public uint LimitFlags; public UIntPtr c, d; public uint e; public UIntPtr f; public uint g, h; }
+	[StructLayout(LayoutKind.Sequential)] struct IO { public ulong a, b, c, d, e, f; }
+	[StructLayout(LayoutKind.Sequential)] struct EXT { public BASIC Basic; public IO Io; public UIntPtr g, h, i, j; }
+	[DllImport("kernel32.dll", CharSet = CharSet.Unicode)] static extern IntPtr CreateJobObject(IntPtr a, string name);
+	[DllImport("kernel32.dll")] static extern bool SetInformationJobObject(IntPtr job, int cls, ref EXT info, int len);
+	[DllImport("kernel32.dll")] static extern bool AssignProcessToJobObject(IntPtr job, IntPtr proc);
+	static IntPtr job = IntPtr.Zero;
+	public static void Add(IntPtr proc) {
+		if (job == IntPtr.Zero) {
+			job = CreateJobObject(IntPtr.Zero, null);
+			var info = new EXT();
+			info.Basic.LimitFlags = 0x2000; // JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+			if (!SetInformationJobObject(job, 9, ref info, Marshal.SizeOf(typeof(EXT)))) throw new System.ComponentModel.Win32Exception();
+		}
+		if (!AssignProcessToJobObject(job, proc)) throw new System.ComponentModel.Win32Exception();
+	}
+}
+'@
+	}
+	[LlmJob]::Add($proc.Handle)
+}
 # 時間切れの既定（秒）。NVIDIA GPU（CUDA 版）は 10 分、Intel GPU（Vulkan 版）と CPU 版は 15 分（r260929-01）
 # 名前に Thinking・Reasoning が入るモデルは、--reasoning off でも長く考えるので倍にする
 function Get-LlmTimeout([string]$llamaDir, [string]$model) {
 	$sec = if ($llamaDir -eq 'llama.cpp' -or $llamaDir -like '*-cuda') { 600 } else { 900 }
 	if ($model -match 'Thinking|Reasoning') { $sec *= 2 }
 	return $sec
+}
+# GPU に何層載せるかの引数（i261003-01）。$devices は llama-server --list-devices の出力
+# Vulkan 版: 大きさに関わらず全部載せる。-ngl を渡さないと 12B は Intel に載らず CPU で動いた
+#   Intel に全部載せるとプロンプトの処理が CPU の 4.6 倍。NVIDIA も見える PC では NVIDIA に分けて載せようとして足りなくなるので、Intel だけを使う
+# CPU 版: 何も付けない
+# CUDA 版（RTX 3050 Ti 4GB）: 3.2GB 以下だけ全部載せ、大きいものは自動配置に任せる（r260929-01 の試験条件）
+function Get-LlmGpuArgs([string]$llamaDir, [long]$size, [string]$devices) {
+	if ($llamaDir -like '*-vulkan') {
+		$m = [regex]::Matches($devices, '(Vulkan\d+):\s*(.+)') | Where-Object { $_.Groups[2].Value -notmatch 'NVIDIA' } | Select-Object -First 1
+		$dev = if ($m -and $devices -match 'NVIDIA') { "--device $($m.Groups[1].Value)" } else { '' }
+		# 空きの 8 割に収まらないものは全部は載らない（15.7GB の Qwen3.6-35B は -ngl 99 で起動しなかった）。-ngl を付けず、入る分だけを自動で載せる
+		$free = if ($m -and $m.Groups[2].Value -match ',\s*(\d+) MiB free') { [long]$Matches[1] * 1MB } else { 0 }
+		$ngl = if ($free -and $size -gt $free * 0.8) { '' } else { '-ngl 99' }
+		return (($ngl, $dev) | Where-Object { $_ }) -join ' '
+	}
+	if ($llamaDir -like '*-cpu') { return '' }
+	if ($size -le 3.2GB) { return '-ngl 99' }
+	return ''
+}
+# Vulkan 版のときだけ、見えるデバイスの一覧を取る
+function Get-LlmDevices([string]$llamaDir) {
+	if ($llamaDir -notlike '*-vulkan') { return '' }
+	$exe = Join-Path $LlmRoot "bin/$llamaDir/llama-server.exe"
+	if (-not (Test-Path $exe)) { return '' }
+	$ErrorActionPreference = 'Continue'
+	return (& $exe --list-devices 2>&1 | Out-String)
 }
 function Resolve-LlmBackend([string]$name) {
 	if ($name -ne 'auto') { return $name }
