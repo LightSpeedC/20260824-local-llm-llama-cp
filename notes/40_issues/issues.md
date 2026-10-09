@@ -162,22 +162,23 @@ N: ドライブが廃止され、プロジェクトは W:、共有ツールは T
 - ✅ **済** 試験スクリプトの場所を設定と引数で変えられるようにする
 - ✅ **済** zip 版 Node.js にエージェントを入れ、起動用の cmd を生成する
 - ✅ **済** 配布物を組み立てるスクリプトを書き、別の場所に置いて 4 つのエージェントの試験が通ることを確かめる
+- ✅ **済** 配布物を組み立て直す（2026-10-08。ポートの確認・窓を閉じたときの停止・Intel に載せる設定などを入れた。持ち込むものを、モデル以外の `llm-bundle-20261008.7z`（0.83 GB）・`models`（16.7 GB）・`drivers`（0.7 GB）の 3 つに分けた）
 - ⬜ **未** ネットを切った状態で動くか、現地で確かめる（対話の cmd も使ってみる）
 - ✅ **済** Claude Code を社内の閉域網で使ってよいか、利用条件を確かめる（2026-10-06 決定: 会社の契約（Commercial Terms）のもとで、自己責任で使う。公式の [Other LLM gateways](https://code.claude.com/docs/en/llm-gateway) は Claude 以外のモデルへのつなぎ方を「サポートしない」と書くが、禁止はしていない。公式の [Legal and compliance](https://code.claude.com/docs/en/legal-and-compliance) では、npm 版もオープンソースではなく Anthropic の規約に従う。会社の契約があるので Commercial Terms が適用され、自社の利用者のために社内の環境へ入れて使うことは書きぶりから外れない。ローカルモデルだけ・閉域網での利用は書かれていない）
 
 関連: [閉域網へ持っていく配布物](../10_plan/p261002-01-閉域網へ持っていく配布物.md)
 
-### ⚠️ **着手** i261003-01 配布物の起動まわりの穴をふさぐ
+### ✅ **済** i261003-01 配布物の起動まわりの穴をふさぐ
 
 全体を見直して見つけた、`start-agent.ps1`・`paths.ps1`・`make-offline-bundle.ps1` の弱いところ。現地でつまずく順に並べた。
 
-- ⬜ **未** Claude Code の起動で `CLAUDE_CODE_ATTRIBUTION_HEADER=0` を渡す（`cc1.cmd` は渡している。無いと遅くなるかを測ってから直す）
+- ✅ **済** Claude Code の起動で `CLAUDE_CODE_ATTRIBUTION_HEADER=0` を渡す（`cc1.cmd` は渡している。無いと遅くなるかを測ってから直す）（2026-10-06。E4B の読み書きを 2 回ずつ測った。切ると読み 37・35 秒、切らないと 380・36 秒で、10 倍遅い回があった。`start-agent.ps1` と `test-cc-tools.ps1` で切る。これまでの試験は、このセッションの `.claude/settings.json` から引き継いで切れていた）
 - ✅ **済** 8080 番を別のプログラムが使っていても `/health` の確認が通ってしまう。起動前に空きを見て、使用中なら「使用中」と出して止める（`paths.ps1` の `Test-LlmPortFree`。`start-agent.ps1` は使用中なら使っているプログラム名を出して止める。テストは `tests/paths.tests.ps1`）
 - ✅ **済** ポートだけ ps1 を直さないと変えられない。`config.cmd` に `LLM_PORT` を足し、`start-agent` と試験のスクリプトの既定にする（現地で変えるのは `config.cmd` だけ、を保つ）（`paths.ps1` の `$LlmPort`。`start-agent.ps1`・`test-agents.ps1`・`test-cc-tools.ps1`・`test-aider-followup.ps1` は `-Port` を省くとこれを使う。配布物の `config.cmd` と使い方にも足した）
-- ⬜ **未** cmd の窓を × で閉じると `finally` が走らず llama-server が残る。次の起動で、配布物の llama-server が残っていれば知らせて止める
-- ⬜ **未** 3.2GB を超えるモデルに `-ngl` を付けないため、Vulkan でも 12B-QAT は CPU だけで動く。Vulkan のときは大きさに関わらず `-ngl 99` にし、この PC の Iris Xe で 12B を測ってから決める
-- ⬜ **未** `config.cmd` を `Encoding.Default` で読むため、pwsh 7 では日本語のパスが化ける。CP932 と決めて読み、`%USERPROFILE%` などの `%変数%` も環境変数で展開する
-- ⬜ **未** `SHASUMS256.txt` の取得に失敗したらその場で止める。npm の中に `claude.exe` が無ければ「置き場が変わった」と出す
+- ✅ **済** cmd の窓を × で閉じると finally が走らず llama-server が残る。窓を閉じたとき・強制終了したときに、llama-server も一緒に止める（2026-10-06。① llama-server をエージェントと同じ窓で起動し、窓を閉じる知らせで一緒に終わらせる。A ジョブオブジェクトに入れ、PowerShell が終われば OS が止める。`paths.ps1` の `Add-LlmKillOnClose`。実機で、窓を閉じたとき・PowerShell だけを強制終了したときのどちらも止まることを確かめた。テストは `tests/paths.tests.ps1`）
+- ✅ **済** 3.2GB を超えるモデルに `-ngl` を付けないため、Vulkan でも 12B-QAT は CPU だけで動く。Vulkan のときは大きさに関わらず `-ngl 99` にする（2026-10-06。この PC の 12B-QAT で、CPU 版はプロンプト 14.8・生成 3.8 tok/s、Intel に全部載せるとプロンプト 68.8・生成 3.4 tok/s。既定のままでは 49 層中 12 層が NVIDIA に、残りが CPU に載っていた。NVIDIA も見える PC では Intel だけを使う `--device` を付ける。`paths.ps1` の `Get-LlmGpuArgs`）
+- ✅ **済** `config.cmd` を `Encoding.Default` で読むため、pwsh 7 では日本語のパスが化ける。CP932 と決めて読み、`%USERPROFILE%` などの `%変数%` も環境変数で展開する（`paths.ps1` の `Read-LlmConfig`。テストは Windows PowerShell 5.1 と pwsh 7 の両方で流す）
+- ✅ **済** `SHASUMS256.txt` の取得に失敗したらその場で止める。npm の中に `claude.exe` が無ければ「置き場が変わった」と出す（`make-offline-bundle.ps1`。curl に `-f` を付けた。付けないと 404 でもエラーの HTML を保存して終了コード 0 になることを確かめた。取得に失敗したら途中のファイルを消して止める）
 - ✅ **済** 配布物は約 20.4 GB で、12B-QAT は 1 ファイルで 4 GB を超える。運ぶ媒体が FAT32 なら書き込めないため、媒体と形式（exFAT・NTFS）を確かめる（利用者が確かめた。問題なし）
 
 関連: [閉域網へ持っていく配布物](../10_plan/p261002-01-閉域網へ持っていく配布物.md)
