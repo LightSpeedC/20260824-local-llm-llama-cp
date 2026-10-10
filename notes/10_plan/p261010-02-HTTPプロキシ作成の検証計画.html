@@ -1,0 +1,352 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTTP プロキシ作成の検証計画</title>
+<style>
+:root{
+	--navy1:#12224d;
+	--navy2:#2f5fbf;
+	--ink:#1c2330;
+	--ink-soft:#4a5568;
+	--line:#d9dfe8;
+	--code-bg:#f4f6fa;
+	--link:#1a4fa0;
+	--accent:var(--navy1, #12224d);
+	--accent2:var(--navy2, #2f5fbf);
+	--soft:#f2f5fb;
+}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(210,78%,25%);--accent2:hsl(210,58%,55%);--soft:hsl(210,28%,95%);}
+.ch03{--accent:hsl(140,78%,25%);--accent2:hsl(140,58%,55%);--soft:hsl(140,28%,95%);}
+.ch04{--accent:hsl(70,78%,25%);--accent2:hsl(70,58%,55%);--soft:hsl(70,28%,95%);}
+.ch05{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+
+*{box-sizing:border-box;}
+body{
+	margin:0;
+	background:#fff;
+	color:var(--ink, #1c2330);
+	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+	font-size:15.5px;
+	line-height:1.85;
+}
+.titlebar{
+	background:linear-gradient(135deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	padding:34px 30px 30px;
+}
+.titlebar .inner{max-width:1600px;margin:0 auto;}
+.titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
+.titlebar .lead{font-size:0.88em;color:#cfe0ff;background:transparent;}
+.titlebar .date{font-size:0.88em;color:#cfe0ff;margin-top:4px;background:transparent;}
+.titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+
+.wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
+
+section{
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:4px 26px 26px;
+	margin:34px 0;
+}
+section h1{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	font-size:1.45em;
+	padding:14px 20px;
+	margin:26px 0 20px;
+	border-radius:8px;
+	box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+h2{
+	font-size:1.15em;
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(90deg,var(--soft, #f2f5fb),#fff);
+	padding:6px 12px;
+	margin:30px 0 12px;
+	color:var(--accent, #12224d);
+}
+h3{
+	font-size:1.02em;
+	display:inline-block;
+	border-bottom:2px dotted var(--accent2, #2f5fbf);
+	padding-bottom:3px;
+	margin:20px 0 8px;
+	color:var(--ink, #1c2330);
+	background:transparent;
+}
+p{margin:8px 0;}
+ul,ol{margin:8px 0;padding-left:1.5em;}
+li{margin:4px 0;}
+
+code{
+	background:var(--code-bg, #f4f6fa);
+	border:1px solid var(--line, #d9dfe8);
+	color:#17335f;
+	border-radius:4px;
+	padding:1px 5px;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+}
+pre{
+	background:var(--code-bg, #f4f6fa);
+	color:var(--ink, #1c2330);
+	border:1px solid var(--line, #d9dfe8);
+	border-left:5px solid var(--accent2, #2f5fbf);
+	border-radius:0 8px 8px 0;
+	padding:13px 16px;
+	overflow-x:auto;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+	line-height:1.6;
+}
+pre code{background:none;border:none;padding:0;color:inherit;}
+
+.tablewrap{overflow-x:auto;margin:12px 0;}
+table{
+	border-collapse:collapse;
+	width:100%;
+	border-radius:8px;
+	overflow:hidden;
+	box-shadow:0 2px 7px rgba(0,0,0,0.09);
+	font-size:0.95em;
+}
+th{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-align:left;
+	padding:9px 12px;
+}
+th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line, #d9dfe8);vertical-align:top;}
+tr:nth-child(even) td{background:#fafbfe;}
+.nowrap{white-space:nowrap;}
+.num{text-align:right;white-space:nowrap;}
+
+.badge{
+	display:inline-block;
+	color:#fff;
+	font-size:0.8em;
+	font-weight:600;
+	border-radius:5px;
+	padding:2px 9px;
+	margin-right:7px;
+	white-space:nowrap;
+	background:linear-gradient(100deg,#5a6472,#97a1ae);
+}
+.b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
+.b-ng{background:linear-gradient(100deg,#a51f22,#e05a5c);}
+.b-none{background:linear-gradient(100deg,#5a6472,#97a1ae);}
+.b-warn{background:linear-gradient(100deg,#b8620a,#f0a548);}
+
+.callout{
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border-radius:0 8px 8px 0;
+	padding:12px 16px;
+	margin:16px 0;
+}
+.callout strong{color:var(--accent, #12224d);background:transparent;}
+
+.toc{
+	background:linear-gradient(180deg,#f2f5fb,#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:6px 26px 22px;
+	margin:34px 0;
+}
+.toc ol{
+	list-style:none;
+	display:flex;
+	flex-wrap:wrap;
+	gap:8px;
+	padding:0;
+	margin:12px 0 0;
+	counter-reset:toc;
+}
+.toc li{counter-increment:toc;margin:0;}
+.toc ol a{
+	display:-webkit-box;
+	-webkit-line-clamp:2;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:normal;
+	width:310px;
+	max-width:100%;
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-decoration:none;
+	border-radius:6px;
+	padding:8px 12px;
+	font-size:0.92em;
+	line-height:1.4;
+	font-weight:700;
+}
+.toc ol a::before{content:counter(toc) ". ";font-weight:700;}
+
+svg{max-width:100%;height:auto;display:block;margin:16px 0;}
+
+.homelink{margin:20px 0 0;}
+a.home{
+	display:inline-block;
+	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	border-radius:6px;
+	padding:4px 11px;
+	line-height:1;
+	text-decoration:none;
+}
+a.home svg{vertical-align:-2px;}
+a{background:none;color:var(--link, #1a4fa0);}
+footer{
+	max-width:1600px;
+	margin:0 auto;
+	padding:18px 30px 30px;
+	border-top:1px solid var(--line, #d9dfe8);
+	color:var(--ink-soft, #4a5568);
+	font-size:0.9em;
+	margin-top:40px;
+	margin-bottom:40px;
+	background:transparent;
+}
+footer a{color:var(--navy2, #2f5fbf);background:transparent;}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+	<div class="inner">
+		<h1>HTTP プロキシ作成の検証計画</h1>
+		<div class="lead">sum より大きいプログラムとして、Node.js の HTTP プロキシサーバをエージェントに書かせ、試験側で実際に通信を通して合否を決める</div>
+		<div class="date">📅 作成: 2026-10-10 / 更新: 2026-10-10</div>
+	</div>
+</div>
+
+<div class="wrap">
+
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+
+<div class="toc">
+	<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">目次</h2>
+	<ol>
+		<li class="ch01"><a href="#ch01">目的</a></li>
+		<li class="ch02"><a href="#ch02">問</a></li>
+		<li class="ch03"><a href="#ch03">判定</a></li>
+		<li class="ch04"><a href="#ch04">対象と進め方</a></li>
+		<li class="ch05"><a href="#ch05">気をつけること</a></li>
+	</ol>
+</div>
+
+<!-- ============ 1 ============ -->
+<section class="ch01" id="ch01">
+<h1>目的</h1>
+<p>
+sum の問（10 行ほどのプログラム）では、モデルとエージェントの組の向き不向きが分かった。
+実際の作業に近い、<strong>数十行で、待ち受けと通信を含み、仕様を満たすかを外から確かめられるプログラム</strong>を書かせ、どの組が「使える」かを確かめる。
+題材は HTTP のプロキシサーバ。標準の <code>http</code>・<code>net</code> モジュールだけで書け、正しく動くかを試験側で機械的に確かめられる。あわせて、作ったものの仕様書を書かせる。
+</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="ch02" id="ch02">
+<h1>問</h1>
+<p>2 つの試験に分ける。HTTPS を通すには CONNECT の扱いを指示する必要があり、1 つ目の指示文では仕様が足りないため。どちらも、エージェントには次の指示文だけを渡す（sum と同じく補足の文や例は付けない）。</p>
+<h2>試験 1: HTTP のプロキシ（proxy）</h2>
+<pre><code class="language-text">Node.js の標準モジュールだけで HTTP のプロキシサーバを proxy.js に書く。127.0.0.1 の 18080 番で待ち受け、受けたリクエストを URL の宛先へ転送し、応答をそのまま返す。node proxy で起動する。仕様書を proxy.md と proxy.html に書く。書いたら起動はしたままにせず終える</code></pre>
+<h2>試験 2: HTTPS も通すプロキシ（proxy-https）</h2>
+<pre><code class="language-text">Node.js の標準モジュールだけで HTTP と HTTPS のプロキシサーバを proxy.js に書く。127.0.0.1 の 18080 番で待ち受ける。HTTP は受けたリクエストを URL の宛先へ転送し、応答をそのまま返す。HTTPS は CONNECT を受けて宛先との TCP の接続をつなぎ、双方向にそのまま中継する（中身は復号しない）。node proxy で起動する。仕様書を proxy.md と proxy.html に書く。書いたら起動はしたままにせず終える</code></pre>
+<ul>
+	<li>「起動はしたままにせず終える」は、エージェントがサーバを起動したまま待ち続け、時間切れになるのを避けるため</li>
+	<li>仕様書は、何を作ったかをエージェント自身がまとめられるかを見るため。Markdown と HTML の両方を求める</li>
+	<li>試験 2 は、試験 1 で ✅ か ☑️ だった組だけで流す</li>
+</ul>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
+<h1>判定</h1>
+<p>エージェントが終わったあと、試験側で次を順に行う。</p>
+<ol>
+	<li><code>proxy.js</code>・<code>proxy.md</code>・<code>proxy.html</code> があるか</li>
+	<li>試験側が宛先のサーバ（127.0.0.1 の空いた番号）を立てる。<code>GET /hello</code> に決めた文字列、<code>POST /echo</code> に受けた本文をそのまま返す</li>
+	<li><code>node proxy</code> を起動し、18080 番が開くまで最大 10 秒待つ</li>
+	<li>プロキシ経由で送る（下の表）</li>
+	<li>プロキシと宛先を止める（ジョブオブジェクトに入れ、試験側が終われば必ず止まるようにする）</li>
+</ol>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">記号</th><th>送るもの</th><th>正しい応答</th><th class="nowrap">試験 1</th><th class="nowrap">試験 2</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">local-get</td><td><code>GET http://127.0.0.1:&lt;宛先&gt;/hello</code></td><td>200 と決めた文字列</td><td>○</td><td>○</td></tr>
+<tr><td class="nowrap">local-post</td><td><code>POST http://127.0.0.1:&lt;宛先&gt;/echo</code>（日本語を含む本文）</td><td>同じ本文</td><td>○</td><td>○</td></tr>
+<tr><td class="nowrap">local-404</td><td><code>GET http://127.0.0.1:&lt;宛先&gt;/missing</code></td><td>宛先の 404 がそのまま返る</td><td>○</td><td>○</td></tr>
+<tr><td class="nowrap">ext-http</td><td><code>GET http://example.com/</code></td><td>200 と <code>Example Domain</code> を含む本文</td><td>○</td><td>○</td></tr>
+<tr><td class="nowrap">ext-https</td><td><code>CONNECT example.com:443</code> を経て <code>https://example.com/</code></td><td>200 と <code>Example Domain</code> を含む本文（証明書の検証も通る）</td><td>—</td><td>○</td></tr>
+</tbody>
+</table>
+</div>
+<p>試験 1 で ext-https も送り、通らないこと（CONNECT を扱わない）を記録する。合否には入れない。</p>
+<h2>仕様書の判定</h2>
+<ul>
+	<li><code>proxy.md</code> と <code>proxy.html</code> の両方がある</li>
+	<li>どちらにも、待ち受けのアドレスと番号（<code>127.0.0.1</code>・<code>18080</code>）と起動の方法（<code>node proxy</code>）が書いてある。試験 2 では、さらに <code>CONNECT</code> が書いてある</li>
+	<li><code>proxy.html</code> がブラウザで開ける HTML になっている（<code>&lt;html</code> と <code>&lt;/html&gt;</code> がある）</li>
+</ul>
+<h2>印</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">印</th><th>条件</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">✅ 合格</td><td>その試験の送るものがすべて正しく返り、仕様書の判定を満たし、エージェントの作業ログに <code>node</code> で動かして確かめた跡がある</td></tr>
+<tr><td class="nowrap">☑️ 補欠合格</td><td>送るものはすべて通り仕様書もあるが、自分では動かしていない</td></tr>
+<tr><td class="nowrap">⚠️ 一部</td><td>一部だけ通る、または仕様書が欠けている（どれが欠けたかを記録する）</td></tr>
+<tr><td class="nowrap">❌ 不合格</td><td>proxy.js が無い、起動しない、どれも通らない</td></tr>
+<tr><td class="nowrap">⏱️ 時間切れ</td><td>エージェントが時間内に終わらない（サーバを起動したまま待ち続けた場合も含む）</td></tr>
+</tbody>
+</table>
+</div>
+<p>判定の関数は <code>sum-judge.ps1</code> と同じく別の関数にし、テストを先に書く（正しいプロキシ・GET しか通さないプロキシ・CONNECT も通すプロキシ・起動しない proxy.js・仕様書の欠けた組を試験用に用意して、それぞれの印になることを確かめる）。</p>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="ch04" id="ch04">
+<h1>対象と進め方</h1>
+<ul>
+	<li><strong>エージェント</strong>: Claude Code・Pi・OpenCode（Aider は自分で実行しないので外す）</li>
+	<li><strong>モデル</strong>: sum の試験で合格が多かったもの（gemma-4-E4B・gemma-4-12B-QAT・gemma-4-12B・Qwen3.5-9B・gemma-4-E2B）と、取得中の新しいモデル（gemma-4-E4B-it-qat・Ornith-1.0-9B・LFM2.5-8B-A1B・granite-4.1-8b）</li>
+	<li><strong>環境と時間切れ</strong>: まず NVIDIA GPU（20 分）。上位の組だけ Intel GPU（30 分）でも流す。sum より長いプログラムなので、sum の倍を取る</li>
+	<li><strong>回数</strong>: 1 組 2 回。sum で 1 回ごとに結果が揺れたため</li>
+</ul>
+<ol>
+	<li>判定の関数とテストを書く</li>
+	<li>試験スクリプトに <code>-Tests proxy</code>・<code>-Tests proxy-https</code> を足す（<code>test-agents.ps1</code>・<code>test-cc-tools.ps1</code>）</li>
+	<li>gemma-4-E4B と Pi で 1 回流し、手順が動くことを見る</li>
+	<li>全体を流し、結果を<a href="../01_research/r260929-01-AIエージェントの試験結果.html">試験結果</a>に書く</li>
+</ol>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="ch05" id="ch05">
+<h1>気をつけること</h1>
+<ul>
+	<li><strong>ポートを llama-server と分ける</strong>。llama-server は 11434、プロキシは 18080、宛先は試験側が空いた番号を取る。起動前に 18080 が空いているかを見る（<code>Test-LlmPortFree</code>）</li>
+	<li><strong>エージェントが起動したプロキシが残ることがある</strong>。1 組ごとに、18080 を使っているプロセスが無いかを見て、残っていれば止める</li>
+	<li><strong>外のサイト（example.com）に届くのは、ネットにつながる PC だけ</strong>。閉域網では ext-http・ext-https を飛ばし、残りで判定する（飛ばしたことを記録に残す）</li>
+	<li><strong>待ち受けるのは 127.0.0.1 だけ</strong>。0.0.0.0 で待ち受けるプログラムを書いた組は、判定は通しても、その旨を記録に残す（外から使える中継になる）</li>
+	<li>Claude Code は <code>--allowedTools "Bash(node:*)"</code> で node だけを許している。プロキシを試すのに <code>curl</code> を使おうとした場合は止められる。止められた回数も記録する</li>
+</ul>
+</section>
+
+</div>
+
+<footer>
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+</footer>
+
+</body>
+</html>
