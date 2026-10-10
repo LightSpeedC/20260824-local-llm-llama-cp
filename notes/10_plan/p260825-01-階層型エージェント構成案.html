@@ -41,7 +41,7 @@ body{
 }
 .titlebar .inner{max-width:1600px;margin:0 auto;}
 .titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
-.titlebar .lead{font-size:0.88em;color:#cfe0ff;}
+.titlebar .lead{font-size:0.88em;color:#cfe0ff;background:transparent;}
 .titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
 
 .wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
@@ -78,6 +78,7 @@ h3{
 	padding-bottom:3px;
 	margin:20px 0 8px;
 	color:var(--ink, #1c2330);
+	background:transparent;
 }
 p{margin:8px 0;}
 ul,ol{margin:8px 0;padding-left:1.5em;}
@@ -136,6 +137,7 @@ tr:nth-child(even) td{background:#fafbfe;}
 	padding:2px 9px;
 	margin-right:7px;
 	white-space:nowrap;
+	background:linear-gradient(100deg,#5a6472,#97a1ae);
 }
 .b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
 .b-ng{background:linear-gradient(100deg,#a51f22,#e05a5c);}
@@ -149,7 +151,7 @@ tr:nth-child(even) td{background:#fafbfe;}
 	padding:12px 16px;
 	margin:16px 0;
 }
-.callout strong{color:var(--accent, #12224d);}
+.callout strong{color:var(--accent, #12224d);background:transparent;}
 
 .toc{
 	background:linear-gradient(180deg,#f2f5fb,#fff);
@@ -168,7 +170,7 @@ tr:nth-child(even) td{background:#fafbfe;}
 	counter-reset:toc;
 }
 .toc li{counter-increment:toc;margin:0;}
-.toc a{
+.toc ol a{
 	display:-webkit-box;
 	-webkit-line-clamp:2;
 	-webkit-box-orient:vertical;
@@ -180,12 +182,13 @@ tr:nth-child(even) td{background:#fafbfe;}
 	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
 	color:#fff;
 	text-decoration:none;
-	border-radius:7px;
+	border-radius:6px;
 	padding:8px 12px;
 	font-size:0.92em;
 	line-height:1.4;
+	font-weight:700;
 }
-.toc a::before{content:counter(toc) ". ";font-weight:700;}
+.toc ol a::before{content:counter(toc) ". ";font-weight:700;}
 
 svg{max-width:100%;height:auto;display:block;margin:16px 0;}
 
@@ -210,8 +213,9 @@ footer{
 	font-size:0.9em;
 	margin-top:40px;
 	margin-bottom:40px;
+	background:transparent;
 }
-footer a{color:var(--navy2, #2f5fbf);}
+footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 </style>
 </head>
 <body>
