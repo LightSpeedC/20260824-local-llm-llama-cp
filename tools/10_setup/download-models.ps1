@@ -5,7 +5,7 @@ $list = @(
 	@{ repo = 'unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF'; file = 'Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL.gguf'; dir = 'Qwen' }
 	@{ repo = 'unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF'; file = 'Qwen3-30B-A3B-Instruct-2507-UD-Q4_K_XL.gguf'; dir = 'Qwen' }
 	@{ repo = 'unsloth/GLM-4.7-Flash-GGUF'; file = 'GLM-4.7-Flash-UD-Q4_K_XL.gguf'; dir = 'GLM' }
-	@{ repo = 'unsloth/Gemma-4-26B-A4B-it-GGUF'; file = 'gemma-4-26B-A4B-it-UD-Q4_K_XL.gguf'; dir = 'Gemma' }
+	@{ repo = 'unsloth/gemma-4-26B-A4B-it-GGUF'; file = 'gemma-4-26B-A4B-it-UD-Q4_K_XL.gguf'; dir = 'Gemma' }
 	@{ repo = 'unsloth/Qwen3.6-35B-A3B-GGUF'; file = 'Qwen3.6-35B-A3B-UD-Q3_K_XL.gguf'; dir = 'Qwen' }
 	@{ repo = 'unsloth/Devstral-Small-2507-GGUF'; file = 'Devstral-Small-2507-UD-Q4_K_XL.gguf'; dir = 'Mistral' }
 )

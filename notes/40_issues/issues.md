@@ -201,6 +201,7 @@ develop の内容を release・master へ取り込む。
 - ⬜ **未** root の `cc1.cmd` は、いちばん使えそうな組み合わせを動かす入口として残す。`start-agent` を呼ぶ形に書き換え、サーバの起動から停止までを 1 本で済ませる（直接書いた `W:\temp` も無くなる）
 - ⬜ **未** README と実行計画の「LM Studio と共用・移動しない」を、置き場を `C:\AI-models` に改めた今の形に直す
 - ✅ **済** `tests/` を作り、`sum-judge.ps1` の判定（✅・☑️・❌）をテストする。ランチャーは `tools/40_test/`（`tests/sum-judge.tests.ps1` の 22 件。`tools/40_test/run-tests.cmd` で流す。表のマスを作る `sum-table.ps1` の `Format-Cell` は、☑️ を入れるときにテストを足す）
+- ✅ **済** モデル置き場を整理する（2026-10-10。`Ministral` を `Mistral` にまとめ、フォルダ名を Hugging Face のリポジトリ名に大小まで揃えた。試験で使えなかった 6 本（Qwen2.5-Coder-14B・Muse-Glimmer-30B・Qwen3.8-27B・GLM-4.6V-Flash・Nemotron-3-Nano-4B・Qwen3-0.6B）と空のフォルダを消し、約 52 GB 空けた）
 - ⬜ **未** どこにも書いていない `bin/llama.cpp-b11302`（1.1 GB）を消す（試験は b11320 で取り直した）
 - ⬜ **未** `tmp/` に残る 9/29 の試験の跡（`agent-home`・`home-norules`・`sandbox`）と、展開済みの llama.cpp の zip 2 本（0.6 GB）を全部消す
 
