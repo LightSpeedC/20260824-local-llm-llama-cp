@@ -39,8 +39,8 @@ if ($llmWork) {
 }
 # 使う llama.cpp（bin の下のフォルダ名）。auto は Vulkan 版に GPU が見えれば Vulkan、見えなければ CPU
 $LlmBackend = Get-LlmSetting 'LLM_BACKEND' 'llama.cpp'
-# llama-server のポート。各スクリプトの -Port を省いたときに使う
-$LlmPort = [int](Get-LlmSetting 'LLM_PORT' '8080')
+# llama-server のポート。各スクリプトの -Port を省いたときに使う。既定は Ollama と同じ 11434
+$LlmPort = [int](Get-LlmSetting 'LLM_PORT' '11434')
 # エージェントの出力ファイルを読む。時間切れで止めた後も子プロセスが開いたままのことがあるので、
 # ほかのプロセスが開いていても読める開き方にし、読めなければ何回かやり直す。それでも駄目なら空を返す
 function Read-LlmText([string]$path) {

@@ -46,7 +46,8 @@ Write-Host '■ LlmPort：llama-server のポート'
 # 読み込みは 1 回きりなので、別の PowerShell で読み直して確かめる
 $pathsPs1 = Join-Path $root 'tools/50_run/paths.ps1'
 $env:LLM_PORT = $null
-Assert-Equal 'LLM_PORT が無ければ 8080' '8080' (powershell -NoProfile -Command ". '$pathsPs1'; `$LlmPort")
+# Ollama と同じ 11434 を既定にする（クライアントの既定の接続先と揃う）
+Assert-Equal 'LLM_PORT が無ければ 11434' '11434' (powershell -NoProfile -Command ". '$pathsPs1'; `$LlmPort")
 $env:LLM_PORT = '18081'
 try { Assert-Equal 'LLM_PORT があればその値' '18081' (powershell -NoProfile -Command ". '$pathsPs1'; `$LlmPort") } finally { $env:LLM_PORT = $null }
 

@@ -232,7 +232,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 		<h1>ローカルLLM 実行計画</h1>
 		<div class="lead">
 			RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで動かすための、ソフトウェア選定・入手方法・モデル選定・導入手順<br>
-			📅 作成: 2026-08-24 / 更新: 2026-09-30
+			📅 作成: 2026-08-24 / 更新: 2026-10-10
 		</div>
 	</div>
 </div>
@@ -1307,7 +1307,7 @@ llama.cpp からも同じ絶対パスで参照できる。Hugging Face から直
   -ngl 99 ^
   -c 8192 ^
   --host 127.0.0.1 ^
-  --port 8080
+  --port 11434
 pause</code></pre>
 <div class="tablewrap">
 <table>
@@ -1316,13 +1316,13 @@ pause</code></pre>
 <tr><td class="nowrap"><code>-ngl 99</code></td><td>GPUに載せる層数。実際の層数より大きい値を指定すれば「全層」の意味になる</td></tr>
 <tr><td class="nowrap"><code>-c 8192</code></td><td>コンテキスト長</td></tr>
 <tr><td class="nowrap"><code>--host 127.0.0.1</code></td><td>ローカルのみ受け付ける。外部公開しない</td></tr>
-<tr><td class="nowrap"><code>--port 8080</code></td><td>APIとWebUIの待ち受けポート</td></tr>
+<tr><td class="nowrap"><code>--port 11434</code></td><td>APIとWebUIの待ち受けポート</td></tr>
 </tbody>
 </table>
 </div>
 
 <h3>確認</h3>
-<p>起動後、ブラウザで <code>http://127.0.0.1:8080</code> を開くと同梱のチャットUIが出る。日本語で数往復して応答を確認する。</p>
+<p>起動後、ブラウザで <code>http://127.0.0.1:11434</code> を開くと同梱のチャットUIが出る。日本語で数往復して応答を確認する。</p>
 
 <h2>Step 4 — 大きいモデルの部分オフロード設定を詰める</h2>
 <p>
@@ -1342,12 +1342,12 @@ Qwen3.5 系はアーキテクチャが新しいため、配布バイナリのリ
 <h2>Step 5 — Claude Code からの接続に切り替える</h2>
 <p>
 <code>llama-server</code> は OpenAI 互換のエンドポイントに加えて、Anthropic 形式の
-<code>http://127.0.0.1:8080/v1/messages</code> にも応答する。
+<code>http://127.0.0.1:11434/v1/messages</code> にも応答する。
 Claude Code は Anthropic 形式で話すため、<strong>変換の層を挟まず、環境変数で接続先を向けるだけで繋がる</strong>。
 </p>
 <ul>
 	<li>サーバは Claude Code 向けの設定で起動する（<code>tools\50_run\run-server-cc.cmd</code>）</li>
-	<li>Claude Code は root の <code>cc1.cmd</code> から起動する。<code>ANTHROPIC_BASE_URL</code> を <code>http://127.0.0.1:8080</code> に向け、モデル名はサーバの <code>--alias</code> に合わせる</li>
+	<li>Claude Code は root の <code>cc1.cmd</code> から起動する。<code>ANTHROPIC_BASE_URL</code> を <code>http://127.0.0.1:11434</code> に向け、モデル名はサーバの <code>--alias</code> に合わせる</li>
 </ul>
 
 <h3>コンテキストは 65536 が要る</h3>

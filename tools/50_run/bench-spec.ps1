@@ -5,7 +5,7 @@ param(
 	[string]$Draft = "C:/AI-models/qwen/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q4_K_M.gguf",
 	[int]$Context = 4096,
 	[int]$MaxTokens = 256,
-	[int]$Port = 8080,
+	[int]$Port = 11434,
 	# 測る構成の番号をカンマ区切りで（"2,6"）。空なら全部。対照の No1 は常に測る
 	[string]$Only = ""
 )

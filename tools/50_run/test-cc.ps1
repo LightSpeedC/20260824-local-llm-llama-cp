@@ -5,7 +5,7 @@
 	[string]$ServerArgs = '-ngl 99 -nkvo -ctk q8_0 -ctv q8_0 -fa on',
 	[string]$Prompt = 'README.html の h1 見出しを1つだけ答えてください。',
 	[int]$TimeoutSec = 900,
-	[int]$Port = 8080
+	[int]$Port = 11434
 )
 # llama-server を起動し、環境変数で接続先を切り替えた Claude Code に1問投げて、応答と所要時間を記録する
 $ErrorActionPreference = 'Stop'

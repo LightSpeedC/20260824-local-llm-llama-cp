@@ -2,7 +2,7 @@
 
 cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエージェントを試す手順
 
-> 📅 作成: 2026-09-30 / 更新: 2026-09-30
+> 📅 作成: 2026-09-30 / 更新: 2026-10-10
 
 [README](../../README.md)
 
@@ -42,7 +42,7 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
   -nkvo -ctk q8_0 -ctv q8_0 -fa on ^
   --reasoning off ^
   --alias gemma-4-E4B-it-Q4_K_M ^
-  --host 127.0.0.1 --port 8080
+  --host 127.0.0.1 --port 11434
 ```
 
 | 引数 | 意味 |
@@ -61,7 +61,7 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
 
 | 環境変数 | 値 |
 |---|---|
-| `ANTHROPIC_BASE_URL` | `http://127.0.0.1:8080` |
+| `ANTHROPIC_BASE_URL` | `http://127.0.0.1:11434` |
 | `ANTHROPIC_AUTH_TOKEN` | 任意の文字列（llama-server は確かめない） |
 | `ANTHROPIC_MODEL`・`ANTHROPIC_SMALL_FAST_MODEL` | サーバの `--alias` と同じ値 |
 | `CLAUDE_CODE_MAX_CONTEXT_TOKENS` | サーバの `-c` と同じ値（65536） |
@@ -77,7 +77,7 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
 
 ### 手順
 
-1. サーバを起動する。窓が開いたままになり、`listening on http://127.0.0.1:8080` と出れば準備完了 `tools\50_run\run-server-cc.cmd`
+1. サーバを起動する。窓が開いたままになり、`listening on http://127.0.0.1:11434` と出れば準備完了 `tools\50_run\run-server-cc.cmd`
 2. 別の窓で Claude Code を起動する。**`.\` を付ける**（このPCはカレントフォルダの cmd を名前だけでは探さない） `.\cc1.cmd .\cc1.cmd -p "README.html の h1 を答えて"`
 3. 使い終わったら、サーバの窓で Ctrl+C
 
@@ -138,7 +138,7 @@ tools\50_run\test-agents.cmd -Agent codex -Only "gpt-oss-20b" -UseTemplates -Ext
 
 ## 共通の注意
 
-- **試験は 1 つずつ流す**。どれもポート 8080 を使い、Windows では 2 つのサーバが同じポートを取れてしまうため、結果が混ざる
+- **試験は 1 つずつ流す**。どれもポート 11434 を使い、Windows では 2 つのサーバが同じポートを取れてしまうため、結果が混ざる
 - **始める前に llama-server が残っていないか確かめる**。残っていれば止める `Get-Process llama-server Stop-Process -Name llama-server`
 - RAM を多く使う（20GB 級のモデルでは 16 GB 前後）。ブラウザなどを閉じておくと安定する
 - 温度とクロックは `tools\80_ops\watch-thermal.cmd` で 30 秒ごとに `logs\thermal\` へ記録できる

@@ -5,7 +5,7 @@
 	[int]$Repeat = 3,
 	[int]$Ctx = 65536,
 	[int]$TimeoutSec = 600,
-	# 0 なら config.cmd の LLM_PORT（無ければ 8080）
+	# 0 なら config.cmd の LLM_PORT（無ければ 11434）
 	[int]$Port = 0
 )
 # Aider に sum.js を書かせたあと、別の指示で実行・テストさせると node を実行するかを試す（i261001-01）

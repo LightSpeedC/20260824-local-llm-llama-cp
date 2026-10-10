@@ -5,7 +5,7 @@
 	[int]$Ctx = 65536,
 	# 0 ならモデルと llama.cpp から決める（paths.ps1 の Get-LlmTimeout）
 	[int]$TimeoutSec = 0,
-	# 0 なら config.cmd の LLM_PORT（無ければ 8080）
+	# 0 なら config.cmd の LLM_PORT（無ければ 11434）
 	[int]$Port = 0,
 	[string]$Only = '',
 	[switch]$UseTemplates,

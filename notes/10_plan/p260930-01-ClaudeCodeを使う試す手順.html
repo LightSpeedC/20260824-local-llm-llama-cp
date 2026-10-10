@@ -219,7 +219,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 	<div class="inner">
 		<h1>ローカルLLM で Claude Code を使う・試す手順</h1>
 		<div class="lead">cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエージェントを試す手順</div>
-		<div class="date">📅 作成: 2026-09-30 / 更新: 2026-09-30</div>
+		<div class="date">📅 作成: 2026-09-30 / 更新: 2026-10-10</div>
 	</div>
 </div>
 
@@ -274,7 +274,7 @@ footer a{color:var(--navy2, #2f5fbf);}
   -nkvo -ctk q8_0 -ctv q8_0 -fa on ^
   --reasoning off ^
   --alias gemma-4-E4B-it-Q4_K_M ^
-  --host 127.0.0.1 --port 8080</code></pre>
+  --host 127.0.0.1 --port 11434</code></pre>
 <div class="tablewrap">
 <table>
 <thead><tr><th class="nowrap">引数</th><th>意味</th></tr></thead>
@@ -297,7 +297,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 <table>
 <thead><tr><th class="nowrap">環境変数</th><th>値</th></tr></thead>
 <tbody>
-<tr><td class="nowrap"><code>ANTHROPIC_BASE_URL</code></td><td><code>http://127.0.0.1:8080</code></td></tr>
+<tr><td class="nowrap"><code>ANTHROPIC_BASE_URL</code></td><td><code>http://127.0.0.1:11434</code></td></tr>
 <tr><td class="nowrap"><code>ANTHROPIC_AUTH_TOKEN</code></td><td>任意の文字列（llama-server は確かめない）</td></tr>
 <tr><td class="nowrap"><code>ANTHROPIC_MODEL</code>・<code>ANTHROPIC_SMALL_FAST_MODEL</code></td><td>サーバの <code>--alias</code> と同じ値</td></tr>
 <tr><td class="nowrap"><code>CLAUDE_CODE_MAX_CONTEXT_TOKENS</code></td><td>サーバの <code>-c</code> と同じ値（65536）</td></tr>
@@ -319,7 +319,7 @@ footer a{color:var(--navy2, #2f5fbf);}
 <h1>cc1.cmd で対話に使う</h1>
 <h2>手順</h2>
 <ol>
-	<li>サーバを起動する。窓が開いたままになり、<code>listening on http://127.0.0.1:8080</code> と出れば準備完了
+	<li>サーバを起動する。窓が開いたままになり、<code>listening on http://127.0.0.1:11434</code> と出れば準備完了
 <pre><code class="language-batch">tools\50_run\run-server-cc.cmd</code></pre></li>
 	<li>別の窓で Claude Code を起動する。<strong><code>.\</code> を付ける</strong>（このPCはカレントフォルダの cmd を名前だけでは探さない）
 <pre><code class="language-batch">.\cc1.cmd
@@ -386,7 +386,7 @@ Windows では <code>-s workspace-write</code> だとファイルの読み書き
 
 <h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">共通の注意</h2>
 <ul>
-	<li><strong>試験は 1 つずつ流す</strong>。どれもポート 8080 を使い、Windows では 2 つのサーバが同じポートを取れてしまうため、結果が混ざる</li>
+	<li><strong>試験は 1 つずつ流す</strong>。どれもポート 11434 を使い、Windows では 2 つのサーバが同じポートを取れてしまうため、結果が混ざる</li>
 	<li><strong>始める前に llama-server が残っていないか確かめる</strong>。残っていれば止める
 <pre><code class="language-powershell">Get-Process llama-server
 Stop-Process -Name llama-server</code></pre></li>

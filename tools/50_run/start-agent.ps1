@@ -4,7 +4,7 @@
 	# モデルのファイル名に含まれる語（例: gemma-4-E4B-it-Q4_K_M）
 	[Parameter(Mandatory)][string]$Model,
 	[int]$Ctx = 65536,
-	# 0 なら config.cmd の LLM_PORT（無ければ 8080）
+	# 0 なら config.cmd の LLM_PORT（無ければ 11434）
 	[int]$Port = 0,
 	# エージェントが作業するフォルダ。空なら work の下の project
 	[string]$WorkDir = ''

@@ -1,5 +1,5 @@
 @echo off
-rem llama-serverihttp://127.0.0.1:8080j‚ÉÚ‘±‚µ‚Ä Claude Code ‚ð‹N“®‚·‚é
+rem llama-serverihttp://127.0.0.1:11434j‚ÉÚ‘±‚µ‚Ä Claude Code ‚ð‹N“®‚·‚é
 rem æ‚É tools\50_run\run-server-cc.cmd ‚ÅƒT[ƒo‚ð‹N“®‚µ‚Ä‚¨‚­
 rem Žg‚¢•û: cc1 -p "‚±‚ñ‚É‚¿‚Í"   iˆø”‚Í‚»‚Ì‚Ü‚Ü claude ‚É“n‚·j
 rem ŠÂ‹«•Ï”‚Í‚±‚Ì cmd ‚Ì’†‚¾‚¯‚ÅŒø‚­BŒÄ‚Ño‚µŒ³‚ÌƒVƒFƒ‹‚É‚ÍŽc‚ç‚È‚¢
@@ -8,7 +8,7 @@ rem ƒz[ƒ€‚ð W:\temp\cc1-home ‚É‘Ö‚¦A—˜—pŽÒ‚Ì‹¤’Êƒ‹[ƒ‹iCLAUDE.mdjEƒƒ‚ƒŠEƒ
 rem “Ç‚Ü‚¹‚é‚ÆÅ‰‚Ì—v‹‚ª–ñ 60,000 ƒg[ƒNƒ“‚É‚È‚èA‚±‚ÌPC‚Å‚Í 1 ‰•œ‚É”•ª‚©‚©‚éiƒ‹[ƒ‹‚È‚µ‚Å–ñ 20,000j
 rem ‹A‘®ƒwƒbƒ_‚ðØ‚éÝ’èiCLAUDE_CODE_ATTRIBUTION_HEADER=0j‚ÍAƒz[ƒ€‚ª•Ï‚í‚é‚ÆƒvƒƒWƒFƒNƒg‚ÌÝ’è‚µ‚©Œø‚©‚È‚¢‚½‚ßA‚±‚±‚Å‚à“n‚·
 setlocal
-set "ANTHROPIC_BASE_URL=http://127.0.0.1:8080"
+set "ANTHROPIC_BASE_URL=http://127.0.0.1:11434"
 set "ANTHROPIC_AUTH_TOKEN=llamacpp"
 set "ANTHROPIC_MODEL=gemma-4-E4B-it-Q4_K_M"
 set "ANTHROPIC_SMALL_FAST_MODEL=gemma-4-E4B-it-Q4_K_M"

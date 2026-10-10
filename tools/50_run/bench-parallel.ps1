@@ -6,7 +6,7 @@ param(
 	[string]$Parallel = "1,2,4",
 	[int]$Context = 8192,
 	[int]$MaxTokens = 256,
-	[int]$Port = 8080,
+	[int]$Port = 11434,
 	# 長いプロンプトで測るときの文の数。1 文が約 13 トークン（0 なら短い 1 行だけ）
 	[int]$PromptSentences = 0,
 	[string]$ExtraArgs = ""
