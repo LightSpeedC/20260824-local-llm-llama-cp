@@ -221,7 +221,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<div class="inner">
 		<h1>ローカルルール — ローカルLLM 実行環境</h1>
 		<div class="lead">このプロジェクトでだけ通る決めごと。共通ルールと食い違うときはこちらが優先する</div>
-		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-09-29</div>
+		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-10-15</div>
 	</div>
 </div>
 
@@ -236,8 +236,24 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<li><strong>結果は1件終わるごとに、その場で応答に書く</strong>。まとめて最後に報告しない</li>
 	<li><strong>途中の進み具合も報告する</strong>。1時間以上結果が出ないときは、いま何件目か・どこまで進んだかを伝える</li>
 	<li><strong>見張りは Monitor で仕掛ける</strong>。試験の出力ファイルは終わるまで書き出されないことがあるので、<code>logs/</code> に1件ずつできる結果ファイルを見る</li>
+	<li><strong>試験が終わったら、残ったプロセスを確かめてから結果を報告する</strong>。<code>psls tail</code>・<code>psls grep</code>・<code>psls llama-server</code>・<code>psls aider</code> で見る</li>
+	<li><strong>止めるのは、このプロジェクトのものと見分けられた分だけ</strong>。先祖のプロセスが残っていればそれで、残っていなければコマンドラインに含まれるプロジェクトのパス・出力先で見分ける。止めるときは <code>taskkill /PID &lt;pid&gt; /T /F</code></li>
+	<li><strong>見張りの tail は、共通ルール「シェル実行ルール」＞「見張りの tail には --pid を付ける」に従う</strong></li>
+	<li><strong>試験が無い日も、区切りで <code>psls tail</code> を流して確かめる</strong>。<code>--pid</code> を付け忘れた分を拾うため</li>
 </ul>
 <p>理由: Claude Code の試験は1問に最長15〜30分かかり、全部で数時間になる。途中が見えないと、止めるか続けるかを判断できない。</p>
+</section>
+
+<section class="ch02" id="ch02">
+<h1>AIエージェントの特徴を保つ</h1>
+<p>適用条件: エージェントの版を上げるとき、新しいエージェントを試すとき、試験の起動のしかたを変えるとき、試験でエージェントの動きに気づいたとき。</p>
+<ul>
+	<li><strong>起動のしかたで結果が変わるエージェントの特徴は、i261014-01「AIエージェントの特徴」に書く</strong></li>
+	<li><strong>版を上げたら、その資料の特徴が今も当てはまるかを見る</strong>。当てはまらなくなったら、資料を直す</li>
+	<li><strong>新しい特徴を見つけたら、その場で資料に足す</strong>。どの版で、どの条件で、何を確かめたかを書き、確かめていないことは「確かめていない」と書く</li>
+	<li><strong>特徴に合わせて入れた回避策は、資料を読んで外してよいと決めるまで外さない</strong>。いまは <code>paths.ps1</code> が環境変数 <code>PWD</code> を外している。外すと OpenCode が、作業用のコピーではなくプロジェクトの root に書く</li>
+	<li><strong>同じ型の不合格が、モデルを替えても続くときは、モデルの力を疑う前に、起動のしかた（環境変数・作業フォルダ）を疑う</strong>。OpenCode の <code>PWD</code> で 26 組が無駄になった</li>
+</ul>
 </section>
 
 </div>
