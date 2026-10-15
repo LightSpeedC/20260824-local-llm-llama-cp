@@ -1,0 +1,325 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新しいモデルの検証計画</title>
+<style>
+:root{
+	--navy1:#12224d;
+	--navy2:#2f5fbf;
+	--ink:#1c2330;
+	--ink-soft:#4a5568;
+	--line:#d9dfe8;
+	--code-bg:#f4f6fa;
+	--link:#1a4fa0;
+	--accent:var(--navy1, #12224d);
+	--accent2:var(--navy2, #2f5fbf);
+	--soft:#f2f5fb;
+}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(210,78%,25%);--accent2:hsl(210,58%,55%);--soft:hsl(210,28%,95%);}
+.ch03{--accent:hsl(140,78%,25%);--accent2:hsl(140,58%,55%);--soft:hsl(140,28%,95%);}
+.ch04{--accent:hsl(70,78%,25%);--accent2:hsl(70,58%,55%);--soft:hsl(70,28%,95%);}
+.ch05{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+
+*{box-sizing:border-box;}
+body{
+	margin:0;
+	background:#fff;
+	color:var(--ink, #1c2330);
+	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+	font-size:15.5px;
+	line-height:1.85;
+}
+.titlebar{
+	background:linear-gradient(135deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	padding:34px 30px 30px;
+}
+.titlebar .inner{max-width:1600px;margin:0 auto;}
+.titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
+.titlebar .lead{font-size:0.88em;color:#cfe0ff;background:transparent;}
+.titlebar .date{font-size:0.88em;color:#cfe0ff;margin-top:4px;background:transparent;}
+.titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+
+.wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
+
+section{
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:4px 26px 26px;
+	margin:34px 0;
+}
+section h1{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	font-size:1.45em;
+	padding:14px 20px;
+	margin:26px 0 20px;
+	border-radius:8px;
+	box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+h2{
+	font-size:1.15em;
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(90deg,var(--soft, #f2f5fb),#fff);
+	padding:6px 12px;
+	margin:30px 0 12px;
+	color:var(--accent, #12224d);
+}
+h3{
+	font-size:1.02em;
+	display:inline-block;
+	border-bottom:2px dotted var(--accent2, #2f5fbf);
+	padding-bottom:3px;
+	margin:20px 0 8px;
+	color:var(--ink, #1c2330);
+	background:transparent;
+}
+p{margin:8px 0;}
+ul,ol{margin:8px 0;padding-left:1.5em;}
+li{margin:4px 0;}
+
+code{
+	background:var(--code-bg, #f4f6fa);
+	border:1px solid var(--line, #d9dfe8);
+	color:#17335f;
+	border-radius:4px;
+	padding:1px 5px;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+}
+pre{
+	background:var(--code-bg, #f4f6fa);
+	color:var(--ink, #1c2330);
+	border:1px solid var(--line, #d9dfe8);
+	border-left:5px solid var(--accent2, #2f5fbf);
+	border-radius:0 8px 8px 0;
+	padding:13px 16px;
+	overflow-x:auto;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+	line-height:1.6;
+}
+pre code{background:none;border:none;padding:0;color:inherit;}
+
+.tablewrap{overflow-x:auto;margin:12px 0;}
+table{
+	border-collapse:collapse;
+	width:100%;
+	border-radius:8px;
+	overflow:hidden;
+	box-shadow:0 2px 7px rgba(0,0,0,0.09);
+	font-size:0.95em;
+}
+th{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-align:left;
+	padding:9px 12px;
+}
+th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line, #d9dfe8);vertical-align:top;}
+tr:nth-child(even) td{background:#fafbfe;}
+.nowrap{white-space:nowrap;}
+.num{text-align:right;white-space:nowrap;}
+
+.badge{
+	display:inline-block;
+	color:#fff;
+	font-size:0.8em;
+	font-weight:600;
+	border-radius:5px;
+	padding:2px 9px;
+	margin-right:7px;
+	white-space:nowrap;
+	background:linear-gradient(100deg,#5a6472,#97a1ae);
+}
+.b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
+.b-ng{background:linear-gradient(100deg,#a51f22,#e05a5c);}
+.b-none{background:linear-gradient(100deg,#5a6472,#97a1ae);}
+.b-warn{background:linear-gradient(100deg,#b8620a,#f0a548);}
+
+.callout{
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border-radius:0 8px 8px 0;
+	padding:12px 16px;
+	margin:16px 0;
+}
+.callout strong{color:var(--accent, #12224d);background:transparent;}
+
+.toc{
+	background:linear-gradient(180deg,#f2f5fb,#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:6px 26px 22px;
+	margin:34px 0;
+}
+.toc ol{
+	list-style:none;
+	display:flex;
+	flex-wrap:wrap;
+	gap:8px;
+	padding:0;
+	margin:12px 0 0;
+	counter-reset:toc;
+}
+.toc li{counter-increment:toc;margin:0;}
+.toc ol a{
+	display:-webkit-box;
+	-webkit-line-clamp:2;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:normal;
+	width:310px;
+	max-width:100%;
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-decoration:none;
+	border-radius:6px;
+	padding:8px 12px;
+	font-size:0.92em;
+	line-height:1.4;
+	font-weight:700;
+}
+.toc ol a::before{content:counter(toc) ". ";font-weight:700;}
+
+svg{max-width:100%;height:auto;display:block;margin:16px 0;}
+
+.homelink{margin:20px 0 0;}
+a.home{
+	display:inline-block;
+	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	border-radius:6px;
+	padding:4px 11px;
+	line-height:1;
+	text-decoration:none;
+}
+a.home svg{vertical-align:-2px;}
+a{background:none;color:var(--link, #1a4fa0);}
+footer{
+	max-width:1600px;
+	margin:0 auto;
+	padding:18px 30px 30px;
+	border-top:1px solid var(--line, #d9dfe8);
+	color:var(--ink-soft, #4a5568);
+	font-size:0.9em;
+	margin-top:40px;
+	margin-bottom:40px;
+	background:transparent;
+}
+footer a{color:var(--navy2, #2f5fbf);background:transparent;}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+	<div class="inner">
+		<h1>新しいモデルの検証計画</h1>
+		<div class="lead">2026-10-10 に取得した 6 本で、これまでと同じ試験（読み書き・sum）を流し、手持ちのモデルと比べる</div>
+		<div class="date">📅 作成: 2026-10-10 / 更新: 2026-10-14</div>
+	</div>
+</div>
+
+<div class="wrap">
+
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+
+<div class="toc">
+	<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">目次</h2>
+	<ol>
+		<li class="ch01"><a href="#ch01">目的</a></li>
+		<li class="ch02"><a href="#ch02">対象のモデル</a></li>
+		<li class="ch03"><a href="#ch03">流す試験</a></li>
+		<li class="ch04"><a href="#ch04">進め方</a></li>
+		<li class="ch05"><a href="#ch05">気をつけること</a></li>
+	</ol>
+</div>
+
+<!-- ============ 1 ============ -->
+<section class="ch01" id="ch01">
+<h1>目的</h1>
+<p>
+これまでの試験で、閉域網で使うモデルは gemma-4-E4B と gemma-4-12B-QAT に絞れた。
+新しく取得したモデルに、これより速いもの・よく通るものが無いかを、同じ試験・同じ判定で確かめる。
+結果は<a href="../01_research/r260929-01-AIエージェントの試験結果.html">試験結果</a>の既存の表に行として足し、同じ表の中で比べられるようにする。
+</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="ch02" id="ch02">
+<h1>対象のモデル</h1>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="num">本体</th><th>種類</th><th>見たいこと</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">gemma-4-E4B-it-qat（UD-Q4_K_XL）</td><td class="num">3.9 GB</td><td>密・量子化前提の学習</td><td>いまの E4B（5.0 GB）と同じくらい通り、小さく速いか。通るなら E4B から差し替える</td></tr>
+<tr><td class="nowrap">LFM2.5-8B-A1B（UD-Q4_K_M）</td><td class="num">5.0 GB</td><td>MoE（動くのは 1B 分）</td><td>Intel GPU・CPU で速いか</td></tr>
+<tr><td class="nowrap">granite-4.1-8b（Q4_K_M）</td><td class="num">5.0 GB</td><td>密</td><td>道具の呼び出しが確かか</td></tr>
+<tr><td class="nowrap">Ornith-1.0-9B（Q4_K_M）</td><td class="num">5.3 GB</td><td>密</td><td>Qwen3.5-9B と比べてどうか</td></tr>
+<tr><td class="nowrap">Muse-Glimmer-30B（UD-Q4_K_XL）</td><td class="num">14.8 GB</td><td>MoE</td><td>前の版（別の配布元、15.6 GB）は読み書きとも時間切れだった。unsloth の版で変わるか</td></tr>
+<tr><td class="nowrap">Qwen3.8-27B（UD-Q4_K_M）</td><td class="num">15.3 GB</td><td>密</td><td>前の版（別の配布元）は読み書きとも不可だった。unsloth の版で変わるか</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
+<h1>流す試験</h1>
+<p>試験と判定は、これまでと同じスクリプト・同じ条件（ルールなし・思考なし・帰属ヘッダを切る）。時間切れは既定の自動（NVIDIA 10 分、Intel GPU と CPU 15 分、名前に Thinking・Reasoning が入れば倍）。</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">段</th><th>試験</th><th>環境</th><th>対象</th><th class="num">組</th><th class="nowrap">見込み</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">1</td><td>読み書き（Claude Code）</td><td class="nowrap">NVIDIA GPU</td><td>6 本</td><td class="num">6</td><td class="nowrap">1〜2 時間</td></tr>
+<tr><td class="nowrap">2</td><td>sum（Claude Code・Pi・OpenCode）を 2 回ずつ</td><td class="nowrap">NVIDIA GPU</td><td>6 本</td><td class="num">36</td><td class="nowrap">3〜5 時間</td></tr>
+<tr><td class="nowrap">3</td><td>sum を 1 回ずつ</td><td class="nowrap">Intel GPU だけ</td><td>11GB 以下の 4 本（Intel GPU で 11GB を超えるものは使えなかったため）</td><td class="num">12</td><td class="nowrap">2〜4 時間</td></tr>
+<tr><td class="nowrap">4</td><td>sum を 1 回ずつ</td><td class="nowrap">CPU だけ</td><td>11GB 以下の 4 本</td><td class="num">12</td><td class="nowrap">2〜3 時間</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li>Aider は自分で実行しないことが分かっているので外す</li>
+	<li>段 3・4 は、段 2 で 3 つのエージェントのどれでも ❌・⏱️ だったモデルを外す（通らないものを遅い環境で流しても意味が無い）</li>
+	<li><strong>版を上げて流す</strong>（2026-10-14）。llama.cpp b11609・Claude Code 2.1.299・Pi 1.2.0・OpenCode 1.19.0・Node.js 26.11.1。上の表の 6 本に加えて、配布物の候補 9 本（gemma-4-E4B・E2B・12B-QAT・12B-Q4_K_M、Qwen3.5-9B、Qwen3-4B Instruct・Thinking、Ministral-3-3B、Bonsai-27B）も、最新の版で同じ段 1〜4 を流し直す。配布物に入れるモデルは、この結果で決める（<a href="../40_issues/issues.html">i261014-01</a>）</li>
+	<li>画像の試験・HTTP プロキシの試験は、それぞれの計画書で扱う（<a href="p261010-01-画像解析の検証計画.html">画像解析の検証計画</a>・<a href="p261010-02-HTTPプロキシ作成の検証計画.html">HTTP プロキシ作成の検証計画</a>）。その対象にも、ここで通ったモデルを加える</li>
+</ul>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="ch04" id="ch04">
+<h1>進め方</h1>
+<ol>
+	<li><strong>起動の確認</strong>: 6 本を llama-server（CUDA 版）で起動し、短い問に答えるか、Claude Code の道具の呼び出しでテンプレートの例外（500 エラー）が出ないかを見る。出たら、これまでと同じくテンプレートを差し替える（<code>tools/50_run/templates/</code>）</li>
+	<li>段 1 → 段 2 → 段 3 → 段 4 の順に流す。1 組ずつ結果をその場で報告する</li>
+	<li>結果を試験結果の各表に行として足し、まとめ（勧めるモデル）を見直す</li>
+	<li>E4B-qat が E4B と同じくらい通るなら、配布物のモデル（<code>make-offline-bundle.ps1</code> の <code>-Models</code>）の差し替えを提案する</li>
+</ol>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="ch05" id="ch05">
+<h1>気をつけること</h1>
+<ul>
+	<li><strong>新しいモデルの系列は、llama.cpp b11320 が対応していないことがある</strong>（LFM2.5・Ornith・granite-4.1）。起動の確認で読み込めないものは、版を上げるか、対象から外すかをその場で報告する</li>
+	<li><strong>PC が休止すると、時間の記録が狂う</strong>（10/05 に休止をまたいだ試験が 11 時間と記録された）。電源につなぎ、休止しない設定で流す。休止をまたいだ組は流し直す</li>
+	<li><strong>Claude Code が途中で自動更新されると、1 問が試験にならない</strong>（10/05 に起きた）。0.2 秒で終わった組は流し直す</li>
+	<li>1 組 1〜2 回では、結果の揺れを区別できない。✅ と ❌ が分かれたモデルは、段 2 の回数を 4 回に増やす</li>
+</ul>
+</section>
+
+</div>
+
+<footer>
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+</footer>
+
+</body>
+</html>

@@ -188,7 +188,7 @@ footer{
 	<div class="inner">
 		<h1>課題一覧 — ローカルLLM 実行環境</h1>
 		<div class="lead">これから解決すること。状態は 未 / 着手 / 済 の3段階</div>
-		<div class="date">📅 作成: 2026-09-27 / 更新: 2026-10-04</div>
+		<div class="date">📅 作成: 2026-09-27 / 更新: 2026-10-15</div>
 	</div>
 </div>
 
@@ -420,7 +420,23 @@ N: ドライブが廃止され、プロジェクトは W:、共有ツールは T
 	<li><span class="badge b-none">未</span>ネットを切った状態で動くか、現地で確かめる（対話の cmd も使ってみる）</li>
 	<li><span class="badge b-ok">済</span>Claude Code を社内の閉域網で使ってよいか、利用条件を確かめる（2026-10-06 決定: 会社の契約（Commercial Terms）のもとで、自己責任で使う。公式の <a href="https://code.claude.com/docs/en/llm-gateway">Other LLM gateways</a> は Claude 以外のモデルへのつなぎ方を「サポートしない」と書くが、禁止はしていない。公式の <a href="https://code.claude.com/docs/en/legal-and-compliance">Legal and compliance</a> では、npm 版もオープンソースではなく Anthropic の規約に従う。会社の契約があるので Commercial Terms が適用され、自社の利用者のために社内の環境へ入れて使うことは書きぶりから外れない。ローカルモデルだけ・閉域網での利用は書かれていない）</li>
 </ul>
-<p>関連: <a href="../10_plan/p261002-01-閉域網へ持っていく配布物.html">閉域網へ持っていく配布物</a></p>
+<p>関連: <a href="../10_plan/p261002-01-閉域網へ持っていく配布物.html">閉域網へ持っていく配布物</a>。10/08 に組み立てた配布物は別の PC に持っていっていない。最新の版で作り直す課題は i261014-01</p>
+</details>
+
+<details class="md-flat" open>
+<summary><span class="badge b-warn">着手</span><span class="no">i261014-01</span>配布物を最新のツールで作り直す</summary>
+<p>10/02 以降、Node.js・エージェント・llama.cpp に新しい版が出た。10/08〜10/10 の変更（3 つに分ける形・ポート 11434 など）は別の PC に持っていっていない。最新の版にそろえて組み立て直す。ツール類は 1 つの 7z、モデルは 1 本ずつ別の 7z にする。</p>
+<ul>
+	<li><span class="badge b-ok">済</span>ツールを最新にする（2026-10-14。Node.js 26.11.1・Claude Code 2.1.299・bun 1.4.3 は、すでに最新だった。Pi 0.99.2 → 1.2.0、OpenCode 1.18.34 → 1.19.0 に上げた。llama.cpp は b11609 の CUDA 版を <code>bin/llama.cpp</code>、Vulkan 版・CPU 版を <code>bin/llama.cpp-b11609-*</code> に置き、旧い CUDA 版は <code>bin/llama.cpp-b11320</code> に退避した。Intel GPU ドライバ 101.7092 は 9/25 公開で最新のため変えない。配布物に入れるのは組み立てるとき）</li>
+	<li><span class="badge b-ok">済</span>最新の版で再試験する（<a href="../10_plan/p261010-03-新しいモデルの検証計画.html">新しいモデルの検証計画</a>を含む。2026-10-15 に全段が終わった。OpenCode は 1.19.0 が環境変数 <code>PWD</code> を見て書き込み先を決めるため、<code>PWD</code> を外して流し直した。結果は試験結果の「最新版で流し直した結果」に書いた）</li>
+	<li><span class="badge b-ok">済</span>組み立てスクリプトを直す（2026-10-15。ツール類を 1 つの 7z に、モデルを 1 本ずつ別の 7z に〔mmproj があれば同じ 7z〕。bun を入れる。版を最新にし、組み立てる前に llama.cpp の実際の版を確かめる。組み立ては、入れるモデルが決まってから。文法の検査だけ済み、実際の組み立ては未確認）</li>
+	<li><span class="badge b-ok">済</span>時間切れの既定を、Intel GPU・CPU 版も 10 分（600 秒）にする（2026-10-15 の指示で、次回の試験から。段 4 までは 15 分で流し切り、終わってから直した。<code>tools/50_run/paths.ps1</code> の <code>Get-LlmTimeout</code> とテスト〔❌Red → ✅Green〕、試験結果の「これからの時間切れの決め方」を直した。Thinking・Reasoning の倍は、そのまま）</li>
+	<li><span class="badge b-none">未</span>配布物を組み立てる（ツール類の 7z・モデルごとの 7z・ドライバ）</li>
+	<li><span class="badge b-none">未</span>別の PC で、ネットを切った状態で動くか確かめる（i261002-01 の現地確認と合わせる）</li>
+</ul>
+<p>入れるモデルの決めごと（2026-10-14）: 10 GB 以下のものだけ。試験で通ったものだけ。Ministral-3-14B-Reasoning は入れない（プログラムを実行せずに答えた）。</p>
+<p>入れるモデル（2026-10-15 に決めた。再試験の結果から）: gemma-4-E4B-it・gemma-4-E4B-it-qat・gemma-4-12B-it・gemma-4-12B-it-QAT・Qwen3.5-9B・gemma-4-E2B-it・Ornith-1.0-9B の 7 本。LFM2.5-8B-A1B・granite-4.1-8b・Ministral-3-3B・Qwen3-4B 2 本・Bonsai-27B は入れない。<code>make-offline-bundle.ps1</code> の <code>$Models</code> に反映した。</p>
+<p>関連: <a href="../10_plan/p261002-01-閉域網へ持っていく配布物.html">閉域網へ持っていく配布物</a>・<a href="../01_research/i261014-01-AIエージェントの特徴.html">AIエージェントの特徴</a></p>
 </details>
 
 <details class="md-flat">
@@ -437,6 +453,18 @@ N: ドライブが廃止され、プロジェクトは W:、共有ツールは T
 	<li><span class="badge b-ok">済</span>配布物は約 20.4 GB で、12B-QAT は 1 ファイルで 4 GB を超える。運ぶ媒体が FAT32 なら書き込めないため、媒体と形式（exFAT・NTFS）を確かめる（利用者が確かめた。問題なし）</li>
 </ul>
 <p>関連: <a href="../10_plan/p261002-01-閉域網へ持っていく配布物.html">閉域網へ持っていく配布物</a></p>
+</details>
+
+<details class="md-flat">
+<summary><span class="badge b-ok">済</span><span class="no">i261011-01</span>試験のあとにプロセスの残骸が残る</summary>
+<p>試験の見張りに使った <code>tail -f … | grep</code> が、見張りを止めても終わらずに残っていた。親のプロセスはすでに無く、<code>-f</code> で待ち続けるので、自然には終わらない。試験のたびに増えていく。</p>
+<ul>
+	<li><span class="badge b-ok">済</span>残骸を止める（2026-10-11。10/01〜10/04 の tail 26 本・grep 26 本と、10/02 の aider の cmd 1 本。先祖のプロセスが無いため、コマンドラインで見分けた。tail は引数がこのプロジェクトのパス、grep は tail と同じ時刻に起動していて検索語が試験のもの、aider は出力先がこのプロジェクトの <code>logs/</code>。ほかのプロジェクトの tail・grep 各 1 本には触れていない）</li>
+	<li><span class="badge b-ok">済</span>試験のあとに残骸を確かめて止める手順を、ローカルルールに書く（2026-10-11。「長い試験・測定の進め方」に 3 行足した）</li>
+	<li><span class="badge b-ok">済</span>Git for Windows の tail で <code>--pid</code> が効くか確かめる（2026-10-11。<code>tail -n 0 -f --pid=$$ … | grep …</code> を bash で起動して確かめた。<code>$$</code> が指す内側の bash（<code>usr/bin/bash.exe</code>）を止めると、tail はすぐ終わり、grep も入力が切れて終わった。外側の bash（<code>bin/bash.exe</code>）だけを止めても、内側が生きている間は tail も残る。残骸はどれも親が無かったので、<code>--pid=$$</code> を付けていれば終わっていたはず）</li>
+	<li><span class="badge b-ok">済</span>Monitor の見張りで <code>tail -f --pid=$$</code> なら残らないことを確かめる（2026-10-11。同じ形の見張りを 2 本立て、1 行ずつ知らせが届くのを見てから TaskStop で止めた。<code>--pid</code> なしは tail と grep が残り、<code>--pid=$$</code> ありは何も残らなかった。Monitor が立てる bash は Windows 上で 2 段（<code>bin/bash.exe</code> → <code>usr/bin/bash.exe</code>）。tail と grep の Windows 上の親は、起動の直後から無いプロセスになっている）</li>
+	<li><span class="badge b-ok">済</span>共通ルールへ上げる（2026-10-12。「シェル実行ルール」＞「見張りの tail には --pid を付ける」を足した。ローカルルールの tail の行は共通ルールへの参照に置き換え、試験が無い日も区切りで <code>psls tail</code> を流す行を足した。きっかけは 10/04 から 8 日間残っていた <code>tail -F</code> の 1 本で、10/11 の片付けでは <code>-F</code>（大文字）を見落としていた）</li>
+</ul>
 </details>
 
 </section>

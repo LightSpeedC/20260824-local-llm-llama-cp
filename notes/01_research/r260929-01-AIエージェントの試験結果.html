@@ -224,7 +224,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<div class="inner">
 		<h1>ローカルLLM で AI エージェントを使う — 試験結果</h1>
 		<div class="lead">llama-server に繋いだ Claude Code・Pi・OpenCode・Aider・Codex CLI で、20GB 以下のモデルがファイルを読み書きできるかを試した結果と、どれを使うか</div>
-		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-10-06</div>
+		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-10-15</div>
 	</div>
 </div>
 
@@ -609,7 +609,8 @@ llama.cpp を b11320 に、エージェントを最新に上げて（版は<a hr
 <thead><tr><th class="nowrap">GPU</th><th class="nowrap">ふつうのモデル</th><th class="nowrap">名前に Thinking・Reasoning が入るモデル</th><th>根拠</th></tr></thead>
 <tbody>
 <tr><td class="nowrap">NVIDIA GPU</td><td class="nowrap">10 分</td><td class="nowrap">20 分</td><td>合格はすべて 10 分以内（最長 577 秒）。Qwen3-4B-Thinking の Claude Code は 869 秒かかった</td></tr>
-<tr><td class="nowrap">Intel GPU</td><td class="nowrap">15 分</td><td class="nowrap">30 分</td><td>Intel だけで流した Claude Code の合格は最長 899 秒（12B-QAT）。これを超える組は、時間をかけても実際には使えない。Thinking・Reasoning は倍の 30 分</td></tr>
+<tr><td class="nowrap">Intel GPU</td><td class="nowrap">10 分（2026-10-15 に 15 分から短くした）</td><td class="nowrap">20 分（同じく 30 分から）</td><td>これまでは、Intel だけで流した Claude Code の合格の最長 899 秒（12B-QAT）に合わせて 15 分にしていた。10 分に短くすると、それを超える組（10/15 の再試験では、Claude Code の 12B-QAT 642.5 秒・Ornith 815.9 秒・granite 625.9 秒）は、時間切れとして扱う。どの環境も同じ枠にして、結果を比べやすくする</td></tr>
+<tr><td class="nowrap">CPU だけ</td><td class="nowrap">10 分（2026-10-15 に 15 分から短くした）</td><td class="nowrap">20 分</td><td>CPU だけでは、Claude Code は 10/15 の再試験で 13 本中 1 本（E4B、840.9 秒）しか通らなかった。Pi は 87〜714 秒で多くが通る</td></tr>
 </tbody>
 </table>
 </div>
@@ -742,6 +743,39 @@ llama.cpp は b11320 の CPU 版、時間切れは 15 分（名前に Thinking�
 	<li>OpenCode も 16 組中 11 組が時間切れ。通った 4 本も 6〜13 分かかる</li>
 </ul>
 
+<h2>最新版で流し直した結果</h2>
+<p>
+ツールを最新にして（llama.cpp b11609・Pi 1.2.0・OpenCode 1.19.0・Claude Code 2.1.299）、新しく試す 4 本（gemma-4-E4B-it-qat・LFM2.5-8B-A1B・granite-4.1-8b・Ornith-1.0-9B）を含む 13 本を流した（2026-10-15）。
+時間切れは 10 分（名前に Thinking が入るモデルは 20 分）。NVIDIA GPU は 1 組 2 回、Intel GPU と CPU は 1 回ずつ。各マスは「Claude Code / Pi / OpenCode」の順で、NVIDIA GPU の Claude Code と Pi は読み・書きの 2 問の結果を並べた。
+※は結果のログが残っておらず、集計の値だけを使ったもの。
+</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="nowrap">NVIDIA GPU</th><th class="nowrap">Intel GPU</th><th class="nowrap">CPU</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">gemma-4-E4B</td><td>✅✅ / ✅✅ / ✅✅</td><td>✅ / ✅ / ✅</td><td>✅ / ✅ / ✅</td></tr>
+<tr><td class="nowrap">gemma-4-E4B-it-qat（新）</td><td>✅✅ / ✅✅ / ✅✅</td><td>✅ / ✅ / ✅</td><td>⏱️ / ✅ / ✅</td></tr>
+<tr><td class="nowrap">gemma-4-12B</td><td>✅✅ / ✅✅ / ✅✅</td><td>⏱️ / ✅ / ✅</td><td>⏱️ / ✅ / ⏱️</td></tr>
+<tr><td class="nowrap">gemma-4-12B-QAT</td><td>✅✅ / ✅✅ / ❌❌</td><td>✅ / ✅ / ❌</td><td>⏱️ / ✅ / ⏱️</td></tr>
+<tr><td class="nowrap">Qwen3.5-9B</td><td>✅✅ / ✅✅ / ❌✅</td><td>✅ / ✅ / ❌</td><td>⏱️ / ✅ / ❌</td></tr>
+<tr><td class="nowrap">Bonsai-27B</td><td>✅✅ / ✅✅ / ✅✅</td><td>⏱️ / ✅ / ⏱️</td><td>⏱️ / ✅ / ⏱️</td></tr>
+<tr><td class="nowrap">Ornith-1.0-9B（新）</td><td>❌❌ / ❌✅ / ✅✅</td><td>✅ / ❌ / ✅</td><td>⏱️ / ⏱️ / ✅</td></tr>
+<tr><td class="nowrap">gemma-4-E2B</td><td>❌❌ / ✅✅ / ❌❌</td><td>✅ / ✅ / ❌</td><td>❌ / ✅ / ✅</td></tr>
+<tr><td class="nowrap">LFM2.5-8B-A1B（新）</td><td>✅❌ / ✅❌ / ❌❌</td><td>✅ / ❌ / ❌</td><td>❌ / ✅ / ❌</td></tr>
+<tr><td class="nowrap">granite-4.1-8b（新）</td><td>✅✅※ / ✅❌ / ❌❌</td><td>✅※ / ✅※ / ❌</td><td>⏱️ / ✅※ / ⏱️</td></tr>
+<tr><td class="nowrap">Ministral-3-3B</td><td>✅❌ / ❌✅ / ❌❌</td><td>✅ / ❌ / ❌</td><td>⏱️ / ✅※ / ⏱️</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Instruct</td><td>✅✅※ / ❌❌ / ❌❌</td><td>✅※ / ✅※ / ❌</td><td>⏱️ / ❌ / ⏱️</td></tr>
+<tr><td class="nowrap">Qwen3-4B-Thinking</td><td>✅✅※ / ❌❌ / ❌❌</td><td>✅※ / ❌ / ❌</td><td>⏱️ / ✅※ / ⏱️</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>NVIDIA GPU と Intel GPU の両方で、3 つのエージェントすべてが通ったのは gemma-4-E4B と gemma-4-E4B-it-qat</strong>。Intel GPU で 3 つとも通ったのもこの 2 本だけ</li>
+	<li>新しい 4 本のうち、gemma-4-E4B-it-qat は E4B と並ぶ結果。Ornith-1.0-9B は OpenCode だけ全環境で通り、Claude Code・Pi では不合格が多い。LFM2.5-8B-A1B・granite-4.1-8b は通らない組が多い</li>
+	<li>時間切れを 10 分にしたため、Intel GPU の Claude Code は gemma-4-12B・Bonsai-27B が、CPU の Claude Code は gemma-4-E4B だけが通り、gemma-4-E2B・LFM2.5-8B-A1B 以外は時間切れになった</li>
+	<li>OpenCode は、起動した側の環境変数 <code>PWD</code> を見て書き込み先を決めるため、<code>PWD</code> を外して流した（<a href="i261014-01-AIエージェントの特徴.html">AIエージェントの特徴</a>）</li>
+</ul>
+
 <h2>調査結果のまとめ</h2>
 <p>NVIDIA GPU・Intel GPU・CPU で流した結果をまとめる。</p>
 <div class="tablewrap">
@@ -759,7 +793,7 @@ llama.cpp は b11320 の CPU 版、時間切れは 15 分（名前に Thinking�
 	<li><strong>合否はモデルとエージェントの組で決まり、GPU の種類ではほとんど変わらない</strong>。変わるのは速さで、最初に送る量が多い Claude Code ほど遅い環境の影響を強く受ける。Intel GPU と CPU では、大きいモデルは時間切れになって使えない</li>
 	<li><strong>同じ組でも結果は揺れる</strong>。1 回だけの合否で組を決めず、複数回流して確かめる</li>
 	<li><strong>☑️（実行せずに答える）はモデルの癖</strong>。gpt-oss-20b・Qwen3-30B-A3B・Ministral-3-14B-Reasoning は、どの環境・エージェントでも ☑️ が多い</li>
-	<li><strong>時間切れは、NVIDIA GPU で 10 分、Intel GPU と CPU で 15 分、名前に Thinking・Reasoning が入るモデルは倍</strong>。延ばしても通る組はほとんど増えない</li>
+	<li><strong>時間切れは、どの環境も 10 分（2026-10-15 から。それまでは Intel GPU と CPU が 15 分）、名前に Thinking・Reasoning が入るモデルは倍</strong>。延ばしても通る組はほとんど増えない</li>
 </ul>
 </section>
 

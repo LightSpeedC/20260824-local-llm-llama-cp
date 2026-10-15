@@ -1,0 +1,300 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIエージェントの特徴 — ローカルLLM 実行環境</title>
+<style>
+:root{
+	--navy1:#12224d;
+	--navy2:#2f5fbf;
+	--ink:#1c2330;
+	--ink-soft:#4a5568;
+	--line:#d9dfe8;
+	--code-bg:#f4f6fa;
+	--link:#1a4fa0;
+	--accent:var(--navy1, #12224d);
+	--accent2:var(--navy2, #2f5fbf);
+	--soft:#f2f5fb;
+}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(187,78%,25%);--accent2:hsl(187,58%,55%);--soft:hsl(187,28%,95%);}
+.ch03{--accent:hsl(93,78%,25%);--accent2:hsl(93,58%,55%);--soft:hsl(93,28%,95%);}
+.ch04{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+
+*{box-sizing:border-box;}
+body{
+	margin:0;
+	background:#fff;
+	color:var(--ink, #1c2330);
+	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+	font-size:15.5px;
+	line-height:1.85;
+}
+.titlebar{
+	background:linear-gradient(135deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	padding:34px 30px 30px;
+}
+.titlebar .inner{max-width:1600px;margin:0 auto;}
+.titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
+.titlebar .lead{font-size:0.88em;color:#cfe0ff;background:transparent;}
+.titlebar .date{font-size:0.88em;color:#cfe0ff;margin-top:4px;background:transparent;}
+.titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+
+.wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
+
+section{
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:4px 26px 26px;
+	margin:34px 0;
+}
+section h1{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	font-size:1.45em;
+	padding:14px 20px;
+	margin:26px 0 20px;
+	border-radius:8px;
+	box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+h2{
+	font-size:1.15em;
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(90deg,var(--soft, #f2f5fb),#fff);
+	padding:6px 12px;
+	margin:30px 0 12px;
+	color:var(--accent, #12224d);
+}
+p{margin:8px 0;}
+ul,ol{margin:8px 0;padding-left:1.5em;}
+li{margin:4px 0;}
+
+code{
+	background:var(--code-bg, #f4f6fa);
+	border:1px solid var(--line, #d9dfe8);
+	color:#17335f;
+	border-radius:4px;
+	padding:1px 5px;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+}
+pre{
+	background:var(--code-bg, #f4f6fa);
+	color:var(--ink, #1c2330);
+	border:1px solid var(--line, #d9dfe8);
+	border-left:5px solid var(--accent2, #2f5fbf);
+	border-radius:0 8px 8px 0;
+	padding:13px 16px;
+	overflow-x:auto;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+	line-height:1.6;
+}
+pre code{background:none;border:none;padding:0;color:inherit;}
+
+.tablewrap{overflow-x:auto;margin:12px 0;}
+table{
+	border-collapse:collapse;
+	width:100%;
+	border-radius:8px;
+	overflow:hidden;
+	box-shadow:0 2px 7px rgba(0,0,0,0.09);
+	font-size:0.95em;
+}
+th{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-align:left;
+	padding:9px 12px;
+}
+th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line, #d9dfe8);vertical-align:top;}
+tr:nth-child(even) td{background:#fafbfe;}
+.nowrap{white-space:nowrap;}
+.num{text-align:right;white-space:nowrap;}
+
+.callout{
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border-radius:0 8px 8px 0;
+	padding:12px 16px;
+	margin:16px 0;
+}
+.callout strong{color:var(--accent, #12224d);background:transparent;}
+
+.toc{
+	background:linear-gradient(180deg,#f2f5fb,#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:6px 26px 22px;
+	margin:34px 0;
+}
+.toc ol{
+	list-style:none;
+	display:flex;
+	flex-wrap:wrap;
+	gap:8px;
+	padding:0;
+	margin:12px 0 0;
+	counter-reset:toc;
+}
+.toc li{counter-increment:toc;margin:0;}
+.toc ol a{
+	display:-webkit-box;
+	-webkit-line-clamp:2;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:normal;
+	width:310px;
+	max-width:100%;
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-decoration:none;
+	border-radius:6px;
+	padding:8px 12px;
+	font-size:0.92em;
+	line-height:1.4;
+	font-weight:700;
+}
+.toc ol a::before{content:counter(toc) ". ";font-weight:700;}
+
+.homelink{margin:20px 0 0;}
+a.home{
+	display:inline-block;
+	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	border-radius:6px;
+	padding:4px 11px;
+	line-height:1;
+	text-decoration:none;
+}
+a.home svg{vertical-align:-2px;}
+a{background:none;color:var(--link, #1a4fa0);}
+footer{
+	max-width:1600px;
+	margin:0 auto;
+	padding:18px 30px 30px;
+	border-top:1px solid var(--line, #d9dfe8);
+	color:var(--ink-soft, #4a5568);
+	font-size:0.9em;
+	margin-top:40px;
+	margin-bottom:40px;
+	background:transparent;
+}
+footer a{color:var(--navy2, #2f5fbf);background:transparent;}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+	<div class="inner">
+		<h1>AIエージェントの特徴</h1>
+		<div class="lead">試験で見つけた、エージェントごとの癖のうち、起動のしかたで結果が変わるもの。見つけたら足していく</div>
+		<div class="date">📅 作成: 2026-10-15 / 更新: 2026-10-15</div>
+	</div>
+</div>
+
+<div class="wrap">
+
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+
+<div class="toc">
+	<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">目次</h2>
+	<ol>
+		<li class="ch01"><a href="#ch01">分かったこと</a></li>
+		<li class="ch02"><a href="#ch02">OpenCode は PWD を見る</a></li>
+		<li class="ch03"><a href="#ch03">影響と対処</a></li>
+		<li class="ch04"><a href="#ch04">ほかのエージェントと、この資料の維持</a></li>
+	</ol>
+</div>
+
+<!-- ============ 1 ============ -->
+<section class="ch01" id="ch01">
+<h1>分かったこと</h1>
+<p>
+最新の版で試験をやり直したとき（<a href="../40_issues/issues.html">i261014-01</a>）、OpenCode 1.19.0 の sum が 26 組すべて「作成なし」になった。
+モデルは <code>sum.js</code> を作り、<code>node sum.js</code> で 55 も出していた。<strong>書いた先が、試験用の作業フォルダではなく、プロジェクトの root だった</strong>。
+</p>
+<ul>
+	<li><strong>OpenCode 1.19.0 は、書くファイルの置き場を、実際の作業フォルダではなく環境変数 <code>PWD</code> で決める</strong>（実験 2・3・5）</li>
+	<li><strong>Bash から起動すると、<code>PWD</code>（呼んだ側のフォルダ）が子に引き継がれる</strong>。PowerShell から直接起動したときは <code>PWD</code> が無い（実験 1）</li>
+	<li><strong>git のリポジトリがあるかどうかは関係しない</strong>（実験 5・6）</li>
+	<li><code>PWD</code> を外して起動すると、作業フォルダに書く（実験 4・6）</li>
+</ul>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="ch02" id="ch02">
+<h1>OpenCode は PWD を見る</h1>
+<p>gemma-4-E4B（Q4_K_M）と llama.cpp b11609 を使い、OpenCode 1.19.0 に「<code>probe-xx.txt</code> を作れ」と頼んだ。作業フォルダは試験用のコピー（実験 5・6 だけ git のリポジトリ）。行き先は、書いた先の <code>filepath</code> と、実際にできたファイルで確かめた。凡例: ✅ 作業フォルダに書いた ／ ❌ 作業フォルダ以外に書いた。</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th class="nowrap">実験</th><th>起動の経路</th><th>作業フォルダ</th><th>PWD</th><th>ファイルの行き先</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">1</td><td>PowerShell から</td><td>試験用のコピー</td><td>無し</td><td>✅ 作業フォルダ</td></tr>
+<tr><td class="nowrap">2</td><td>Bash → psh</td><td>試験用のコピー</td><td>プロジェクトの root（引き継ぎ）</td><td>❌ プロジェクトの root</td></tr>
+<tr><td class="nowrap">3</td><td>PowerShell から</td><td>試験用のコピー</td><td>プロジェクトの root（自分で設定）</td><td>❌ プロジェクトの root</td></tr>
+<tr><td class="nowrap">4</td><td>Bash → psh</td><td>試験用のコピー</td><td>外した</td><td>✅ 作業フォルダ</td></tr>
+<tr><td class="nowrap">5</td><td>PowerShell から</td><td>git のリポジトリ</td><td>プロジェクトの root（自分で設定）</td><td>❌ プロジェクトの root</td></tr>
+<tr><td class="nowrap">6</td><td>PowerShell から</td><td>git のリポジトリ</td><td>無し</td><td>✅ 作業フォルダ</td></tr>
+</tbody>
+</table>
+</div>
+<h2>作業フォルダの外に書こうとして、OpenCode に断られる組がある</h2>
+<ul>
+	<li><code>PWD</code> を外したあとの流し直しで、granite-4.1-8b は <code>/workspace/sum.js</code>、Qwen3-4B-Instruct は <code>/sum.js</code> という絶対パスに書こうとした。OpenCode は「許可されていない」として断り（<code>The user rejected permission to use this specific tool call.</code>）、モデルはそのまま終わった。判定は「作成なし」になる</li>
+	<li>この「作成なし」は、<code>PWD</code> のずれによる「作成なし」とは別のもので、モデルが作業フォルダの外のパスを選んだ結果。プロジェクトの root に <code>sum.js</code> が無いことで見分けられる</li>
+	<li><strong>確かめていないこと</strong>: 1.18.34 でも断られたか。モデルがなぜこの絶対パスを選んだか（OpenCode がモデルに渡す作業フォルダの情報によるのか、モデルの癖か）</li>
+</ul>
+<h2>確かめられなかったこと</h2>
+<ul>
+	<li><strong>OpenCode 1.18.34 も <code>PWD</code> を見ていたか</strong>は、確かめていない。10/01〜10/02 の試験は PowerShell から流していて、<code>PWD</code> が無かった。版を上げて起きたのか、起動の経路が変わって起きたのかは、分けられていない</li>
+	<li><strong>モデルなしの再現はできなかった</strong>。<code>opencode debug file read</code> は、<code>PWD</code> を変えても作業フォルダのファイルを読めた。書き込みの道具だけが <code>PWD</code> を見ているらしい（ほかの道具は未確認）</li>
+</ul>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
+<h1>影響と対処</h1>
+<h2>起きたこと</h2>
+<ul>
+	<li>sum の判定が「作成なし」になり、OpenCode の結果 26 組（2 セット × 13 本）が、モデルの力を測れなかった</li>
+	<li>OpenCode が、プロジェクトの root に <code>sum.js</code> を書き続けた。<strong>作業用のコピーに閉じ込める、という前提が破れていた</strong>。モデルが別のファイル名を選べば、プロジェクトの本物のファイルを上書きしうる</li>
+</ul>
+<h2>対処</h2>
+<ul>
+	<li><code>tools/50_run/paths.ps1</code> を読み込むときに、環境変数 <code>PWD</code> を外す。エージェントを起動するスクリプトはどれもこのファイルを読むので、1 か所で済む</li>
+	<li>テスト <code>tests/paths.tests.ps1</code> に、「<code>PWD</code> を引き継いで起動しても、<code>paths.ps1</code> を読んだあとは空」を足した。直す前に ❌Red（実際は引き継いだ値のまま）、直したあとに ✅Green を確かめた</li>
+	<li>直したあと、Bash 経由（これまで落ちていた経路）で OpenCode を 1 本流し、✅ 合格（38.4 秒、作成・実行・報告・ログとも OK）を確かめた</li>
+</ul>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="ch04" id="ch04">
+<h1>ほかのエージェントと、この資料の維持</h1>
+<h2>ほかのエージェント</h2>
+<ul>
+	<li><strong>Claude Code 2.1.299 と Pi 1.2.0 は、同じ Bash 経由の起動でも、作業フォルダに書けた</strong>。段 2 の sum で、「作成あり」と判定された組が多数ある。<code>PWD</code> の影響は見えなかった</li>
+	<li>Aider・Codex CLI・Claude Code・Pi が、<code>PWD</code> 以外の環境変数や起動の経路の違いで動きを変えるかは、確かめていない</li>
+</ul>
+<h2>この資料の維持</h2>
+<ul>
+	<li>エージェントの版を上げたとき、新しいエージェントを試すとき、試験の起動の経路を変えたときは、<strong>この資料の特徴が今も当てはまるかを見る</strong></li>
+	<li>新しい特徴（起動のしかたで結果が変わるもの）を見つけたら、この資料に足す。どの版で、どの条件で、何を確かめたかを書き、確かめていないことは「確かめていない」と書く</li>
+	<li>特徴に合わせて入れた回避策（上の <code>PWD</code> を外す処理など）は、この資料を読んで外してよいかを決めるまで、外さない</li>
+</ul>
+</section>
+
+</div>
+
+<footer>
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+</footer>
+
+</body>
+</html>

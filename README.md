@@ -18,6 +18,7 @@ RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで llama.cpp を動�
 - [GPU 併用の検証計画](notes/10_plan/p261007-01-GPU併用の検証計画.md) — NVIDIA GPU・Intel GPU・CPU を組み合わせて載せたときに速くなるかを測る
 - [画像解析の検証計画](notes/10_plan/p261010-01-画像解析の検証計画.md) — mmproj を持つモデルに文字・表・グラフ・画面の画像を読ませ、正しさと速さを測る
 - [HTTP プロキシ作成の検証計画](notes/10_plan/p261010-02-HTTPプロキシ作成の検証計画.md) — Node.js の HTTP プロキシサーバを書かせ、試験側で実際に通信を通して合否を決める
+- [新しいモデルの検証計画](notes/10_plan/p261010-03-新しいモデルの検証計画.md) — 新しく取得したモデルで、これまでと同じ試験（読み書き・sum）を流して比べる
 - [階層型エージェント構成案](notes/10_plan/p260825-01-階層型エージェント構成案.md) — 大きなモデルで計画し、小さなモデルで実装する構成。VRAM 4GB では複数モデルを同時常駐できないため、 並列スロットで代替する設計
 
 ## 2. 調査
@@ -27,6 +28,7 @@ RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで llama.cpp を動�
 - [ローカルLLM で AI エージェントを使う — 試験結果](notes/01_research/r260929-01-AIエージェントの試験結果.md) — llama-server に繋いだ Claude Code・Pi・OpenCode・Aider・Codex CLI で、20GB 以下のモデルがファイルを読み書きできるかを試した結果と、どのモデル・エージェントを使うか
 - [AI エージェント試験の経緯と全実行の記録](notes/01_research/r260930-01-エージェント試験の経緯と全実行の記録.md) — 上の試験の試し方、途中で起きたことと対処、最初の試験（共通ルールあり）の結果、流したすべての試験
 - [Claude Code 以外の AI エージェント調査](notes/01_research/p260929-01-ClaudeCode以外のエージェント調査.md) — Pi・OpenCode・Qwen Code・Codex CLI・Aider を llama-server に繋ぐ方法と、最初に送る量の比較
+- [AIエージェントの特徴](notes/01_research/i261014-01-AIエージェントの特徴.md) — 試験で見つけた、起動のしかたで結果が変わるエージェントの癖（OpenCode 1.19.0 は環境変数 PWD を見て、書くファイルの置き場を決める）と、その対処
 
 ## 3. 課題
 
