@@ -15,13 +15,13 @@ Write-Host '■ Get-LlmTimeout：時間切れの既定（秒）'
 # NVIDIA GPU（CUDA 版）は 10 分。合格はすべて 10 分以内だった
 Assert-Equal 'NVIDIA GPU（llama.cpp）は 600 秒' 600 (Get-LlmTimeout 'llama.cpp' 'gemma-4-E4B-it-Q4_K_M')
 Assert-Equal '配布物の CUDA 版も 600 秒' 600 (Get-LlmTimeout 'llama.cpp-b11320-cuda' 'gemma-4-E4B-it-Q4_K_M')
-# Intel GPU（Vulkan 版）は 15 分。Claude Code の合格は最長 643 秒だった
-Assert-Equal 'Intel GPU（Vulkan 版）は 900 秒' 900 (Get-LlmTimeout 'llama.cpp-b11320-vulkan' 'gemma-4-E4B-it-Q4_K_M')
-# CPU 版は測っていないので、遅い側の Intel GPU に揃える
-Assert-Equal 'CPU 版は Intel GPU と同じ 900 秒' 900 (Get-LlmTimeout 'llama.cpp-b11320-cpu' 'gemma-4-E4B-it-Q4_K_M')
+# Intel GPU（Vulkan 版）も 10 分（2026-10-15 の指示。それまでは 15 分だった）
+Assert-Equal 'Intel GPU（Vulkan 版）は 600 秒' 600 (Get-LlmTimeout 'llama.cpp-b11320-vulkan' 'gemma-4-E4B-it-Q4_K_M')
+# CPU 版も 10 分。どの環境も同じにして、結果を比べやすくする
+Assert-Equal 'CPU 版も 600 秒' 600 (Get-LlmTimeout 'llama.cpp-b11320-cpu' 'gemma-4-E4B-it-Q4_K_M')
 # 名前に Thinking・Reasoning が入るモデルは、--reasoning off でも長く考えるので倍
 Assert-Equal 'Thinking は NVIDIA GPU で倍の 1200 秒' 1200 (Get-LlmTimeout 'llama.cpp' 'Qwen3-4B-Thinking-2507-Q4_K_M')
-Assert-Equal 'Reasoning は Intel GPU で倍の 1800 秒' 1800 (Get-LlmTimeout 'llama.cpp-b11320-vulkan' 'Ministral-3-14B-Reasoning-2512-Q4_K_M')
+Assert-Equal 'Reasoning は Intel GPU で倍の 1200 秒' 1200 (Get-LlmTimeout 'llama.cpp-b11320-vulkan' 'Ministral-3-14B-Reasoning-2512-Q4_K_M')
 Assert-Equal '-Only の略した名前（Qwen3-4B-Thinking）でも倍' 1200 (Get-LlmTimeout 'llama.cpp' 'Qwen3-4B-Thinking')
 
 Write-Host '■ Read-LlmText：エージェントの出力ファイルを読む'
@@ -50,6 +50,12 @@ $env:LLM_PORT = $null
 Assert-Equal 'LLM_PORT が無ければ 11434' '11434' (powershell -NoProfile -Command ". '$pathsPs1'; `$LlmPort")
 $env:LLM_PORT = '18081'
 try { Assert-Equal 'LLM_PORT があればその値' '18081' (powershell -NoProfile -Command ". '$pathsPs1'; `$LlmPort") } finally { $env:LLM_PORT = $null }
+
+Write-Host '■ PWD：Bash から引き継いだ PWD を、エージェントに渡さない'
+# Bash から起動すると、環境変数 PWD（呼んだ側のフォルダ）が子に引き継がれる。OpenCode 1.19.0 は実際の作業フォルダではなく PWD を見て、
+# 書くファイルの置き場を決める。作業用のコピーではなくプロジェクトの root に書かれ、判定は「作成なし」になった（i261014-01）
+# 読み込みは 1 回きりなので、別の PowerShell で読み直して確かめる
+Assert-Equal 'PWD を引き継いで起動しても、paths.ps1 を読んだあとは空' '' (powershell -NoProfile -Command "`$env:PWD = 'X:/wrong'; . '$pathsPs1'; [string]`$env:PWD")
 
 Write-Host '■ Add-LlmKillOnClose：起動した PowerShell が終わったら llama-server も止める'
 # 窓を × で閉じる・強制終了すると finally が走らず、llama-server が残っていた（i261003-01）

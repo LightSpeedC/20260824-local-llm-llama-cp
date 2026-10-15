@@ -6,7 +6,15 @@
 	# 1 セット目で済んでいるエージェント（カンマ区切り。cc・pi・opencode・aider）
 	[string]$DoneInFirst = '',
 	# 1 セット目で済んでいるモデル（カンマ区切り。1 セット目だけ除く）
-	[string]$SkipInFirst = 'gemma-4-E4B'
+	[string]$SkipInFirst = 'gemma-4-E4B',
+	# 流すモデル（カンマ区切り。名前の一部。空なら下の既定の 19 本）
+	[string]$Models = '',
+	# 流すエージェント（カンマ区切り）
+	[string]$Agents = 'cc,pi,opencode,aider',
+	# 使う llama.cpp の bin 下のフォルダ名（空なら config.cmd の LLM_BACKEND）
+	[string]$LlamaDir = '',
+	# cc で対象にするモデルの大きさの上限（GB）
+	[double]$MaxSizeGB = 20
 )
 # sum（初期プログラミング）を 4 エージェント × 19 本で何セットも流し、揺れを見る（i261001-01）
 $ErrorActionPreference = 'Stop'
@@ -17,6 +25,11 @@ $log = Join-Path $logDir "$(Get-Date -Format 'yyyyMMdd-HHmmss')-driver.log"
 function Write-Log([string]$s) { $line = "$(Get-Date -Format 'yyyy/MM/dd HH:mm:ss') $s"; Add-Content $log $line -Encoding UTF8; Write-Host $line }
 
 $all = 'gemma-4-E2B,gemma-4-E4B,Ministral-3-3B,Qwen3-4B-Instruct,Qwen3.5-9B,gpt-oss-20b,gemma-4-12B-it-QAT,gemma-4-12B-it-Q4_K_M,gemma-4-26B-A4B,Qwen3-30B-A3B,Qwen3-Coder-30B,GLM-4.7-Flash,Bonsai-27B,Qwen3.6-35B,Ministral-3-14B,Devstral,NVIDIA-Nemotron,Qwen3-4B-Thinking,GLM-4.6V'.Split(',')
+if ($Models) { $all = $Models.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ } }
+$agentList = $Agents.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+# 使う llama.cpp を各試験スクリプトへ渡す（空なら渡さず、各スクリプトが config.cmd から決める）
+# 配列で渡すと位置引数になり、-LlamaDir の名前が消えて値が別の引数に入る。名前付きで渡すためにハッシュテーブルにする
+$llamaArgs = if ($LlamaDir) { @{ LlamaDir = $LlamaDir } } else { @{} }
 # 1 セットにかかる時間の見込み（分。2026-10-01 の実績から）
 $minutes = @{ cc = 80; pi = 25; opencode = 45; aider = 25 }
 $deadline = [datetime]::ParseExact($Until, 'HH:mm', $null)
@@ -27,7 +40,7 @@ $t = $PSScriptRoot
 Write-Log "開始 $Sets セット・期限 $($deadline.ToString('MM/dd HH:mm'))"
 
 :sets for ($s = 1; $s -le $Sets; $s++) {
-	foreach ($a in 'cc', 'pi', 'opencode', 'aider') {
+	foreach ($a in $agentList) {
 		if ($s -eq 1 -and $done -contains $a) { continue }
 		if ((Get-Date).AddMinutes($minutes[$a]) -gt $deadline) { Write-Log "期限に間に合わないため止める（$s セット目 $a）"; break sets }
 		$keys = if ($s -eq 1) { $all | Where-Object { $skip -notcontains $_ } } else { $all }
@@ -35,9 +48,9 @@ Write-Log "開始 $Sets セット・期限 $($deadline.ToString('MM/dd HH:mm'))"
 		Write-Log "=== $s セット目 $a 開始"
 		$out = Join-Path $logDir "$(Get-Date -Format 'yyyyMMdd-HHmmss')-set$s-$a.txt"
 		if ($a -eq 'cc') {
-			& "$t/test-cc-tools.ps1" -Only $only -MaxSizeGB 20 -UseTemplates -NoRules -Tests 'sum' -ExtraArgs '--reasoning off' *>&1 | ForEach-Object { "$_" } | Tee-Object -FilePath $out | Where-Object { $_ -match '^===|sum:|結果:' } | ForEach-Object { Write-Log "  $_" }
+			& "$t/test-cc-tools.ps1" -Only $only -MaxSizeGB $MaxSizeGB -UseTemplates -NoRules -Tests 'sum' -ExtraArgs '--reasoning off' @llamaArgs *>&1 | ForEach-Object { "$_" } | Tee-Object -FilePath $out | Where-Object { $_ -match '^===|sum:|結果:' } | ForEach-Object { Write-Log "  $_" }
 		} else {
-			& "$t/test-agents.ps1" -Agent $a -Only $only -UseTemplates -Tests 'sum' -ExtraArgs '--reasoning off' *>&1 | ForEach-Object { "$_" } | Tee-Object -FilePath $out | Where-Object { $_ -match '^===|sum:|結果:' } | ForEach-Object { Write-Log "  $_" }
+			& "$t/test-agents.ps1" -Agent $a -Only $only -UseTemplates -Tests 'sum' -ExtraArgs '--reasoning off' @llamaArgs *>&1 | ForEach-Object { "$_" } | Tee-Object -FilePath $out | Where-Object { $_ -match '^===|sum:|結果:' } | ForEach-Object { Write-Log "  $_" }
 		}
 		Write-Log "=== $s セット目 $a 終了"
 	}

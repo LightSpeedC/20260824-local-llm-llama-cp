@@ -12,7 +12,7 @@
 	[string]$Tests = 'read,write',
 	[switch]$NoRules,
 	[string]$ExtraArgs = '',
-	# 使う llama.cpp の bin 下のフォルダ名（Intel GPU は llama.cpp-b11320-vulkan、CPU だけは llama.cpp-b11320-cpu、auto は自動）。空なら config.cmd の LLM_BACKEND
+	# 使う llama.cpp の bin 下のフォルダ名（Intel GPU は llama.cpp-b11609-vulkan、CPU だけは llama.cpp-b11609-cpu、auto は自動）。空なら config.cmd の LLM_BACKEND
 	[string]$LlamaDir = ''
 )
 # 10GB 以下の手持ちモデルを 1 本ずつ llama-server で起動し、Claude Code からファイルの読み・書きができるかを試す

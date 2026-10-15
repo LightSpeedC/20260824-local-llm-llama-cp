@@ -20,7 +20,7 @@ $m = Get-ChildItem $LlmModelDir -Recurse -Filter *.gguf | Where-Object { $_.Base
 if (-not $m) { throw "モデルが見つかりません: $Model（場所: $LlmModelDir）" }
 $name = $m.BaseName
 if ($Agent -eq 'bench') {
-	foreach ($b in 'llama.cpp-b11320-vulkan', 'llama.cpp-b11320-cpu') {
+	foreach ($b in 'llama.cpp-b11609-vulkan', 'llama.cpp-b11609-cpu') {
 		$bench = Join-Path $LlmRoot "bin/$b/llama-bench.exe"
 		if (-not (Test-Path $bench)) { continue }
 		Write-Host "=== $b / $name"

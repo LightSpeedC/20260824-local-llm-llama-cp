@@ -13,7 +13,7 @@
 	[ValidateSet('responses', 'chat')][string]$CodexWireApi = 'responses',
 	# read・write・sum（初期プログラミング）・echo（日本語が届くかの確認）をカンマ区切りで
 	[string]$Tests = 'read,write',
-	# 使う llama.cpp の bin 下のフォルダ名（Intel GPU は llama.cpp-b11320-vulkan、CPU だけは llama.cpp-b11320-cpu、auto は自動）。空なら config.cmd の LLM_BACKEND
+	# 使う llama.cpp の bin 下のフォルダ名（Intel GPU は llama.cpp-b11609-vulkan、CPU だけは llama.cpp-b11609-cpu、auto は自動）。空なら config.cmd の LLM_BACKEND
 	[string]$LlamaDir = ''
 )
 # Claude Code 以外のエージェント（Pi・OpenCode・Aider）を llama-server に繋ぎ、読み・書きができるかを試す

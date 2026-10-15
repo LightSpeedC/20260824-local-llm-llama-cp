@@ -2,6 +2,10 @@
 # root に config.cmd があれば、その set 行を読む（配布物ではこれを書き換えるだけで場所が変わる）
 # 無ければ環境変数、それも無ければ開発用の PC の場所にする
 $LlmRoot = (Resolve-Path "$PSScriptRoot/../..").Path
+# Bash から起動されると、環境変数 PWD（呼んだ側のフォルダ）が子のエージェントに引き継がれる。
+# OpenCode 1.19.0 は実際の作業フォルダではなく PWD を見て、書くファイルの置き場を決める（i261014-01）
+# エージェントを起動するスクリプトはどれもこのファイルを読むので、ここで外す
+$env:PWD = $null
 # config.cmd の set 行を読む。cmd のファイルは SJIS なので CP932 と決めて読む（Encoding.Default は pwsh 7 では UTF-8 になる）
 # %~dp0 は config.cmd の置き場所（末尾に \ が付く）。ほかの %変数% は cmd と同じく環境変数で展開する
 function Read-LlmConfig([string]$path, [string]$root) {
@@ -94,10 +98,10 @@ public static class LlmJob {
 	}
 	[LlmJob]::Add($proc.Handle)
 }
-# 時間切れの既定（秒）。NVIDIA GPU（CUDA 版）は 10 分、Intel GPU（Vulkan 版）と CPU 版は 15 分（r260929-01）
+# 時間切れの既定（秒）。どの環境も 10 分（r260929-01）。Intel GPU（Vulkan 版）と CPU 版は、それまで 15 分だった（2026-10-15 の指示で短くした）
 # 名前に Thinking・Reasoning が入るモデルは、--reasoning off でも長く考えるので倍にする
 function Get-LlmTimeout([string]$llamaDir, [string]$model) {
-	$sec = if ($llamaDir -eq 'llama.cpp' -or $llamaDir -like '*-cuda') { 600 } else { 900 }
+	$sec = 600
 	if ($model -match 'Thinking|Reasoning') { $sec *= 2 }
 	return $sec
 }
@@ -129,11 +133,11 @@ function Get-LlmDevices([string]$llamaDir) {
 }
 function Resolve-LlmBackend([string]$name) {
 	if ($name -ne 'auto') { return $name }
-	$vk = Join-Path $LlmRoot 'bin/llama.cpp-b11320-vulkan/llama-server.exe'
+	$vk = Join-Path $LlmRoot 'bin/llama.cpp-b11609-vulkan/llama-server.exe'
 	if (Test-Path $vk) {
 		$ErrorActionPreference = 'Continue'
 		$dev = & $vk --list-devices 2>&1 | Out-String
-		if ($dev -match 'Vulkan\d+:') { return 'llama.cpp-b11320-vulkan' }
+		if ($dev -match 'Vulkan\d+:') { return 'llama.cpp-b11609-vulkan' }
 	}
-	return 'llama.cpp-b11320-cpu'
+	return 'llama.cpp-b11609-cpu'
 }
