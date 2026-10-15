@@ -6,7 +6,7 @@ set "LLM_MODEL_DIR=%~dp0models"
 rem エージェントの作業フォルダと空のホーム
 set "LLM_WORK_DIR=%~dp0work"
 rem 使う llama.cpp。auto は Intel GPU が見えれば Vulkan 版、見えなければ CPU 版
-rem 固定するときは llama.cpp-b11320-vulkan / llama.cpp-b11320-cpu / llama.cpp-b11320-cuda
+rem 固定するときは llama.cpp-b11609-vulkan / llama.cpp-b11609-cpu / llama.cpp-b11609-cuda
 set "LLM_BACKEND=auto"
 rem llama-server のポート。ほかのプログラムが 11434 を使っていて起動できないときだけ書き換える（例: set "LLM_PORT=11435"）
 set "LLM_PORT=11434"
