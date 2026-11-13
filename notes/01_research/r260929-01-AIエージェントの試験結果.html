@@ -749,6 +749,9 @@ llama.cpp は b11320 の CPU 版、時間切れは 15 分（名前に Thinking�
 時間切れは 10 分（名前に Thinking が入るモデルは 20 分）。NVIDIA GPU は 1 組 2 回、Intel GPU と CPU は 1 回ずつ。各マスは「Claude Code / Pi / OpenCode」の順で、NVIDIA GPU の Claude Code と Pi は読み・書きの 2 問の結果を並べた。
 ※は結果のログが残っておらず、集計の値だけを使ったもの。
 </p>
+<p>
+NVIDIA GPU のドライバは、この試験のあと（2026-10-17）に 617.42 へ上げた。試験は上げる前のドライバで流したもので、上げる前の版は記録していない。上げたあとの llama-bench（gemma-4-E4B・b11609・CUDA 版）は、プロンプト処理 1,810 トークン/秒、生成 45.8 トークン/秒で、GPU は正常に動いた。上げたあとの Claude Code の読みは、Claude Code が 2.1.302 に上がっていたこともあり、時間切れ（600 秒）になった（書きは、途中で llama-server を止めたため結果が無い）。サーバのログでは、文脈が 62,000 トークンまで増えていた。ドライバが原因か、Claude Code の版が原因かは切り分けていない。
+</p>
 <div class="tablewrap">
 <table>
 <thead><tr><th>モデル</th><th class="nowrap">NVIDIA GPU</th><th class="nowrap">Intel GPU</th><th class="nowrap">CPU</th></tr></thead>

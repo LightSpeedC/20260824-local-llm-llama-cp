@@ -195,7 +195,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<div class="inner">
 		<h1>AIエージェントの特徴</h1>
 		<div class="lead">試験で見つけた、エージェントごとの癖のうち、起動のしかたで結果が変わるもの。見つけたら足していく</div>
-		<div class="date">📅 作成: 2026-10-15 / 更新: 2026-10-15</div>
+		<div class="date">📅 作成: 2026-10-15 / 更新: 2026-10-16</div>
 	</div>
 </div>
 
@@ -271,6 +271,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<li><code>tools/50_run/paths.ps1</code> を読み込むときに、環境変数 <code>PWD</code> を外す。エージェントを起動するスクリプトはどれもこのファイルを読むので、1 か所で済む</li>
 	<li>テスト <code>tests/paths.tests.ps1</code> に、「<code>PWD</code> を引き継いで起動しても、<code>paths.ps1</code> を読んだあとは空」を足した。直す前に ❌Red（実際は引き継いだ値のまま）、直したあとに ✅Green を確かめた</li>
 	<li>直したあと、Bash 経由（これまで落ちていた経路）で OpenCode を 1 本流し、✅ 合格（38.4 秒、作成・実行・報告・ログとも OK）を確かめた</li>
+		<li><code>PWD</code> を外して OpenCode を 2 セット流し直した（2026-10-15、13 本）。NVIDIA GPU で 2 回とも通ったのは、gemma-4-E4B・gemma-4-E4B-it-qat・gemma-4-12B・Bonsai-27B・Ornith-1.0-9B の 5 本。Ornith は Claude Code・Pi では不合格が多いが、OpenCode では全環境で通った。各組の結果は<a href="r260929-01-AIエージェントの試験結果.html">試験結果</a>の「最新版で流し直した結果」にある</li>
 </ul>
 </section>
 

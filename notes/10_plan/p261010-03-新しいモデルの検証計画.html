@@ -223,7 +223,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<div class="inner">
 		<h1>新しいモデルの検証計画</h1>
 		<div class="lead">2026-10-10 に取得した 6 本で、これまでと同じ試験（読み書き・sum）を流し、手持ちのモデルと比べる</div>
-		<div class="date">📅 作成: 2026-10-10 / 更新: 2026-10-14</div>
+		<div class="date">📅 作成: 2026-10-10 / 更新: 2026-10-16</div>
 	</div>
 </div>
 
@@ -302,13 +302,14 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<li>結果を試験結果の各表に行として足し、まとめ（勧めるモデル）を見直す</li>
 	<li>E4B-qat が E4B と同じくらい通るなら、配布物のモデル（<code>make-offline-bundle.ps1</code> の <code>-Models</code>）の差し替えを提案する</li>
 </ol>
+<p><strong>結果（2026-10-15）</strong>: 全段を流し終え、結果を試験結果の「最新版で流し直した結果」に書いた。E4B-qat は E4B と同じ結果で、配布物のモデルに入れた。Ornith-1.0-9B は OpenCode だけ全環境で通るため入れた。LFM2.5-8B-A1B・granite-4.1-8b は通らない組が多く、入れない。配布物は 7 本（<a href="../40_issues/issues.html">i261014-01</a>）。</p>
 </section>
 
 <!-- ============ 5 ============ -->
 <section class="ch05" id="ch05">
 <h1>気をつけること</h1>
 <ul>
-	<li><strong>新しいモデルの系列は、llama.cpp b11320 が対応していないことがある</strong>（LFM2.5・Ornith・granite-4.1）。起動の確認で読み込めないものは、版を上げるか、対象から外すかをその場で報告する</li>
+	<li><strong>新しいモデルの系列は、llama.cpp b11320 が対応していないことがある</strong>（LFM2.5・Ornith・granite-4.1）。起動の確認で読み込めないものは、版を上げるか、対象から外すかをその場で報告する（2026-10-15: b11609 では新しい 4 本とも読み込めた）</li>
 	<li><strong>PC が休止すると、時間の記録が狂う</strong>（10/05 に休止をまたいだ試験が 11 時間と記録された）。電源につなぎ、休止しない設定で流す。休止をまたいだ組は流し直す</li>
 	<li><strong>Claude Code が途中で自動更新されると、1 問が試験にならない</strong>（10/05 に起きた）。0.2 秒で終わった組は流し直す</li>
 	<li>1 組 1〜2 回では、結果の揺れを区別できない。✅ と ❌ が分かれたモデルは、段 2 の回数を 4 回に増やす</li>
