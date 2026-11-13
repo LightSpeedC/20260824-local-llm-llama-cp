@@ -292,7 +292,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 <table>
 <thead><tr><th class="nowrap">種類</th><th>中身</th><th>作り方</th></tr></thead>
 <tbody>
-<tr><td class="nowrap">llama.cpp</td><td>b11320 の Vulkan 版（Intel GPU）・CPU 版・CUDA 版（NVIDIA がある PC のため）</td><td>GitHub の公式リリースを展開したフォルダをそのままコピーする。exe は同じフォルダの DLL を使うので、フォルダの中身を分けない</td></tr>
+<tr><td class="nowrap">llama.cpp</td><td>b11609 の Vulkan 版（Intel GPU）・CPU 版・CUDA 版（NVIDIA がある PC のため）</td><td>GitHub の公式リリースを展開したフォルダをそのままコピーする。exe は同じフォルダの DLL を使うので、フォルダの中身を分けない</td></tr>
 <tr><td class="nowrap">Node.js</td><td>v26.10.0 の <strong>zip 版と msi 版の両方</strong></td><td>zip 版はインストールも管理者の権限も要らない。msi 版は、インストールして使いたい PC のために添える</td></tr>
 <tr><td class="nowrap">エージェント</td><td>Pi・OpenCode・Claude Code（<strong>npm 版と単体の <code>claude.exe</code> の両方</strong>）</td><td>こちらで zip 版 Node.js のフォルダの中に npm でインストールし、そのフォルダごと運ぶ。インストール時に取ってくる OS 用の実行ファイルも中に入った状態で運べる</td></tr>
 <tr><td class="nowrap">モデル</td><td>gemma-4-E4B（Q4_K_M、5.0 GB）・gemma-4-E2B（Q4_K_M、3.2 GB）・Ministral-3-3B（Q4_K_M、2.0 GB）・gemma-4-12B-QAT（Q4_0、6.5 GB）</td><td>差し替え用のテンプレートがあるもの（いまは Ministral-3-3B）は <code>.jinja</code> も一緒に運ぶ</td></tr>
@@ -320,9 +320,9 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 <h2>配布物のフォルダ構成</h2>
 <pre><code class="language-text">&lt;配布先&gt;\
   bin\
-    llama.cpp-b11320-vulkan\
-    llama.cpp-b11320-cpu\
-    llama.cpp-b11320-cuda\
+    llama.cpp-b11609-vulkan\
+    llama.cpp-b11609-cpu\
+    llama.cpp-b11609-cuda\
     node\                  zip 版 Node.js。中に npm で入れたエージェント
     claude\                単体の claude.exe
   installers\
