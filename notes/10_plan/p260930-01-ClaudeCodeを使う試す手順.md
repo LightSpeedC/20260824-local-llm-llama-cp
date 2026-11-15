@@ -98,17 +98,17 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
 
 ```batch
 rem 決めたモデルだけ（名前の一部をカンマ区切り。書いた順に流れる）
-tools\50_run\test-cc-tools.cmd -Only "gemma-4-E2B,gpt-oss-20b" -NoRules -UseTemplates -ExtraArgs "--reasoning off" -TimeoutSec 900
+tools\50_run\test-cc-tools.cmd -Only "gemma-4-E2B,gpt-oss-20b" -UseTemplates -ExtraArgs "--reasoning off" -TimeoutSec 900
 
 rem 20GB 以下の全モデル（小さい順）
-tools\50_run\test-cc-tools.cmd -MaxSizeGB 20 -NoRules -UseTemplates -ExtraArgs "--reasoning off" -TimeoutSec 900
+tools\50_run\test-cc-tools.cmd -MaxSizeGB 20 -UseTemplates -ExtraArgs "--reasoning off" -TimeoutSec 900
 ```
 
 | 引数 | 意味 |
 |---|---|
 | `-Only` | 試すモデル。ファイル名の一部をカンマ区切りで書く |
 | `-MaxSizeGB` | このサイズ未満を対象にする（既定 10） |
-| `-NoRules` | ルールなし（ホームを `W:\temp\llama-cp-home` にする）。**付けないと 1 往復に数分かかる** |
+| `-WithRules` | ルールあり（利用者の `CLAUDE.md`・メモリ・フックを読ませる）。**付けると最初の要求が 2 倍以上になり、1 往復に数分かかる**。既定はルールなしで、ホームを `W:\temp\llama-cp-home` にする。`-NoRules` は、これまでの流し方との互換のために残してあり、付けても同じ |
 | `-UseTemplates` | 差し替えたテンプレートがあるモデルはそれを使う |
 | `-ExtraArgs` | llama-server に足す引数。`"--reasoning off"` で思考を切る |
 | `-TimeoutSec` | 1 問を待つ秒数（既定 600） |

@@ -10,7 +10,10 @@
 	[string]$Only = '',
 	[switch]$UseTemplates,
 	[string]$Tests = 'read,write',
+	# 既定がルールなし。-NoRules は、これまでの流し方との互換のために残してある（付けても付けなくても同じ）
 	[switch]$NoRules,
+	# 利用者の CLAUDE.md・メモリ・フックを読ませて流す。最初の要求が 2 倍以上になり、E4B の読みは 600 秒の時間切れになる（i261014-01）
+	[switch]$WithRules,
 	[string]$ExtraArgs = '',
 	# 使う llama.cpp の bin 下のフォルダ名（Intel GPU は llama.cpp-b12359-vulkan、CPU だけは llama.cpp-b12359-cpu、auto は自動）。空なら config.cmd の LLM_BACKEND
 	[string]$LlamaDir = ''
@@ -18,6 +21,8 @@
 # 10GB 以下の手持ちモデルを 1 本ずつ llama-server で起動し、Claude Code からファイルの読み・書きができるかを試す
 # 結果は logs/test-cc-tools/ に 1 モデル 1 行の JSON Lines で追記する
 $ErrorActionPreference = 'Stop'
+# ルールなしを既定にする。付け忘れると、10/17 以降の読みが時間切れになった（i261014-01）
+$NoRules = -not $WithRules
 # -Tests には read・write のほか、sum（初期プログラミング）・echo（日本語が届くかの確認）も渡せる
 . (Join-Path $PSScriptRoot 'sum-judge.ps1')
 . (Join-Path $PSScriptRoot 'paths.ps1')

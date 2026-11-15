@@ -347,17 +347,17 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 <p>モデルを 1 本ずつ起動し、Claude Code に「README の h1 を読む」「決めた 1 行を書く」の 2 問を投げる。サーバの起動と停止もスクリプトが行う。</p>
 <h2>よく使う形</h2>
 <pre><code class="language-batch">rem 決めたモデルだけ（名前の一部をカンマ区切り。書いた順に流れる）
-tools\50_run\test-cc-tools.cmd -Only "gemma-4-E2B,gpt-oss-20b" -NoRules -UseTemplates -ExtraArgs "--reasoning off" -TimeoutSec 900
+tools\50_run\test-cc-tools.cmd -Only "gemma-4-E2B,gpt-oss-20b" -UseTemplates -ExtraArgs "--reasoning off" -TimeoutSec 900
 
 rem 20GB 以下の全モデル（小さい順）
-tools\50_run\test-cc-tools.cmd -MaxSizeGB 20 -NoRules -UseTemplates -ExtraArgs "--reasoning off" -TimeoutSec 900</code></pre>
+tools\50_run\test-cc-tools.cmd -MaxSizeGB 20 -UseTemplates -ExtraArgs "--reasoning off" -TimeoutSec 900</code></pre>
 <div class="tablewrap">
 <table>
 <thead><tr><th class="nowrap">引数</th><th>意味</th></tr></thead>
 <tbody>
 <tr><td class="nowrap"><code>-Only</code></td><td>試すモデル。ファイル名の一部をカンマ区切りで書く</td></tr>
 <tr><td class="nowrap"><code>-MaxSizeGB</code></td><td>このサイズ未満を対象にする（既定 10）</td></tr>
-<tr><td class="nowrap"><code>-NoRules</code></td><td>ルールなし（ホームを <code>W:\temp\llama-cp-home</code> にする）。<strong>付けないと 1 往復に数分かかる</strong></td></tr>
+<tr><td class="nowrap"><code>-WithRules</code></td><td>ルールあり（利用者の <code>CLAUDE.md</code>・メモリ・フックを読ませる）。<strong>付けると最初の要求が 2 倍以上になり、1 往復に数分かかる</strong>。既定はルールなしで、ホームを <code>W:\temp\llama-cp-home</code> にする。<code>-NoRules</code> は、これまでの流し方との互換のために残してあり、付けても同じ</td></tr>
 <tr><td class="nowrap"><code>-UseTemplates</code></td><td>差し替えたテンプレートがあるモデルはそれを使う</td></tr>
 <tr><td class="nowrap"><code>-ExtraArgs</code></td><td>llama-server に足す引数。<code>"--reasoning off"</code> で思考を切る</td></tr>
 <tr><td class="nowrap"><code>-TimeoutSec</code></td><td>1 問を待つ秒数（既定 600）</td></tr>
