@@ -33,7 +33,8 @@ RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで llama.cpp を動�
 
 ## 3. 課題
 
-- [課題一覧](notes/40_issues/issues.md) — これから解決すること
+- 課題は `notes/40_issues/items/` に 1 件 1 ファイルで置く。見るときは `issue view` を使う — これから解決すること
+- [旧課題の一覧](notes/40_issues/issues-legacy.md) — `issue` に移す前の課題
 
 ## 4. ルール
 

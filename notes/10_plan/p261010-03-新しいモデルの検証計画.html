@@ -288,7 +288,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 <ul>
 	<li>Aider は自分で実行しないことが分かっているので外す</li>
 	<li>段 3・4 は、段 2 で 3 つのエージェントのどれでも ❌・⏱️ だったモデルを外す（通らないものを遅い環境で流しても意味が無い）</li>
-	<li><strong>版を上げて流す</strong>（2026-10-14）。llama.cpp b11609・Claude Code 2.1.299・Pi 1.2.0・OpenCode 1.19.0・Node.js 26.11.1。上の表の 6 本に加えて、配布物の候補 9 本（gemma-4-E4B・E2B・12B-QAT・12B-Q4_K_M、Qwen3.5-9B、Qwen3-4B Instruct・Thinking、Ministral-3-3B、Bonsai-27B）も、最新の版で同じ段 1〜4 を流し直す。配布物に入れるモデルは、この結果で決める（<a href="../40_issues/issues.html">i261014-01</a>）</li>
+	<li><strong>版を上げて流す</strong>（2026-10-14）。llama.cpp b11609・Claude Code 2.1.299・Pi 1.2.0・OpenCode 1.19.0・Node.js 26.11.1。上の表の 6 本に加えて、配布物の候補 9 本（gemma-4-E4B・E2B・12B-QAT・12B-Q4_K_M、Qwen3.5-9B、Qwen3-4B Instruct・Thinking、Ministral-3-3B、Bonsai-27B）も、最新の版で同じ段 1〜4 を流し直す。配布物に入れるモデルは、この結果で決める（<a href="../40_issues/issues-legacy.html">i261014-01</a>）</li>
 	<li>画像の試験・HTTP プロキシの試験は、それぞれの計画書で扱う（<a href="p261010-01-画像解析の検証計画.html">画像解析の検証計画</a>・<a href="p261010-02-HTTPプロキシ作成の検証計画.html">HTTP プロキシ作成の検証計画</a>）。その対象にも、ここで通ったモデルを加える</li>
 </ul>
 </section>
@@ -302,7 +302,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<li>結果を試験結果の各表に行として足し、まとめ（勧めるモデル）を見直す</li>
 	<li>E4B-qat が E4B と同じくらい通るなら、配布物のモデル（<code>make-offline-bundle.ps1</code> の <code>-Models</code>）の差し替えを提案する</li>
 </ol>
-<p><strong>結果（2026-10-15）</strong>: 全段を流し終え、結果を試験結果の「最新版で流し直した結果」に書いた。E4B-qat は E4B と同じ結果で、配布物のモデルに入れた。Ornith-1.0-9B は OpenCode だけ全環境で通るため入れた。LFM2.5-8B-A1B・granite-4.1-8b は通らない組が多く、入れない。配布物は 7 本（<a href="../40_issues/issues.html">i261014-01</a>）。</p>
+<p><strong>結果（2026-10-15）</strong>: 全段を流し終え、結果を試験結果の「最新版で流し直した結果」に書いた。E4B-qat は E4B と同じ結果で、配布物のモデルに入れた。Ornith-1.0-9B は OpenCode だけ全環境で通るため入れた。LFM2.5-8B-A1B・granite-4.1-8b は通らない組が多く、入れない。配布物は 7 本（<a href="../40_issues/issues-legacy.html">i261014-01</a>）。</p>
 </section>
 
 <!-- ============ 5 ============ -->
