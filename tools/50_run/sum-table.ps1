@@ -4,7 +4,7 @@
 # -Sets: 同じ組を何回も流したとき、1 マスに回の順で ✅☑️❌⏱️ を並べる（版を上げて 3 回ずつ流した表用）
 # -Until: この時刻より前の結果だけを使う（例: 版を上げた 3 セットは -Since 20261001-2300 -Until 20261002-0700）
 # -Ranges: 期間を複数渡す（「始め..終わり」をカンマで区切る）。渡せば -Since・-Until より優先する
-# -LlamaDir: その llama.cpp（例: llama.cpp-b11609-vulkan）で流した結果だけを使う。空なら既定の llama.cpp（CUDA 版）の結果だけ
+# -LlamaDir: その llama.cpp（例: llama.cpp-b12359-vulkan）で流した結果だけを使う。空なら既定の llama.cpp（CUDA 版）の結果だけ
 param([string]$Since = '20260930-2254', [string]$Until = '99999999', [switch]$All, [switch]$Sets, [string]$Ranges = '', [string]$LlamaDir = '')
 $spans = if ($Ranges) { foreach ($r in $Ranges.Split(',')) { $a, $b = $r.Trim() -split '\.\.'; ,@($a, $b) } } else { ,@(,@($Since, $Until)) }
 function Test-InSpan([string]$name) { foreach ($s in $spans) { if ($name -ge $s[0] -and $name -lt $s[1]) { return $true } }; return $false }

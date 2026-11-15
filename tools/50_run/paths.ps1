@@ -133,11 +133,11 @@ function Get-LlmDevices([string]$llamaDir) {
 }
 function Resolve-LlmBackend([string]$name) {
 	if ($name -ne 'auto') { return $name }
-	$vk = Join-Path $LlmRoot 'bin/llama.cpp-b11609-vulkan/llama-server.exe'
+	$vk = Join-Path $LlmRoot 'bin/llama.cpp-b12359-vulkan/llama-server.exe'
 	if (Test-Path $vk) {
 		$ErrorActionPreference = 'Continue'
 		$dev = & $vk --list-devices 2>&1 | Out-String
-		if ($dev -match 'Vulkan\d+:') { return 'llama.cpp-b11609-vulkan' }
+		if ($dev -match 'Vulkan\d+:') { return 'llama.cpp-b12359-vulkan' }
 	}
-	return 'llama.cpp-b11609-cpu'
+	return 'llama.cpp-b12359-cpu'
 }
