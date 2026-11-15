@@ -488,7 +488,7 @@ N: ドライブが廃止され、プロジェクトは W:、共有ツールは T
 <p>配布物には入らないが、開発用の PC の置き場を変えたときに取り残されるものと、確かめる手段が無いもの。</p>
 <ul>
 	<li><span class="badge b-ok">済</span>モデルの置き場を現地と同じ <code>C:\AI-models</code> に改め、スクリプトと資料の <code>C:\AI_Models</code> をすべて書き換える</li>
-	<li><span class="badge b-none">未</span><code>start-agent</code>・<code>test-cc-tools</code> と役目が重なる <code>test-cc.ps1</code>・<code>run-server-*.cmd</code>・<code>bench.cmd</code> を消し、資料に出てくる名前を書き換える（消す対象は作業のときに 1 つずつ示す）</li>
+	<li><span class="badge b-none">未</span><code>start-agent</code>・<code>test-cc-tools</code> と役目が重なる <code>test-cc.ps1</code>・<code>run-server-*.cmd</code>・<code>bench.cmd</code> を消し、資料に出てくる名前を書き換える（消す対象は作業のときに 1 つずつ示す。<code>run-server-*.cmd</code> の 5 本は 2026-11-15 に消し、<code>cc1.cmd</code> と手順書の名前も直した〔1c2b2ab〕。残りは <code>test-cc.ps1</code> と <code>bench.cmd</code>）</li>
 	<li><span class="badge b-none">未</span>root の <code>cc1.cmd</code> は、いちばん使えそうな組み合わせを動かす入口として残す。<code>start-agent</code> を呼ぶ形に書き換え、サーバの起動から停止までを 1 本で済ませる（直接書いた <code>W:\temp</code> も無くなる）</li>
 	<li><span class="badge b-none">未</span>README と実行計画の「LM Studio と共用・移動しない」を、置き場を <code>C:\AI-models</code> に改めた今の形に直す</li>
 	<li><span class="badge b-ok">済</span><code>tests/</code> を作り、<code>sum-judge.ps1</code> の判定（✅・☑️・❌）をテストする。ランチャーは <code>tools/40_test/</code>（<code>tests/sum-judge.tests.ps1</code> の 22 件。<code>tools/40_test/run-tests.cmd</code> で流す。表のマスを作る <code>sum-table.ps1</code> の <code>Format-Cell</code> は、☑️ を入れるときにテストを足す）</li>

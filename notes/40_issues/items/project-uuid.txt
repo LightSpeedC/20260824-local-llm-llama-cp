@@ -1,0 +1,3 @@
+schema: 2
+project_uuid: 4e5d9b9c88c94c3eb0fb0af655af9a9d
+project_id: 20260824-local-llm-llama-cp

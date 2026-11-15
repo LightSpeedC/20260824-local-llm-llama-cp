@@ -226,7 +226,7 @@ develop の内容を release・master へ取り込む。
 配布物には入らないが、開発用の PC の置き場を変えたときに取り残されるものと、確かめる手段が無いもの。
 
 - ✅ **済** モデルの置き場を現地と同じ `C:\AI-models` に改め、スクリプトと資料の `C:\AI_Models` をすべて書き換える
-- ⬜ **未** `start-agent`・`test-cc-tools` と役目が重なる `test-cc.ps1`・`run-server-*.cmd`・`bench.cmd` を消し、資料に出てくる名前を書き換える（消す対象は作業のときに 1 つずつ示す）
+- ⬜ **未** `start-agent`・`test-cc-tools` と役目が重なる `test-cc.ps1`・`run-server-*.cmd`・`bench.cmd` を消し、資料に出てくる名前を書き換える（消す対象は作業のときに 1 つずつ示す。`run-server-*.cmd` の 5 本は 2026-11-15 に消し、`cc1.cmd` と手順書の名前も直した〔1c2b2ab〕。残りは `test-cc.ps1` と `bench.cmd`）
 - ⬜ **未** root の `cc1.cmd` は、いちばん使えそうな組み合わせを動かす入口として残す。`start-agent` を呼ぶ形に書き換え、サーバの起動から停止までを 1 本で済ませる（直接書いた `W:\temp` も無くなる）
 - ⬜ **未** README と実行計画の「LM Studio と共用・移動しない」を、置き場を `C:\AI-models` に改めた今の形に直す
 - ✅ **済** `tests/` を作り、`sum-judge.ps1` の判定（✅・☑️・❌）をテストする。ランチャーは `tools/40_test/`（`tests/sum-judge.tests.ps1` の 22 件。`tools/40_test/run-tests.cmd` で流す。表のマスを作る `sum-table.ps1` の `Format-Cell` は、☑️ を入れるときにテストを足す）
