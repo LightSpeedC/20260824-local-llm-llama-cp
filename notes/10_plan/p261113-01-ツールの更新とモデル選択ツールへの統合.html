@@ -1,0 +1,327 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ツールの更新とモデル選択ツールへの統合</title>
+<style>
+:root{
+	--navy1:#12224d;
+	--navy2:#2f5fbf;
+	--ink:#1c2330;
+	--ink-soft:#4a5568;
+	--line:#d9dfe8;
+	--code-bg:#f4f6fa;
+	--link:#1a4fa0;
+	--accent:var(--navy1, #12224d);
+	--accent2:var(--navy2, #2f5fbf);
+	--soft:#f2f5fb;
+}
+.ch01{--accent:hsl(280,78%,25%);--accent2:hsl(280,58%,55%);--soft:hsl(280,28%,95%);}
+.ch02{--accent:hsl(210,78%,25%);--accent2:hsl(210,58%,55%);--soft:hsl(210,28%,95%);}
+.ch03{--accent:hsl(140,78%,25%);--accent2:hsl(140,58%,55%);--soft:hsl(140,28%,95%);}
+.ch04{--accent:hsl(70,78%,25%);--accent2:hsl(70,58%,55%);--soft:hsl(70,28%,95%);}
+.ch05{--accent:hsl(0,78%,25%);--accent2:hsl(0,58%,55%);--soft:hsl(0,28%,95%);}
+
+*{box-sizing:border-box;}
+body{
+	margin:0;
+	background:#fff;
+	color:var(--ink, #1c2330);
+	font-family:"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+	font-size:15.5px;
+	line-height:1.85;
+}
+.titlebar{
+	background:linear-gradient(135deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	padding:34px 30px 30px;
+}
+.titlebar .inner{max-width:1600px;margin:0 auto;}
+.titlebar h1{font-size:2.0em;margin:0 0 8px;color:#fff;}
+.titlebar .lead{font-size:0.88em;color:#cfe0ff;background:transparent;}
+.titlebar .date{font-size:0.88em;color:#cfe0ff;margin-top:4px;background:transparent;}
+.titlebar code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+
+.wrap{max-width:1600px;margin:0 auto;padding:0 30px;}
+
+section{
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:4px 26px 26px;
+	margin:34px 0;
+}
+section h1{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	font-size:1.45em;
+	padding:14px 20px;
+	margin:26px 0 20px;
+	border-radius:8px;
+	box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+section h1 code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+h2{
+	font-size:1.15em;
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(90deg,var(--soft, #f2f5fb),#fff);
+	padding:6px 12px;
+	margin:30px 0 12px;
+	color:var(--accent, #12224d);
+}
+h3{
+	font-size:1.02em;
+	display:inline-block;
+	border-bottom:2px dotted var(--accent2, #2f5fbf);
+	padding-bottom:3px;
+	margin:20px 0 8px;
+	color:var(--ink, #1c2330);
+	background:transparent;
+}
+p{margin:8px 0;}
+ul,ol{margin:8px 0;padding-left:1.5em;}
+li{margin:4px 0;}
+
+code{
+	background:var(--code-bg, #f4f6fa);
+	border:1px solid var(--line, #d9dfe8);
+	color:#17335f;
+	border-radius:4px;
+	padding:1px 5px;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+}
+pre{
+	background:var(--code-bg, #f4f6fa);
+	color:var(--ink, #1c2330);
+	border:1px solid var(--line, #d9dfe8);
+	border-left:5px solid var(--accent2, #2f5fbf);
+	border-radius:0 8px 8px 0;
+	padding:13px 16px;
+	overflow-x:auto;
+	font-family:Consolas,"Courier New",monospace;
+	font-size:0.92em;
+	line-height:1.6;
+}
+pre code{background:none;border:none;padding:0;color:inherit;}
+
+.tablewrap{overflow-x:auto;margin:12px 0;}
+table{
+	border-collapse:collapse;
+	width:100%;
+	border-radius:8px;
+	overflow:hidden;
+	box-shadow:0 2px 7px rgba(0,0,0,0.09);
+	font-size:0.95em;
+}
+th{
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-align:left;
+	padding:9px 12px;
+}
+th code{background:rgba(255,255,255,0.16);color:#fff;border:none;}
+td{padding:9px 12px;border-bottom:1px solid var(--line, #d9dfe8);vertical-align:top;}
+tr:nth-child(even) td{background:#fafbfe;}
+.nowrap{white-space:nowrap;}
+.num{text-align:right;white-space:nowrap;}
+
+.badge{
+	display:inline-block;
+	color:#fff;
+	font-size:0.8em;
+	font-weight:600;
+	border-radius:5px;
+	padding:2px 9px;
+	margin-right:7px;
+	white-space:nowrap;
+	background:linear-gradient(100deg,#5a6472,#97a1ae);
+}
+.b-ok{background:linear-gradient(100deg,#1d7a3c,#45b56c);}
+.b-ng{background:linear-gradient(100deg,#a51f22,#e05a5c);}
+.b-none{background:linear-gradient(100deg,#5a6472,#97a1ae);}
+.b-warn{background:linear-gradient(100deg,#b8620a,#f0a548);}
+
+.callout{
+	border-left:6px solid var(--accent, #12224d);
+	background:linear-gradient(180deg,var(--soft, #f2f5fb),#fff);
+	border-radius:0 8px 8px 0;
+	padding:12px 16px;
+	margin:16px 0;
+}
+.callout strong{color:var(--accent, #12224d);background:transparent;}
+
+.toc{
+	background:linear-gradient(180deg,#f2f5fb,#fff);
+	border:1px solid var(--line, #d9dfe8);
+	border-radius:10px;
+	padding:6px 26px 22px;
+	margin:34px 0;
+}
+.toc ol{
+	list-style:none;
+	display:flex;
+	flex-wrap:wrap;
+	gap:8px;
+	padding:0;
+	margin:12px 0 0;
+	counter-reset:toc;
+}
+.toc li{counter-increment:toc;margin:0;}
+.toc ol a{
+	display:-webkit-box;
+	-webkit-line-clamp:2;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:normal;
+	width:310px;
+	max-width:100%;
+	background:linear-gradient(100deg,var(--accent, #12224d),var(--accent2, #2f5fbf));
+	color:#fff;
+	text-decoration:none;
+	border-radius:6px;
+	padding:8px 12px;
+	font-size:0.92em;
+	line-height:1.4;
+	font-weight:700;
+}
+.toc ol a::before{content:counter(toc) ". ";font-weight:700;}
+
+svg{max-width:100%;height:auto;display:block;margin:16px 0;}
+
+.homelink{margin:20px 0 0;}
+a.home{
+	display:inline-block;
+	background:linear-gradient(100deg,var(--navy1, #12224d),var(--navy2, #2f5fbf));
+	color:#fff;
+	border-radius:6px;
+	padding:4px 11px;
+	line-height:1;
+	text-decoration:none;
+}
+a.home svg{vertical-align:-2px;}
+a{background:none;color:var(--link, #1a4fa0);}
+footer{
+	max-width:1600px;
+	margin:0 auto;
+	padding:18px 30px 30px;
+	border-top:1px solid var(--line, #d9dfe8);
+	color:var(--ink-soft, #4a5568);
+	font-size:0.9em;
+	margin-top:40px;
+	margin-bottom:40px;
+	background:transparent;
+}
+footer a{color:var(--navy2, #2f5fbf);background:transparent;}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+	<div class="inner">
+		<h1>ツールの更新と、モデルを選んで動かすツールへの統合</h1>
+		<div class="lead">llama.cpp・node・bun・AI エージェントを最新にし、start-agent をモデルを選べる 1 本のツールにまとめる</div>
+		<div class="date">📅 作成: 2026-11-13 / 更新: 2026-11-13</div>
+	</div>
+</div>
+
+<div class="wrap">
+
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+
+<p>対象: このプロジェクト。入力は <code>C:\AI-models</code> の gguf と、GitHub・npm の最新版。出力は <code>bin/</code>・<code>tools/50_run/</code>・試験結果の資料。</p>
+
+<div class="toc">
+	<h2 style="border-left-color:var(--navy1, #12224d);color:var(--navy1, #12224d);">目次</h2>
+	<ol>
+		<li class="ch01"><a href="#ch01">目的</a></li>
+		<li class="ch02"><a href="#ch02">決めたこと</a></li>
+		<li class="ch03"><a href="#ch03">更新の手順</a></li>
+		<li class="ch04"><a href="#ch04">ツールの統合</a></li>
+		<li class="ch05"><a href="#ch05">気をつけること</a></li>
+	</ol>
+</div>
+
+<!-- ============ 1 ============ -->
+<section class="ch01" id="ch01">
+<h1>目的</h1>
+<p>
+2026-10-16 に配布物を組み立ててから、ツールの版が古くなった。最新の版で動くかを確かめ直してから、配布物を作り直す。
+あわせて、モデルごとに分かれていた起動用の cmd をやめ、<code>C:\AI-models</code> の中から選んでエージェントを動かせる 1 本のツールにまとめる。
+</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="ch02" id="ch02">
+<h1>決めたこと</h1>
+<div class="tablewrap">
+<table>
+<thead><tr><th>番号</th><th>決めたこと</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">1</td><td>更新するのは llama.cpp・AI エージェント (Claude Code・OpenCode・Pi)・node・bun。配布物の作り直しは、再検証とツールの統合が済んでからにする (今回はしない)</td></tr>
+<tr><td class="nowrap">2-A</td><td><code>start-agent.ps1</code> を広げる。別のツールは作らない</td></tr>
+<tr><td class="nowrap">3-A</td><td>モデル別の <code>run-server-*.cmd</code> を消す</td></tr>
+<tr><td class="nowrap">4-A</td><td>ポートは環境変数 <code>LLM_PORT</code> で決める。無ければ 11434</td></tr>
+<tr><td class="nowrap">5-B</td><td>llama.cpp の旧版 (b11609) は残さず、新しい版に置き換える</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="ch03" id="ch03">
+<h1>更新の手順</h1>
+<ol>
+	<li>今の版を測る (llama.cpp・node・bun・Claude Code・OpenCode・Pi・NVIDIA ドライバ)。引継ぎにあった環境の変化を先に押さえる</li>
+	<li>最新の版を調べ、ダウンロードするファイル名・取得元・サイズを示して承認をもらう</li>
+	<li>1 つずつ上げる。上げるたびに、gemma-4-E4B で Claude Code の読み・書き (<code>test-cc-tools.ps1 -Only gemma-4-E4B-it-Q4_K_M -Tests read,write</code>) を流す
+		<ol>
+			<li>llama.cpp: CUDA・Vulkan・CPU 版を <code>bin/llama.cpp-b&lt;新版&gt;-*</code> に置き、b11609 を消す。<code>paths.ps1</code> とスクリプトの版を直す。<code>llama-bench</code> の値を前の版と比べる</li>
+			<li>node・bun</li>
+			<li>Claude Code・OpenCode・Pi</li>
+		</ol>
+	</li>
+	<li>10/17 から続く、読みの時間切れが新しい版で直るかを見る。直らなければ、サーバのログ・Vulkan 版で切り分けを続ける</li>
+	<li>結果を<a href="../01_research/r260929-01-AIエージェントの試験結果.html">試験結果</a>に書く。版で動きが変わったら、<a href="../01_research/i261014-01-AIエージェントの特徴.html">AIエージェントの特徴</a>も直す</li>
+</ol>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="ch04" id="ch04">
+<h1>ツールの統合</h1>
+<p><strong>今ある動き:</strong> <code>start-agent.ps1</code> は、モデル名の一部とエージェントを引数で受け取る。差し替えたテンプレートがあれば使う。ポートが使用中なら止める。エージェントの窓を閉じたら llama-server も止める。エージェントのホームを作業用の場所に分ける。<code>server</code> と <code>bench</code> も選べる。直したあとも、これらを同じ手順で確かめる。</p>
+<h2>変えること</h2>
+<ul>
+	<li><code>-Model</code> を省いたら、<code>C:\AI-models</code> を探して gguf (mmproj を除く) を一覧にする。番号・サイズ (GB)・モデル名を出し、番号で選ばせる</li>
+	<li><code>-Agent</code> を省いたときも、一覧から番号で選ばせる</li>
+	<li>ポートは、引数 → 環境変数 <code>LLM_PORT</code> → 11434 の順で決める</li>
+	<li>引数を全部渡したときは、今と同じく聞かずに動く (試験から呼ぶため)</li>
+	<li><code>start-agent.cmd</code> から引数なしで起動できるようにする</li>
+</ul>
+<h2>消すもの</h2>
+<ul>
+	<li><code>run-server.cmd</code>・<code>run-server-9b.cmd</code>・<code>run-server-cc.cmd</code>・<code>run-server-e4b.cmd</code>・<code>run-server-moe.cmd</code></li>
+	<li>消したあと、<code>text find</code> で古い名前を探し、README・資料・スクリプトに残っていれば直す</li>
+</ul>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="ch05" id="ch05">
+<h1>気をつけること</h1>
+<ul>
+	<li>配布物 (<code>_releases/offline/llm-bundle-20261016/</code>) の中身は変えない。作り直すのは後でまとめて行う</li>
+	<li>OpenCode の <code>PWD</code> を外す回避策 (<code>paths.ps1</code>) は、新しい版でも外さない</li>
+	<li>モデルの一覧は、<code>LlmModelDir</code> (<code>paths.ps1</code>) で場所を変えられるようにしておく。閉域網の PC では置き場が違う</li>
+</ul>
+</section>
+
+</div>
+
+<footer>
+<p class="homelink"><a class="home" href="../../README.html" aria-label="README"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5 1 7.2V14h4.5V9.8h5V14H15V7.2z"/></svg></a></p>
+</footer>
+
+</body>
+</html>
