@@ -8,10 +8,10 @@
 	# モデルを写さない（現地にモデルがあるとき）
 	[switch]$NoModels,
 	# 入れる版
-	[string]$NodeVersion = '26.11.1',
-	[string[]]$Packages = @('@anthropic-ai/claude-code@2.1.299', '@earendil-works/pi-coding-agent@1.2.0', 'opencode-ai@1.19.0'),
+	[string]$NodeVersion = '26.13.1',
+	[string[]]$Packages = @('@anthropic-ai/claude-code@2.1.325', '@earendil-works/pi-coding-agent@1.5.2', 'opencode-ai@1.19.5'),
 	# llama.cpp の版（bin の下のフォルダ名と、配布物の中のフォルダ名に使う。実際の版と合うかを組み立てる前に確かめる）
-	[string]$LlamaVersion = 'b11609',
+	[string]$LlamaVersion = 'b12359',
 	# 作り置きの node（エージェント入り）を作り直す
 	[switch]$RebuildNode,
 	# 7z を作らず、フォルダだけにする
@@ -92,7 +92,7 @@ Copy-Item (Join-Path $inst "node-v$NodeVersion-x64.msi") (Join-Path $OutDir 'ins
 Write-Host '  インストーラ（Node.js の msi）'
 $t = Join-Path $OutDir 'tools/50_run'
 New-Item -ItemType Directory -Force $t | Out-Null
-foreach ($f in 'paths.ps1', 'sum-judge.ps1', 'start-agent.ps1', 'start-agent.cmd', 'test-agents.ps1', 'test-agents.cmd', 'test-cc-tools.ps1', 'test-cc-tools.cmd') {
+foreach ($f in 'paths.ps1', 'sum-judge.ps1', 'start-agent.ps1', 'start-agent.cmd', 'test-agents.ps1', 'test-agents.cmd', 'test-cc-tools.ps1', 'test-cc-tools.cmd', '使い方.html') {
 	Copy-Item (Join-Path $root "tools/50_run/$f") $t
 }
 Copy-Dir (Join-Path $root 'tools/50_run/templates') (Join-Path $t 'templates')

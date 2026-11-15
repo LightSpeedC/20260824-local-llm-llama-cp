@@ -218,11 +218,11 @@ footer{
 <tr><td class="nowrap"><code>run\</code></td><td>ダブルクリックで動かす cmd（第 3 章）</td></tr>
 <tr><td class="nowrap"><code>config.cmd</code></td><td>場所の設定。モデルを別の場所に置くときだけ書き換える（第 2 章）</td></tr>
 <tr><td class="nowrap"><code>models\</code></td><td>モデル。大きいので 1 本ずつ別の 7z で持ってくる。展開してできた <code>.gguf</code>（画像を読むモデルは <code>mmproj</code> も）を、ここに置く</td></tr>
-<tr><td class="nowrap"><code>bin\llama.cpp-b11609-vulkan\</code></td><td>llama.cpp（Intel GPU を使う版）</td></tr>
-<tr><td class="nowrap"><code>bin\llama.cpp-b11609-cpu\</code></td><td>llama.cpp（CPU だけの版）</td></tr>
-<tr><td class="nowrap"><code>bin\llama.cpp-b11609-cuda\</code></td><td>llama.cpp（NVIDIA の GPU を使う版）</td></tr>
-<tr><td class="nowrap"><code>bin\node\</code></td><td>Node.js v26.11.1。中に Claude Code・Pi・OpenCode が入っている。インストールは要らない</td></tr>
-<tr><td class="nowrap"><code>bin\bun\</code></td><td>bun 1.4.3（1 本の exe）</td></tr>
+<tr><td class="nowrap"><code>bin\llama.cpp-b12359-vulkan\</code></td><td>llama.cpp（Intel GPU を使う版）</td></tr>
+<tr><td class="nowrap"><code>bin\llama.cpp-b12359-cpu\</code></td><td>llama.cpp（CPU だけの版）</td></tr>
+<tr><td class="nowrap"><code>bin\llama.cpp-b12359-cuda\</code></td><td>llama.cpp（NVIDIA の GPU を使う版）</td></tr>
+<tr><td class="nowrap"><code>bin\node\</code></td><td>Node.js v26.13.1。中に Claude Code・Pi・OpenCode が入っている。インストールは要らない</td></tr>
+<tr><td class="nowrap"><code>bin\bun\</code></td><td>bun 1.4.4（1 本の exe）</td></tr>
 <tr><td class="nowrap"><code>bin\claude\claude.exe</code></td><td>Claude Code の単体版</td></tr>
 <tr><td class="nowrap"><code>installers\</code></td><td>Node.js の msi（PC に入れて使いたいとき）</td></tr>
 <tr><td class="nowrap"><code>tools\50_run\</code></td><td>試験スクリプト（第 4 章）</td></tr>
@@ -252,7 +252,7 @@ footer{
 <h2>使う llama.cpp を決めるとき</h2>
 <p>
 <code>LLM_BACKEND=auto</code>（既定）は、Intel GPU が見えれば Vulkan 版、見えなければ CPU 版を使う。
-固定したいときは <code>llama.cpp-b11609-vulkan</code>・<code>llama.cpp-b11609-cpu</code>・<code>llama.cpp-b11609-cuda</code> のどれかを書く。
+固定したいときは <code>llama.cpp-b12359-vulkan</code>・<code>llama.cpp-b12359-cpu</code>・<code>llama.cpp-b12359-cuda</code> のどれかを書く。
 </p>
 <h2>「ポート 11434 は使用中です」と出たとき</h2>
 <p>
@@ -336,7 +336,7 @@ tools\50_run\test-cc-tools.cmd -Only "gemma-4-E4B" -MaxSizeGB 20 -UseTemplates -
 </div>
 
 <footer>
-<p>llama.cpp b11609 / Node.js v26.11.1 / bun 1.4.3 / Claude Code 2.1.299 / Pi 1.2.0 / OpenCode 1.19.0</p>
+<p>llama.cpp b12359 / Node.js v26.13.1 / bun 1.4.4 / Claude Code 2.1.325 / Pi 1.5.2 / OpenCode 1.19.5</p>
 </footer>
 
 </body>
