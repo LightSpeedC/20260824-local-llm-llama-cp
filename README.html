@@ -186,6 +186,8 @@ footer{
 		— Node.js の HTTP プロキシサーバを書かせ、試験側で実際に通信を通して合否を決める</li>
 	<li><a href="notes/10_plan/p261010-03-新しいモデルの検証計画.html">新しいモデルの検証計画</a>
 		— 新しく取得したモデルで、これまでと同じ試験（読み書き・sum）を流して比べる</li>
+	<li><a href="notes/10_plan/p261113-01-ツールの更新とモデル選択ツールへの統合.html">ツールの更新とモデル選択ツールへの統合</a>
+		— llama.cpp・node・bun・AI エージェントを最新にし、start-agent をモデルを選べる 1 本のツールにまとめる</li>
 	<li><a href="notes/10_plan/p260825-01-階層型エージェント構成案.html">階層型エージェント構成案</a>
 		— 大きなモデルで計画し、小さなモデルで実装する構成。VRAM 4GB では複数モデルを同時常駐できないため、
 		並列スロットで代替する設計</li>
@@ -223,6 +225,11 @@ footer{
 	<li><a href="notes/90_rules/local-rules.html">ローカルルール</a> — このプロジェクトでだけ通る決めごと</li>
 </ul>
 </section>
+
+<h2>使い方</h2>
+<ul>
+	<li><a href="tools/50_run/使い方.html">start-agent の使い方</a> — cmd から、モデルを選んで llama-server と Claude Code・Pi・OpenCode を起動する</li>
+</ul>
 
 <h2>環境</h2>
 <div class="tablewrap">

@@ -19,6 +19,7 @@ RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで llama.cpp を動�
 - [画像解析の検証計画](notes/10_plan/p261010-01-画像解析の検証計画.md) — mmproj を持つモデルに文字・表・グラフ・画面の画像を読ませ、正しさと速さを測る
 - [HTTP プロキシ作成の検証計画](notes/10_plan/p261010-02-HTTPプロキシ作成の検証計画.md) — Node.js の HTTP プロキシサーバを書かせ、試験側で実際に通信を通して合否を決める
 - [新しいモデルの検証計画](notes/10_plan/p261010-03-新しいモデルの検証計画.md) — 新しく取得したモデルで、これまでと同じ試験（読み書き・sum）を流して比べる
+- [ツールの更新とモデル選択ツールへの統合](notes/10_plan/p261113-01-ツールの更新とモデル選択ツールへの統合.md) — llama.cpp・node・bun・AI エージェントを最新にし、start-agent をモデルを選べる 1 本のツールにまとめる
 - [階層型エージェント構成案](notes/10_plan/p260825-01-階層型エージェント構成案.md) — 大きなモデルで計画し、小さなモデルで実装する構成。VRAM 4GB では複数モデルを同時常駐できないため、 並列スロットで代替する設計
 
 ## 2. 調査
@@ -37,6 +38,10 @@ RTX 3050 Ti Laptop（VRAM 4GB）／RAM 32GB のノートPCで llama.cpp を動�
 ## 4. ルール
 
 - [ローカルルール](notes/90_rules/local-rules.md) — このプロジェクトでだけ通る決めごと
+
+## 使い方
+
+- [start-agent の使い方](tools/50_run/使い方.md) — cmd から、モデルを選んで llama-server と Claude Code・Pi・OpenCode を起動する
 
 ## 環境
 

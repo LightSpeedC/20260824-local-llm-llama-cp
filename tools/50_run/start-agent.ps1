@@ -1,10 +1,11 @@
 ﻿param(
 	# pi・opencode・claude（npm 版）・claude-exe（単体の claude.exe）・server（llama-server だけ）・bench（Vulkan 版と CPU 版で速さを測る）
-	[Parameter(Mandatory)][ValidateSet('pi', 'opencode', 'claude', 'claude-exe', 'server', 'bench')][string]$Agent,
-	# モデルのファイル名に含まれる語（例: gemma-4-E4B-it-Q4_K_M）
-	[Parameter(Mandatory)][string]$Model,
+	# 省くと、一覧から番号で選ぶ
+	[ValidateSet('', 'pi', 'opencode', 'claude', 'claude-exe', 'server', 'bench')][string]$Agent = '',
+	# モデルのファイル名に含まれる語（例: gemma-4-E4B-it-Q4_K_M）。省くと、モデルの置き場を探して一覧から番号で選ぶ
+	[string]$Model = '',
 	[int]$Ctx = 65536,
-	# 0 なら config.cmd の LLM_PORT（無ければ 11434）
+	# 0 なら config.cmd の LLM_PORT、無ければ環境変数 LLM_PORT、それも無ければ 11434
 	[int]$Port = 0,
 	# エージェントが作業するフォルダ。空なら work の下の project
 	[string]$WorkDir = ''
@@ -16,11 +17,33 @@ $ErrorActionPreference = 'Stop'
 if (-not $Port) { $Port = $LlmPort }
 $utf8 = New-Object Text.UTF8Encoding($false)
 
-$m = Get-ChildItem $LlmModelDir -Recurse -Filter *.gguf | Where-Object { $_.BaseName -like "*$Model*" -and $_.Name -notmatch 'mmproj' } | Select-Object -First 1
-if (-not $m) { throw "モデルが見つかりません: $Model（場所: $LlmModelDir）" }
+# 一覧を出し、番号で選ばせて、選んだ位置（0 始まり）を返す
+function Read-LlmChoice([string]$title, [string[]]$items) {
+	Write-Host $title
+	for ($i = 0; $i -lt $items.Count; $i++) { Write-Host ('  {0,2}  {1}' -f ($i + 1), $items[$i]) }
+	while ($true) {
+		$n = 0
+		if ([int]::TryParse((Read-Host '番号'), [ref]$n) -and $n -ge 1 -and $n -le $items.Count) { return $n - 1 }
+		Write-Host "1 から $($items.Count) の番号を入れてください"
+	}
+}
+if (-not $Agent) {
+	$agents = 'claude', 'claude-exe', 'pi', 'opencode', 'server', 'bench'
+	$agentNotes = 'Claude Code（npm 版）', 'Claude Code（単体の claude.exe）', 'Pi', 'OpenCode', 'llama-server だけ', 'Vulkan 版と CPU 版で速さを測る'
+	$Agent = $agents[(Read-LlmChoice 'エージェントを選んでください' @(0..5 | ForEach-Object { '{0,-10} {1}' -f $agents[$_], $agentNotes[$_] }))]
+}
+$m = $null
+if ($Model) {
+	$m = Get-ChildItem $LlmModelDir -Recurse -Filter *.gguf | Where-Object { $_.BaseName -like "*$Model*" -and $_.Name -notmatch 'mmproj' } | Select-Object -First 1
+	if (-not $m) { throw "モデルが見つかりません: $Model（場所: $LlmModelDir）" }
+} else {
+	$all = @(Get-ChildItem $LlmModelDir -Recurse -Filter *.gguf -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch 'mmproj' } | Sort-Object BaseName)
+	if (-not $all) { throw "モデルが見つかりません（場所: $LlmModelDir）" }
+	$m = $all[(Read-LlmChoice "モデルを選んでください（場所: $LlmModelDir）" @($all | ForEach-Object { '{0,6:N2} GB  {1}' -f ($_.Length / 1GB), $_.BaseName }))]
+}
 $name = $m.BaseName
 if ($Agent -eq 'bench') {
-	foreach ($b in 'llama.cpp-b11609-vulkan', 'llama.cpp-b11609-cpu') {
+	foreach ($b in 'llama.cpp-b12359-vulkan', 'llama.cpp-b12359-cpu') {
 		$bench = Join-Path $LlmRoot "bin/$b/llama-bench.exe"
 		if (-not (Test-Path $bench)) { continue }
 		Write-Host "=== $b / $name"

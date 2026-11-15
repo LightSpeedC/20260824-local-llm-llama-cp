@@ -2,7 +2,7 @@
 
 cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエージェントを試す手順
 
-> 📅 作成: 2026-09-30 / 更新: 2026-10-10
+> 📅 作成: 2026-09-30 / 更新: 2026-11-15
 
 [README](../../README.md)
 
@@ -31,7 +31,7 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
 
 ## 2. 設定の中身
 
-`tools\50_run\run-server-cc.cmd` と `cc1.cmd` が渡している値。試験スクリプトも、1 問の待ち時間とホームの置き場所のほかは同じ値を使う。
+`tools\50_run\start-agent.cmd` の `-Agent server` と `cc1.cmd` が渡している値。試験スクリプトも、1 問の待ち時間とホームの置き場所のほかは同じ値を使う。
 
 ### llama-server
 
@@ -77,7 +77,7 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
 
 ### 手順
 
-1. サーバを起動する。窓が開いたままになり、`listening on http://127.0.0.1:11434` と出れば準備完了 `tools\50_run\run-server-cc.cmd`
+1. サーバを起動する。窓が開いたままになり、`listening on http://127.0.0.1:11434` と出れば準備完了 `tools\50_run\start-agent.cmd -Agent server -Model gemma-4-E4B-it-Q4_K_M` `-Model` を省くと、`C:\AI-models` の一覧から番号で選べる。使い方は [start-agent の使い方](../../tools/50_run/使い方.md)にある。
 2. 別の窓で Claude Code を起動する。**`.\` を付ける**（このPCはカレントフォルダの cmd を名前だけでは探さない） `.\cc1.cmd .\cc1.cmd -p "README.html の h1 を答えて"`
 3. 使い終わったら、サーバの窓で Ctrl+C
 
@@ -85,7 +85,7 @@ cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエー
 
 2 か所を同じ名前にそろえる。
 
-- `tools\50_run\run-server-cc.cmd` の `-m`（モデルのファイル）と `--alias`（名前）。3.2 GB 以下のモデルは `-ngl 99` を足す。テンプレートを差し替えるモデルは `--chat-template-file "tools\50_run\templates\<名前>.jinja"` を足す
+- `start-agent.cmd` の `-Model`（モデルのファイル名の一部）。`--alias` はモデルのファイル名（拡張子なし）になる。`-ngl` は自動配置で、テンプレートは `tools\50_run\templates\<名前>.jinja` があれば自動で使う
 - `cc1.cmd` の `ANTHROPIC_MODEL` と `ANTHROPIC_SMALL_FAST_MODEL`（`--alias` と同じ値）
 
 どのモデルにするかは[試験結果の第 1 章](../01_research/r260929-01-AIエージェントの試験結果.md#1-結論)にある。

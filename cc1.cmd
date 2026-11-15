@@ -1,6 +1,6 @@
 @echo off
 rem llama-server（http://127.0.0.1:11434）に接続して Claude Code を起動する
-rem 先に tools\50_run\run-server-cc.cmd でサーバを起動しておく
+rem 先に tools\50_run\start-agent.cmd -Agent server -Model gemma-4-E4B-it-Q4_K_M でサーバを起動しておく
 rem 使い方: cc1 -p "こんにちは"   （引数はそのまま claude に渡す）
 rem 環境変数はこの cmd の中だけで効く。呼び出し元のシェルには残らない
 rem

@@ -223,7 +223,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<div class="inner">
 		<h1>ローカルLLM で Claude Code を使う・試す手順</h1>
 		<div class="lead">cc1.cmd で対話に使う手順と、試験スクリプトでモデルやエージェントを試す手順</div>
-		<div class="date">📅 作成: 2026-09-30 / 更新: 2026-10-10</div>
+		<div class="date">📅 作成: 2026-09-30 / 更新: 2026-11-15</div>
 	</div>
 </div>
 
@@ -269,7 +269,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 <!-- ============ 2 ============ -->
 <section class="ch02" id="ch02">
 <h1>設定の中身</h1>
-<p><code>tools\50_run\run-server-cc.cmd</code> と <code>cc1.cmd</code> が渡している値。試験スクリプトも、1 問の待ち時間とホームの置き場所のほかは同じ値を使う。</p>
+<p><code>tools\50_run\start-agent.cmd</code> の <code>-Agent server</code> と <code>cc1.cmd</code> が渡している値。試験スクリプトも、1 問の待ち時間とホームの置き場所のほかは同じ値を使う。</p>
 
 <h2>llama-server</h2>
 <pre><code class="language-batch">"bin\llama.cpp\llama-server.exe" ^
@@ -324,7 +324,8 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 <h2>手順</h2>
 <ol>
 	<li>サーバを起動する。窓が開いたままになり、<code>listening on http://127.0.0.1:11434</code> と出れば準備完了
-<pre><code class="language-batch">tools\50_run\run-server-cc.cmd</code></pre></li>
+<pre><code class="language-batch">tools\50_run\start-agent.cmd -Agent server -Model gemma-4-E4B-it-Q4_K_M</code></pre>
+	<code>-Model</code> を省くと、<code>C:\AI-models</code> の一覧から番号で選べる。使い方は <a href="../../tools/50_run/使い方.html">start-agent の使い方</a>にある。</li>
 	<li>別の窓で Claude Code を起動する。<strong><code>.\</code> を付ける</strong>（このPCはカレントフォルダの cmd を名前だけでは探さない）
 <pre><code class="language-batch">.\cc1.cmd
 .\cc1.cmd -p "README.html の h1 を答えて"</code></pre></li>
@@ -334,7 +335,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 <h2>モデルを替えるとき</h2>
 <p>2 か所を同じ名前にそろえる。</p>
 <ul>
-	<li><code>tools\50_run\run-server-cc.cmd</code> の <code>-m</code>（モデルのファイル）と <code>--alias</code>（名前）。3.2 GB 以下のモデルは <code>-ngl 99</code> を足す。テンプレートを差し替えるモデルは <code>--chat-template-file "tools\50_run\templates\&lt;名前&gt;.jinja"</code> を足す</li>
+	<li><code>start-agent.cmd</code> の <code>-Model</code>（モデルのファイル名の一部）。<code>--alias</code> はモデルのファイル名（拡張子なし）になる。<code>-ngl</code> は自動配置で、テンプレートは <code>tools\50_run\templates\&lt;名前&gt;.jinja</code> があれば自動で使う</li>
 	<li><code>cc1.cmd</code> の <code>ANTHROPIC_MODEL</code> と <code>ANTHROPIC_SMALL_FAST_MODEL</code>（<code>--alias</code> と同じ値）</li>
 </ul>
 <p>どのモデルにするかは<a href="../01_research/r260929-01-AIエージェントの試験結果.html#ch01">試験結果の第 1 章</a>にある。</p>
