@@ -195,7 +195,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<div class="inner">
 		<h1>AIエージェントの特徴</h1>
 		<div class="lead">試験で見つけた、エージェントごとの癖のうち、起動のしかたで結果が変わるもの。見つけたら足していく</div>
-		<div class="date">📅 作成: 2026-10-15 / 更新: 2026-10-16</div>
+		<div class="date">📅 作成: 2026-10-15 / 更新: 2026-11-15</div>
 	</div>
 </div>
 
@@ -281,6 +281,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 <h2>ほかのエージェント</h2>
 <ul>
 	<li><strong>Claude Code 2.1.299 と Pi 1.2.0 は、同じ Bash 経由の起動でも、作業フォルダに書けた</strong>。段 2 の sum で、「作成あり」と判定された組が多数ある。<code>PWD</code> の影響は見えなかった</li>
+	<li><strong>Claude Code は、ルール（利用者の <code>CLAUDE.md</code>・メモリ・フック）を読ませると、最初の要求が 2 倍以上になる</strong>。2.1.322・2.1.325 で、ルールありは 42,806〜45,713 トークン、空のホームに向けた <code>-NoRules</code> は 17,361 トークン。E4B の読みは、ルールありで 600 秒の時間切れ、<code>-NoRules</code> で 53.9 秒の合格だった（2026-11-15、llama.cpp b12359）。試験は <code>-NoRules</code> を付けて流す。Pi・OpenCode でも同じ差が出るかは、確かめていない</li>
 	<li>Aider・Codex CLI・Claude Code・Pi が、<code>PWD</code> 以外の環境変数や起動の経路の違いで動きを変えるかは、確かめていない</li>
 </ul>
 <h2>この資料の維持</h2>
