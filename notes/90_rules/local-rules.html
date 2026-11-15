@@ -221,7 +221,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<div class="inner">
 		<h1>ローカルルール — ローカルLLM 実行環境</h1>
 		<div class="lead">このプロジェクトでだけ通る決めごと。共通ルールと食い違うときはこちらが優先する</div>
-		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-10-15</div>
+		<div class="date">📅 作成: 2026-09-29 / 更新: 2026-11-15</div>
 	</div>
 </div>
 
@@ -253,6 +253,18 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<li><strong>新しい特徴を見つけたら、その場で資料に足す</strong>。どの版で、どの条件で、何を確かめたかを書き、確かめていないことは「確かめていない」と書く</li>
 	<li><strong>特徴に合わせて入れた回避策は、資料を読んで外してよいと決めるまで外さない</strong>。いまは <code>paths.ps1</code> が環境変数 <code>PWD</code> を外している。外すと OpenCode が、作業用のコピーではなくプロジェクトの root に書く</li>
 	<li><strong>同じ型の不合格が、モデルを替えても続くときは、モデルの力を疑う前に、起動のしかた（環境変数・作業フォルダ）を疑う</strong>。OpenCode の <code>PWD</code> で 26 組が無駄になった</li>
+</ul>
+</section>
+
+<section class="ch03" id="ch03">
+<h1>commit・push</h1>
+<p>適用条件: このプロジェクトで commit・push するとき。</p>
+<ul>
+	<li><strong>commit・push は、利用者に確かめずに行う</strong>。共通ルール「重大な操作の確認方法」の例外</li>
+	<li><strong>対象は、このプロジェクトのすべてのファイル</strong></li>
+	<li><strong>載せるファイルは、自分が変えたものを名指しする</strong>。<code>git add -A</code> ・ <code>git add .</code> ・ <code>git commit -a</code> は使わない (共通ルールのまま)</li>
+	<li><strong>区切りごとに、適切な単位に分けて commit する</strong></li>
+	<li><strong>確かめずに行うのは、commit と push だけ</strong>。<code>git reset</code> ・ 履歴の書き換え (<code>--amend</code> ・ <code>--force</code>) は、共通ルールどおり、説明して確認を取る</li>
 </ul>
 </section>
 
