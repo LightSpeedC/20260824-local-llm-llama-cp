@@ -221,7 +221,7 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 	<div class="inner">
 		<h1>閉域網へ持っていく配布物</h1>
 		<div class="lead">ネットに出られない別の PC（Intel の内蔵 GPU）で、ローカル LLM とエージェントを試せるように、モデル以外も含めて 1 つにまとめて運ぶ</div>
-		<div class="date">📅 作成: 2026-10-02 / 更新: 2026-10-10</div>
+		<div class="date">📅 作成: 2026-10-02 / 更新: 2026-11-18</div>
 	</div>
 </div>
 
@@ -292,13 +292,13 @@ footer a{color:var(--navy2, #2f5fbf);background:transparent;}
 <table>
 <thead><tr><th class="nowrap">種類</th><th>中身</th><th>作り方</th></tr></thead>
 <tbody>
-<tr><td class="nowrap">llama.cpp</td><td>b11609 の Vulkan 版（Intel GPU）・CPU 版・CUDA 版（NVIDIA がある PC のため）</td><td>GitHub の公式リリースを展開したフォルダをそのままコピーする。exe は同じフォルダの DLL を使うので、フォルダの中身を分けない</td></tr>
-<tr><td class="nowrap">Node.js</td><td>v26.10.0 の <strong>zip 版と msi 版の両方</strong></td><td>zip 版はインストールも管理者の権限も要らない。msi 版は、インストールして使いたい PC のために添える</td></tr>
-<tr><td class="nowrap">エージェント</td><td>Pi・OpenCode・Claude Code（<strong>npm 版と単体の <code>claude.exe</code> の両方</strong>）</td><td>こちらで zip 版 Node.js のフォルダの中に npm でインストールし、そのフォルダごと運ぶ。インストール時に取ってくる OS 用の実行ファイルも中に入った状態で運べる</td></tr>
-<tr><td class="nowrap">モデル</td><td>gemma-4-E4B（Q4_K_M、5.0 GB）・gemma-4-E2B（Q4_K_M、3.2 GB）・Ministral-3-3B（Q4_K_M、2.0 GB）・gemma-4-12B-QAT（Q4_0、6.5 GB）</td><td>差し替え用のテンプレートがあるもの（いまは Ministral-3-3B）は <code>.jinja</code> も一緒に運ぶ</td></tr>
+<tr><td class="nowrap">llama.cpp</td><td>b12359（v1.0.0 相当）の Vulkan 版（Intel GPU）・CPU 版・CUDA 版（NVIDIA がある PC のため）</td><td>GitHub の公式リリースを展開したフォルダをそのままコピーする。exe は同じフォルダの DLL を使うので、フォルダの中身を分けない</td></tr>
+<tr><td class="nowrap">Node.js</td><td>v26.13.1 の <strong>zip 版と msi 版の両方</strong>（zip 版は <code>bin\node</code> に展開した形で入れる。<code>installers\</code> に入るのは msi）</td><td>zip 版はインストールも管理者の権限も要らない。msi 版は、インストールして使いたい PC のために添える</td></tr>
+<tr><td class="nowrap">エージェント</td><td>Pi 1.5.2・OpenCode 1.19.5・Claude Code 2.1.325（<strong>npm 版と単体の <code>claude.exe</code> の両方</strong>）。あわせて bun 1.4.4</td><td>こちらで zip 版 Node.js のフォルダの中に npm でインストールし、そのフォルダごと運ぶ。インストール時に取ってくる OS 用の実行ファイルも中に入った状態で運べる</td></tr>
+<tr><td class="nowrap">モデル</td><td>7 本（2026-10-15 に再試験の結果から決めた）: gemma-4-E4B-it（Q4_K_M）・gemma-4-E4B-it-qat（UD-Q4_K_XL）・gemma-4-12B-it（Q4_K_M）・gemma-4-12B-it-QAT（Q4_0）・Qwen3.5-9B（Q4_K_M）・gemma-4-E2B-it（Q4_K_M）・Ornith-1.0-9B（Q4_K_M）。10 GB 以下で、試験で通ったものだけ。入れるモデルは <code>make-offline-bundle.ps1</code> の <code>$Models</code> で決める</td><td>モデルごとに別の 7z（mmproj があれば同じ 7z）。現地では配布物の <code>models\</code> に展開する。差し替え用のテンプレートがあるもの（いまは Qwen3.5-9B）は <code>.jinja</code> も一緒に運ぶ</td></tr>
 <tr><td class="nowrap">試験スクリプト</td><td><code>tools/50_run/</code> の sum・読み書き・ベンチの試験</td><td>置き場所を引数と 1 つの設定で変えられるようにしてから運ぶ（第 3 章）</td></tr>
 <tr><td class="nowrap">起動用の cmd</td><td>エージェントとモデルの組み合わせごとの cmd</td><td>第 4 章</td></tr>
-<tr><td class="nowrap">GPU ドライバ</td><td>Intel 第 11〜14 世代向け 32.0.101.7092（<code>gfx_win_101.7092.exe</code>）</td><td>Intel の公式サイトから取得済み。入れるかは現地で決める</td></tr>
+<tr><td class="nowrap">GPU ドライバ</td><td>Intel 第 11〜14 世代向け 32.0.101.7092（<code>gfx_win_101.7092.exe</code>）</td><td>Intel の公式サイトから取得済み。配布物の 7z には入れず、<code>_releases/drivers</code> に別に置く。入れるかは現地で決める</td></tr>
 </tbody>
 </table>
 </div>
@@ -320,15 +320,14 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 <h2>配布物のフォルダ構成</h2>
 <pre><code class="language-text">&lt;配布先&gt;\
   bin\
-    llama.cpp-b11609-vulkan\
-    llama.cpp-b11609-cpu\
-    llama.cpp-b11609-cuda\
+    llama.cpp-b12359-vulkan\
+    llama.cpp-b12359-cpu\
+    llama.cpp-b12359-cuda\
     node\                  zip 版 Node.js。中に npm で入れたエージェント
     claude\                単体の claude.exe
+    bun\                   bun
   installers\
-    node-v26.10.0-x64.msi
-    gfx_win_101.7092.exe
-    drivers\               Intel GPU ドライバ
+    node-v26.13.1-x64.msi  （Intel GPU ドライバは入れず、_releases/drivers に別に置く）
   models\                  .gguf（既定の置き場。設定で別の場所にもできる）
   run\                     起動用の cmd（第 4 章）
   tools\50_run\            試験スクリプト・起動用の start-agent.ps1・paths.ps1
@@ -391,7 +390,8 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 </tbody>
 </table>
 </div>
-<p>モデル 4 本 × 6 種類（Pi・OpenCode・Claude Code の npm 版と単体版・サーバだけ・速さ）＋ <code>list-devices.cmd</code> の 25 本。cmd は手で書かず、組み立てのスクリプトがモデルの一覧から生成する。中身はどれも <code>tools\50_run\start-agent.ps1</code> を引数付きで呼ぶだけ。</p>
+<p>モデル 7 本 × 6 種類（Pi・OpenCode・Claude Code の npm 版と単体版・サーバだけ・速さ）＋ <code>list-devices.cmd</code> の 43 本。cmd は手で書かず、組み立てのスクリプトがモデルの一覧から生成する。中身はどれも <code>tools\50_run\start-agent.ps1</code> を引数付きで呼ぶだけ。</p>
+<p>これとは別に、<code>tools\50_run\start-agent.cmd</code> を引数なしで叩くと、エージェントとモデルを一覧から選んで起動できる（p261113-01 の決定 2-A）。使い方は <code>tools\50_run\使い方.html</code>。</p>
 
 <h2>cmd がすること</h2>
 <ol>
@@ -410,11 +410,14 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 <h2>手順</h2>
 <ul>
 	<li><span class="badge b-ok">済</span>試験スクリプトの場所を <code>config.cmd</code> の設定と引数で変えられるようにする（<code>tools/50_run/paths.ps1</code>）</li>
-	<li><span class="badge b-ok">済</span>zip 版 Node.js（SHA256 を照合）を展開し、その中に Claude Code 2.1.287・Pi 0.99.2・OpenCode 1.18.34 を npm で入れる</li>
+	<li><span class="badge b-ok">済</span>zip 版 Node.js（SHA256 を照合）を展開し、その中に Claude Code 2.1.287・Pi 0.99.2・OpenCode 1.18.34 を npm で入れる（2026-10-02 の版。いまは Claude Code 2.1.325・Pi 1.5.2・OpenCode 1.19.5）</li>
 	<li><span class="badge b-ok">済</span>起動用の <code>tools/50_run/start-agent.ps1</code> を書き、組み立てのときに組み合わせごとの cmd を生成する</li>
-	<li><span class="badge b-ok">済</span>配布物を組み立てる <code>tools/60_release/make-offline-bundle.ps1</code> を書く。出力は <code>_releases/offline/llm-bundle-yyyyMMdd</code>（モデル込みで 20.4 GB）</li>
+	<li><span class="badge b-ok">済</span>配布物を組み立てる <code>tools/60_release/make-offline-bundle.ps1</code> を書く。出力は <code>_releases/offline/llm-bundle-yyyyMMdd</code>（2026-10-02 の版はモデル込みで 20.4 GB。いまはツール類を 1 つの 7z〔約 1.0 GB〕、モデルを 1 本ずつ別の 7z〔7 本で約 39 GB、<code>_releases/models-20261016</code>〕に分ける）</li>
 	<li><span class="badge b-ok">済</span>この PC で、配布物をプロジェクトの外の別の場所に置き、<code>config.cmd</code> のモデルの場所を書き換えて動くかを確かめる（下の表）</li>
 	<li><span class="badge b-ok">済</span>現地での手順を <code>tools/60_release/bundle/使い方.html</code> に書き、配布物の root に入れる。手順のとおりに配布物の中で <code>test-agents.cmd</code> を流し、PATH を足さずに配布物の node が使われ、Vulkan 版が自動で選ばれることを確かめた</li>
+	<li><span class="badge b-ok">済</span>ツールとモデルを最新にして組み立て直す（2026-10-16 にモデル 7 本の 7z、2026-11-15 に llama.cpp b12359・Node.js v26.13.1・Claude Code 2.1.325・Pi 1.5.2・OpenCode 1.19.5・bun 1.4.4 のツール類 <code>llm-bundle-20261115.7z</code>）。7z を別の場所へ展開し、同梱の版が合うことを確かめた。展開しての試験は未（課題 i261014-01）</li>
+	<li><span class="badge b-ok">済</span>新しい版（Claude Code 2.1.325・Pi 1.5.2・OpenCode 1.19.5）で、gemma-4-E4B の読み・書きを再試験する（2026-11-15・11-18。3 つとも合格。<a href="../01_research/r260929-01-AIエージェントの試験結果.html">試験結果</a>の「最新版で流し直した結果」）</li>
+	<li><span class="badge b-ok">済</span>新しい小型モデル 2 本（LFM3-1.7B・Nemotron-3.5-Bolt-E4B）を追加で試験する（2026-11-18。Bolt-E4B は Claude Code だけが読み・書きとも合格、LFM3-1.7B は Pi の読みだけ合格。配布するモデルには足していない。<a href="../01_research/r260929-01-AIエージェントの試験結果.html">試験結果</a>の「新しい小型モデルの追加試験」）</li>
 	<li><span class="badge b-none">未</span>ネットを切った状態で動くかを確かめる</li>
 	<li><span class="badge b-none">未</span>現地で <code>list-devices.cmd</code>・<code>bench-….cmd</code>・sum の試験を流し、対話の cmd で使ってみる</li>
 </ul>
@@ -441,8 +444,8 @@ PATH は配布物の <code>bin\node</code> と Windows の最小限だけにし�
 </div>
 <p>試験は速さを見るものではないため、サーバは CUDA 版で動かした。</p>
 <div class="callout callout-important">
-<strong>Claude Code は試験のときより 1 つ新しい 2.1.287 を入れた。</strong>
-3 回ずつ流した試験は 2.1.286 だった。npm の版が自動で上がっていたため、配布物にはいま入っている 2.1.287 を入れている。
+<strong>配布物の Claude Code の版は、試験した版と合っているかを組み立てるたびに確かめる。</strong>
+2026-10-02 の組み立てでは、3 回ずつ流した試験は 2.1.286 で、npm の版が自動で上がっていたため配布物には 2.1.287 を入れた。2026-11-15 の組み立ては 2.1.325 で、E4B の読み・書きを同じ版で流して合格している。
 </div>
 
 <h2>未確認のこと</h2>

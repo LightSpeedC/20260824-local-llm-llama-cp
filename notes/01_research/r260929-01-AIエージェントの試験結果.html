@@ -798,6 +798,33 @@ Pi の読み 187.5 秒は、第 3 章の 13 秒より大幅に遅い。遅くな
 	<li>OpenCode は、起動した側の環境変数 <code>PWD</code> を見て書き込み先を決めるため、<code>PWD</code> を外して流した（<a href="i261014-01-AIエージェントの特徴.html">AIエージェントの特徴</a>）</li>
 </ul>
 
+<h2>新しい小型モデルの追加試験</h2>
+<p>
+手持ちの使えないモデル 8 本（計 97.26 GB）を消して空きを作り、新しい小型モデルを 2 本取得して、読み・書きを 1 回ずつ流した（2026-11-18、NVIDIA GPU、llama.cpp b12359、Claude Code 2.1.325〔<code>-NoRules</code>〕・Pi 1.5.2・OpenCode 1.19.5、時間切れ 600 秒）。
+新しい MoE を探したが、10 GB 以下の公式の新作は見つからなかった（直近の MoE は 30B 以上か個人の改造版）。
+そのため、新しい小型の 2 本を試した。
+</p>
+<ul>
+	<li>LFM3-1.7B（Q4_K_M、1.10 GB、<code>LiquidAI/LFM3-1.7B-GGUF</code>）。MoE かは確かめていない</li>
+	<li>NVIDIA Nemotron-3.5-Bolt-E4B（Q4_K_M、6.18 GB、<code>nvidia/NVIDIA-Nemotron-3.5-Bolt-E4B-4GB</code>）。GGUF のアーキテクチャは gemma4、7.52B パラメータ。MoE かは確かめていない</li>
+</ul>
+<div class="tablewrap">
+<table>
+<thead><tr><th>モデル</th><th class="nowrap">Claude Code</th><th class="nowrap">Pi</th><th class="nowrap">OpenCode</th></tr></thead>
+<tbody>
+<tr><td class="nowrap">LFM3-1.7B</td><td>⏱️ 読み 600.2 秒 / ⏱️ 書き 600.8 秒</td><td>✅ 読み 283.8 秒 / ❌ 書き 352.9 秒</td><td>❌ 読み 486.9 秒 / ⏱️ 書き 600.1 秒</td></tr>
+<tr><td class="nowrap">Nemotron-3.5-Bolt-E4B</td><td>✅ 読み 186.0 秒 / ✅ 書き 324.7 秒</td><td>⏱️ 読み 600.1 秒 / ✅ 書き 394.8 秒</td><td>⏱️ 読み 600.1 秒 / ⏱️ 書き 600.1 秒</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+	<li><strong>Bolt-E4B で読み・書きの両方に合格したのは Claude Code だけ</strong>（2 ターン、入力 17,821 トークン）。Pi は書きのみ、OpenCode は両方とも時間切れ。同じ E4B 級の gemma-4-E4B が 3 つのエージェントすべてで合格したのと比べ、通らない組が多い</li>
+	<li><strong>LFM3-1.7B で読みが通ったのは Pi だけ</strong>。Pi の書きは、答えは「<code>/tmp/…</code> に作った」だったが、作業フォルダにファイルが無く不合格。OpenCode の書きは、時間切れだがファイルはできていた（試験スクリプトの判定は合格）</li>
+	<li>どちらも 1.7B・E4B 級にしては遅い（LFM3-1.7B の Pi の読みで 283.8 秒）。遅い原因は調べていない</li>
+	<li>配布するモデルの 7 本には、この 2 本を足していない</li>
+	<li><strong>最初に流した Claude Code の結果は、2 本とも無効にした</strong>。0.1〜0.3 秒で終わり、出力が空だった。<code>claude</code> の解決先が、共有ツールの <code>claude.cmd</code> だったため。npm の <code>claude.cmd</code> が先に当たるよう PATH を直して流し直した結果が、上の表（<a href="i261014-01-AIエージェントの特徴.html">AIエージェントの特徴</a>）</li>
+</ul>
+
 <h2>調査結果のまとめ</h2>
 <p>NVIDIA GPU・Intel GPU・CPU で流した結果をまとめる。</p>
 <div class="tablewrap">
