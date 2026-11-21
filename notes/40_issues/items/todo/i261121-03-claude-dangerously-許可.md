@@ -41,7 +41,9 @@ created: 2026-11-21
 - 配布物の現地で、確認なしの起動を止める方法は、`claude-*.cmd` を使わないことだけ。使い方.html に書く
 - 試験の作業フォルダに写す `.claude/settings.json` (test-cc-tools.ps1:50) に、許可・フックがあれば、dangerously でも読まれる。フックは動く見込み (確かめていない)
 
-未決 (利用者に聞く): `.claude.json` の読み書きの方式、`-p` (非対話) で信頼と同意の確認が出るかの実測と、出ないときの扱い、書けなかったときの止まり方。
+決まったこと (決定 22、22-A): `.claude.json` の読み書きは、Node.js の小さなスクリプトで行う (開発用の PC は PATH の `node`、配布物は `bin/node`)。JSON を解析して、`projects` の 1 件だけを足し、書く前にバックアップを取る。解析に失敗したら、書かずに止まる。PowerShell 5.1 の `ConvertTo-Json` の深さの既定 (2) で、本物の `.claude.json` の入れ子を潰す恐れを避ける。`settings.json` への `skipDangerousModePermissionPrompt` も、同じ方式で足す。
+
+未決 (利用者に聞く): `-p` (非対話) で信頼と同意の確認が出るかの実測と、出ないときの扱い (決定 23)、書けなかったときの止まり方。
 
 気づいた点 (記録):
 
