@@ -417,7 +417,7 @@ npm で公開されているが、ライセンスは Anthropic の利用条件�
 	<li><span class="badge b-ok">済</span>現地での手順を <code>tools/60_release/bundle/使い方.html</code> に書き、配布物の root に入れる。手順のとおりに配布物の中で <code>test-agents.cmd</code> を流し、PATH を足さずに配布物の node が使われ、Vulkan 版が自動で選ばれることを確かめた</li>
 	<li><span class="badge b-ok">済</span>ツールとモデルを最新にして組み立て直す（2026-10-16 にモデル 7 本の 7z、2026-11-15 に llama.cpp b12359・Node.js v26.13.1・Claude Code 2.1.325・Pi 1.5.2・OpenCode 1.19.5・bun 1.4.4 のツール類 <code>llm-bundle-20261115.7z</code>）。7z を別の場所へ展開し、同梱の版が合うことを確かめた。展開しての試験は未（課題 i261014-01）</li>
 	<li><span class="badge b-ok">済</span>新しい版（Claude Code 2.1.325・Pi 1.5.2・OpenCode 1.19.5）で、gemma-4-E4B の読み・書きを再試験する（2026-11-15・11-18。3 つとも合格。<a href="../01_research/r260929-01-AIエージェントの試験結果.html">試験結果</a>の「最新版で流し直した結果」）</li>
-	<li><span class="badge b-ok">済</span>新しい小型モデル 2 本（LFM3-1.7B・Nemotron-3.5-Bolt-E4B）を追加で試験する（2026-11-18。Bolt-E4B は Claude Code だけが読み・書きとも合格、LFM3-1.7B は Pi の読みだけ合格。配布するモデルには足していない。<a href="../01_research/r260929-01-AIエージェントの試験結果.html">試験結果</a>の「新しい小型モデルの追加試験」）</li>
+	<li><span class="badge b-ok">済</span>新しい小型モデル 2 本（LFM3-1.7B・Nemotron-3.5-Bolt-E4B）を追加で試験する（2026-11-18。Bolt-E4B は Claude Code だけが読み・書きとも合格、LFM3-1.7B は Pi の読みだけ合格。配布するモデルには足していない。MoE と見ている LFM2.5-24B-A2B〔14.53 GB〕も同日に試験し、Claude Code だけが読み・書きとも合格。<a href="../01_research/r260929-01-AIエージェントの試験結果.html">試験結果</a>の「新しい小型モデルの追加試験」）</li>
 	<li><span class="badge b-none">未</span>ネットを切った状態で動くかを確かめる</li>
 	<li><span class="badge b-none">未</span>現地で <code>list-devices.cmd</code>・<code>bench-….cmd</code>・sum の試験を流し、対話の cmd で使ってみる</li>
 </ul>
